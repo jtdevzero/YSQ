@@ -1,0 +1,3524 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>YSQ-L · Young Séma Kérdőív</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:   #1B2A4A;
+  --navy2:  #243558;
+  --navy3:  #2E4270;
+  --gold:   #C9973A;
+  --gold2:  #E8C47A;
+  --gold3:  #FDF3DC;
+  --cream:  #FAF8F4;
+  --white:  #FFFFFF;
+  --txt:    #1B2A4A;
+  --txt2:   #4A5568;
+  --txt3:   #8898A8;
+  --dom1:   #1B2A4A;
+  --dom2:   #1F4068;
+  --dom3:   #1A5276;
+  --dom4:   #1E8BC3;
+  --dom5:   #117A65;
+  --red:    #C0392B;
+  --orange: #E67E22;
+  --yellow: #D4AC0D;
+  --green:  #1E8449;
+  --blue:   #1A5276;
+  --radius: 12px;
+  --shadow: 0 4px 24px rgba(27,42,74,0.10);
+  --shadow-lg: 0 8px 40px rgba(27,42,74,0.16);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--txt);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+/* ── HEADER ── */
+.app-header {
+  background: var(--navy);
+  padding: 0;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: var(--shadow-lg);
+}
+.header-inner {
+  max-width: 800px; margin: 0 auto;
+  padding: 14px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.header-title { color: white; font-family: 'DM Serif Display', serif; font-size: 1.15rem; }
+.header-sub { color: var(--gold2); font-size: 0.78rem; font-weight: 300; margin-top: 1px; }
+.progress-chip {
+  background: var(--gold); color: white;
+  border-radius: 20px; padding: 4px 12px;
+  font-size: 0.8rem; font-weight: 600;
+  white-space: nowrap; min-width: 64px; text-align: center;
+}
+.progress-bar-wrap {
+  height: 3px; background: rgba(255,255,255,0.15);
+  position: relative;
+}
+.progress-bar-fill {
+  height: 100%; background: var(--gold);
+  transition: width 0.4s ease;
+  width: 0%;
+}
+
+/* ── NAV TABS ── */
+.nav-tabs {
+  background: var(--navy2);
+  display: flex; overflow-x: auto;
+  scrollbar-width: none;
+  max-width: 800px; margin: 0 auto;
+}
+.nav-tabs::-webkit-scrollbar { display: none; }
+.nav-tab {
+  flex: none;
+  padding: 10px 16px;
+  color: rgba(255,255,255,0.55);
+  font-size: 0.82rem; font-weight: 500;
+  cursor: pointer; border: none; background: none;
+  white-space: nowrap;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s;
+}
+.nav-tab.active {
+  color: var(--gold2);
+  border-bottom-color: var(--gold);
+}
+.nav-tab:hover { color: white; }
+
+/* ── MAIN CONTENT ── */
+.main { max-width: 800px; margin: 0 auto; padding: 20px 16px 80px; }
+
+/* ── VIEWS ── */
+.view { display: none; }
+.view.active { display: block; }
+
+/* ── WELCOME ── */
+.welcome-card {
+  background: white; border-radius: var(--radius);
+  box-shadow: var(--shadow); overflow: hidden;
+  margin-bottom: 16px;
+}
+.welcome-hero {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy3) 100%);
+  padding: 36px 24px; text-align: center;
+}
+.welcome-hero h1 {
+  font-family: 'DM Serif Display', serif;
+  color: white; font-size: 1.9rem; line-height: 1.2;
+  margin-bottom: 8px;
+}
+.welcome-hero p { color: var(--gold2); font-size: 0.9rem; font-weight: 300; }
+.gold-divider { height: 4px; background: var(--gold); }
+.welcome-body { padding: 24px; }
+.welcome-body h3 {
+  color: var(--navy); font-family: 'DM Serif Display', serif;
+  font-size: 1.1rem; margin-bottom: 12px;
+}
+.scale-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 8px; margin-bottom: 20px;
+}
+.scale-item {
+  background: var(--cream); border-radius: 8px;
+  padding: 10px 8px; text-align: center;
+}
+.scale-num {
+  font-size: 1.4rem; font-weight: 700;
+  color: var(--navy); display: block;
+}
+.scale-txt { font-size: 0.72rem; color: var(--txt2); line-height: 1.3; }
+.warn-box {
+  background: var(--gold3); border-left: 4px solid var(--gold);
+  border-radius: 8px; padding: 12px 16px;
+  font-size: 0.84rem; color: var(--txt2); line-height: 1.5;
+}
+.start-btn {
+  width: 100%; padding: 16px;
+  background: var(--navy); color: white;
+  border: none; border-radius: var(--radius);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem; font-weight: 600;
+  cursor: pointer; margin-top: 16px;
+  transition: all 0.2s;
+  letter-spacing: 0.02em;
+}
+.start-btn:hover { background: var(--navy2); transform: translateY(-1px); box-shadow: var(--shadow); }
+.start-btn:active { transform: translateY(0); }
+
+/* ── QUESTIONS ── */
+.domain-banner {
+  border-radius: var(--radius); padding: 12px 16px;
+  margin-bottom: 12px; color: white;
+  font-weight: 600; font-size: 0.88rem;
+  display: flex; align-items: center; gap: 8px;
+}
+.domain-banner span { opacity: 0.7; font-size: 0.78rem; font-weight: 400; }
+
+.question-card {
+  background: white; border-radius: var(--radius);
+  box-shadow: var(--shadow); margin-bottom: 10px;
+  overflow: hidden; transition: box-shadow 0.2s;
+}
+.question-card:hover { box-shadow: var(--shadow-lg); }
+.question-top {
+  padding: 14px 16px 10px;
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.q-num {
+  font-size: 0.72rem; color: var(--txt3); font-weight: 600;
+  min-width: 28px; padding-top: 2px;
+}
+.q-text { font-size: 0.92rem; line-height: 1.5; color: var(--txt); flex: 1; }
+.q-schema {
+  font-size: 0.7rem; font-weight: 600;
+  padding: 2px 8px; border-radius: 10px;
+  color: white; white-space: nowrap;
+  align-self: flex-start; margin-top: 2px;
+}
+.answer-row {
+  display: flex; padding: 10px 16px 14px;
+  gap: 8px;
+}
+.ans-btn {
+  flex: 1; aspect-ratio: 1;
+  border: 2px solid #E8EDF5;
+  border-radius: 10px; background: var(--cream);
+  font-size: 1rem; font-weight: 700;
+  color: var(--txt3);
+  cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center;
+  min-height: 44px;
+  -webkit-tap-highlight-color: transparent;
+}
+.ans-btn:hover { border-color: var(--navy); color: var(--navy); background: #EEF2F9; }
+.ans-btn.selected {
+  border-width: 2px;
+  color: white; font-weight: 700;
+}
+.ans-btn[data-val="1"].selected { background: #1A5276; border-color: #1A5276; }
+.ans-btn[data-val="2"].selected { background: #1E8BC3; border-color: #1E8BC3; }
+.ans-btn[data-val="3"].selected { background: #D4AC0D; border-color: #D4AC0D; }
+.ans-btn[data-val="4"].selected { background: #E67E22; border-color: #E67E22; }
+.ans-btn[data-val="5"].selected { background: #C0392B; border-color: #C0392B; }
+.ans-btn[data-val="6"].selected { background: #922B21; border-color: #922B21; }
+
+/* ── RESULTS ── */
+.results-summary {
+  background: white; border-radius: var(--radius);
+  box-shadow: var(--shadow); overflow: hidden; margin-bottom: 16px;
+}
+.results-hero {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy3) 100%);
+  padding: 24px; color: white;
+}
+.results-hero h2 { font-family: 'DM Serif Display', serif; font-size: 1.5rem; margin-bottom: 4px; }
+.results-hero p { color: var(--gold2); font-size: 0.85rem; }
+.top-schemas { padding: 20px; }
+.top-schemas h3 {
+  font-family: 'DM Serif Display', serif;
+  color: var(--navy); font-size: 1rem; margin-bottom: 14px;
+}
+.top-schema-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0; border-bottom: 1px solid #F0F4FA;
+}
+.top-schema-item:last-child { border-bottom: none; }
+.top-schema-rank {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--navy); color: white;
+  font-size: 0.78rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.top-schema-name { flex: 1; font-size: 0.9rem; font-weight: 500; }
+.top-schema-bar-wrap {
+  flex: 2; height: 8px; background: #EEF2F9;
+  border-radius: 4px; overflow: hidden;
+}
+.top-schema-bar { height: 100%; border-radius: 4px; transition: width 0.8s ease; }
+.top-schema-val {
+  font-size: 0.88rem; font-weight: 700;
+  color: var(--navy); min-width: 32px; text-align: right;
+}
+
+/* Schema result cards */
+.schema-result-card {
+  background: white; border-radius: var(--radius);
+  box-shadow: var(--shadow); margin-bottom: 10px;
+  overflow: hidden; cursor: pointer;
+}
+.schema-result-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px;
+}
+.schema-result-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  flex-shrink: 0;
+}
+.schema-result-name { flex: 1; font-weight: 600; font-size: 0.92rem; }
+.schema-result-score {
+  font-size: 1.1rem; font-weight: 700; min-width: 36px; text-align: right;
+}
+.schema-result-level {
+  font-size: 0.72rem; font-weight: 600;
+  padding: 3px 10px; border-radius: 10px;
+  white-space: nowrap;
+}
+.schema-bar-row { padding: 0 16px 12px; }
+.schema-bar-bg { height: 6px; background: #EEF2F9; border-radius: 3px; overflow: hidden; }
+.schema-bar { height: 100%; border-radius: 3px; transition: width 1s ease; }
+
+.schema-detail { display: none; border-top: 1px solid #F0F4FA; padding: 16px; }
+.schema-detail.open { display: block; }
+.detail-section { margin-bottom: 14px; }
+.detail-section h4 {
+  font-size: 0.8rem; font-weight: 700;
+  color: var(--txt3); text-transform: uppercase;
+  letter-spacing: 0.08em; margin-bottom: 6px;
+}
+.detail-section p { font-size: 0.88rem; color: var(--txt2); line-height: 1.6; }
+.memo-area {
+  width: 100%; border: 2px solid #E8EDF5;
+  border-radius: 8px; padding: 10px 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem; color: var(--txt);
+  resize: vertical; min-height: 70px;
+  margin-top: 6px; background: var(--cream);
+  transition: border-color 0.2s;
+}
+.memo-area:focus { outline: none; border-color: var(--navy); }
+.goal-area {
+  width: 100%; border: 2px solid #E8EDF5;
+  border-radius: 8px; padding: 10px 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem; color: var(--txt);
+  resize: vertical; min-height: 60px;
+  background: #FFFBEA;
+  transition: border-color 0.2s;
+}
+.goal-area:focus { outline: none; border-color: var(--gold); }
+
+/* ── CHART ── */
+.chart-card {
+  background: white; border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 20px;
+  margin-bottom: 16px;
+}
+.chart-card h3 {
+  font-family: 'DM Serif Display', serif;
+  color: var(--navy); font-size: 1.1rem; margin-bottom: 16px;
+}
+.bar-chart { display: flex; flex-direction: column; gap: 8px; }
+.bar-row {
+  display: flex; align-items: center; gap: 10px;
+}
+.bar-label { font-size: 0.76rem; color: var(--txt2); width: 130px; flex-shrink: 0; line-height: 1.3; }
+.bar-track { flex: 1; height: 22px; background: #EEF2F9; border-radius: 4px; overflow: hidden; position: relative; }
+.bar-fill {
+  height: 100%; border-radius: 4px;
+  display: flex; align-items: center; justify-content: flex-end;
+  padding-right: 6px; transition: width 1s ease;
+  min-width: 24px;
+}
+.bar-val { font-size: 0.72rem; font-weight: 700; color: white; }
+.bar-val-outside { font-size: 0.76rem; font-weight: 700; color: var(--navy); margin-left: 4px; width: 30px; }
+
+/* ── CONNECTIONS ── */
+.conn-card {
+  background: white; border-radius: var(--radius);
+  box-shadow: var(--shadow); margin-bottom: 10px;
+  overflow: hidden; cursor: pointer;
+}
+.conn-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px;
+}
+.conn-badge {
+  font-size: 0.72rem; font-weight: 700;
+  padding: 3px 8px; border-radius: 6px;
+  color: white; flex-shrink: 0;
+}
+.conn-name { flex: 1; font-weight: 600; font-size: 0.9rem; }
+.conn-arrow { color: var(--txt3); font-size: 0.9rem; transition: transform 0.2s; }
+.conn-arrow.open { transform: rotate(180deg); }
+.conn-body { display: none; padding: 0 16px 16px; }
+.conn-body.open { display: block; }
+.conn-desc { font-size: 0.86rem; color: var(--txt2); line-height: 1.6; margin-bottom: 12px; }
+.conn-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.conn-tag {
+  font-size: 0.72rem; font-weight: 600;
+  padding: 3px 10px; border-radius: 12px;
+  background: var(--cream); color: var(--navy);
+  border: 1px solid #E8EDF5;
+}
+.trigger-box {
+  background: var(--cream); border-radius: 8px;
+  padding: 10px 12px; font-size: 0.82rem;
+  color: var(--txt2); line-height: 1.5;
+}
+.trigger-box strong { color: var(--navy); }
+
+/* ── RECOMMENDATIONS ── */
+.rec-card {
+  background: white; border-radius: var(--radius);
+  box-shadow: var(--shadow); margin-bottom: 10px;
+  overflow: hidden;
+}
+.rec-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px; cursor: pointer;
+}
+.rec-body { display: none; }
+.rec-body.open { display: block; }
+.rec-section { padding: 12px 16px; border-top: 1px solid #F0F4FA; }
+.rec-section h4 {
+  font-size: 0.78rem; font-weight: 700;
+  color: var(--txt3); text-transform: uppercase;
+  letter-spacing: 0.08em; margin-bottom: 8px;
+}
+.rec-item {
+  display: flex; gap: 8px; align-items: flex-start;
+  padding: 6px 0; border-bottom: 1px solid #F8F9FA;
+  font-size: 0.86rem; color: var(--txt2); line-height: 1.5;
+}
+.rec-item:last-child { border-bottom: none; }
+.rec-dot { color: var(--gold); flex-shrink: 0; margin-top: 3px; }
+
+/* ── DOMAIN FILTER ── */
+.filter-row {
+  display: flex; gap: 8px; overflow-x: auto;
+  scrollbar-width: none; padding-bottom: 4px; margin-bottom: 16px;
+}
+.filter-row::-webkit-scrollbar { display: none; }
+.filter-chip {
+  flex: none; padding: 6px 14px;
+  border-radius: 20px; border: 2px solid #E8EDF5;
+  background: white; color: var(--txt2);
+  font-size: 0.78rem; font-weight: 600;
+  cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+.filter-chip.active { background: var(--navy); color: white; border-color: var(--navy); }
+
+/* ── LEVEL STYLES ── */
+.lvl-5 { background: #FDEDEC; color: var(--red); }
+.lvl-4 { background: #FEF5E7; color: #B7770D; }
+.lvl-3 { background: #FEFCE8; color: #856404; }
+.lvl-2 { background: #EAFAF1; color: var(--green); }
+.lvl-1 { background: #EBF5FB; color: var(--blue); }
+.bar-lvl-5 { background: var(--red); }
+.bar-lvl-4 { background: var(--orange); }
+.bar-lvl-3 { background: var(--yellow); }
+.bar-lvl-2 { background: var(--green); }
+.bar-lvl-1 { background: var(--blue); }
+
+/* ── FLOATING ACTION ── */
+.fab {
+  position: fixed; bottom: 24px; right: 20px;
+  background: var(--gold); color: white;
+  border: none; border-radius: 28px;
+  padding: 14px 22px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem; font-weight: 700;
+  cursor: pointer; box-shadow: 0 6px 20px rgba(201,151,58,0.4);
+  transition: all 0.2s; z-index: 50;
+  display: none;
+}
+.fab:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(201,151,58,0.5); }
+.fab.visible { display: block; }
+
+/* ── SECTION TITLE ── */
+.section-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.2rem; color: var(--navy);
+  margin-bottom: 14px; padding-bottom: 8px;
+  border-bottom: 2px solid var(--gold3);
+}
+
+/* ── INCOMPLETE NOTICE ── */
+.incomplete-notice {
+  background: var(--gold3); border: 2px dashed var(--gold2);
+  border-radius: var(--radius); padding: 20px;
+  text-align: center; color: var(--txt2);
+}
+.incomplete-notice h3 { color: var(--navy); margin-bottom: 6px; font-size: 1rem; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp 0.35s ease forwards; }
+
+@keyframes pulse {
+  0%,100% { opacity: 1; }
+  50%      { opacity: 0.6; }
+}
+
+/* ── DOMAIN COLORS ── */
+.dom-I   { background: var(--dom1); }
+.dom-II  { background: var(--dom2); }
+.dom-III { background: var(--dom3); }
+.dom-IV  { background: var(--dom4); }
+.dom-V   { background: var(--dom5); }
+.txt-I   { color: var(--dom1); }
+.txt-II  { color: var(--dom2); }
+.txt-III { color: var(--dom3); }
+.txt-IV  { color: var(--dom4); }
+.txt-V   { color: var(--dom5); }
+
+/* ── DARK MODE ── */
+[data-theme="dark"] {
+  --cream:  #0F1621;
+  --white:  #1A2535;
+  --off_wh: #1E2D40;
+  --txt:    #E8EDF5;
+  --txt2:   #A8B8CC;
+  --txt3:   #6A82A0;
+  --brd:    #2A3D58;
+  --even:   #1A2535;
+  --odd:    #1E2D40;
+}
+[data-theme="dark"] body { background: #0F1621; color: #E8EDF5; }
+[data-theme="dark"] .welcome-card,
+[data-theme="dark"] .question-card,
+[data-theme="dark"] .results-summary,
+[data-theme="dark"] .schema-result-card,
+[data-theme="dark"] .chart-card,
+[data-theme="dark"] .conn-card,
+[data-theme="dark"] .rec-card,
+[data-theme="dark"] .client-panel { background: #1A2535; color: #E8EDF5; }
+[data-theme="dark"] .q-text,
+[data-theme="dark"] .schema-result-name,
+[data-theme="dark"] .conn-name { color: #E8EDF5; }
+[data-theme="dark"] .ans-btn { background: #1E2D40; border-color: #2A3D58; color: #A8B8CC; }
+[data-theme="dark"] .ans-btn:hover { background: #243452; border-color: #4A6A9A; color: #E8EDF5; }
+[data-theme="dark"] .section-title { border-bottom-color: #2A3D58; }
+[data-theme="dark"] .filter-chip { background: #1E2D40; border-color: #2A3D58; color: #A8B8CC; }
+[data-theme="dark"] .filter-chip.active { background: var(--navy3); color: white; }
+[data-theme="dark"] .memo-area,
+[data-theme="dark"] .goal-area { background: #151E2E; border-color: #2A3D58; color: #E8EDF5; }
+[data-theme="dark"] .memo-area:focus { border-color: var(--gold); }
+[data-theme="dark"] .warn-box { background: #231A0A; border-color: var(--gold); color: #C8A86A; }
+[data-theme="dark"] .conn-desc,
+[data-theme="dark"] .detail-section p,
+[data-theme="dark"] .rec-item { color: #A8B8CC; }
+[data-theme="dark"] .trigger-box { background: #151E2E; color: #A8B8CC; }
+[data-theme="dark"] .schema-bar-bg,
+[data-theme="dark"] .top-schema-bar-wrap,
+[data-theme="dark"] .bar-track { background: #2A3D58; }
+[data-theme="dark"] .detail-section { border-color: #2A3D58; }
+[data-theme="dark"] .incomplete-notice { background: #151E2E; border-color: #2A3D58; color: #A8B8CC; }
+[data-theme="dark"] .scale-item { background: #151E2E; }
+[data-theme="dark"] .scale-txt { color: #A8B8CC; }
+[data-theme="dark"] .welcome-body h3 { color: #E8EDF5; }
+[data-theme="dark"] .top-schema-name { color: #E8EDF5; }
+[data-theme="dark"] .top-schema-val { color: #E8EDF5; }
+[data-theme="dark"] .top-schemas h3 { color: #E8EDF5; }
+[data-theme="dark"] .top-schema-item { border-color: #2A3D58; }
+[data-theme="dark"] .rec-section { border-color: #2A3D58; }
+[data-theme="dark"] .rec-section h4 { color: #6A82A0; }
+[data-theme="dark"] .schema-result-header { border-color: #2A3D58; }
+[data-theme="dark"] .bar-val-outside { color: #A8B8CC; }
+
+/* ── CLIENT PANEL ── */
+.client-panel {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.client-panel h3 {
+  font-family: 'DM Serif Display', serif;
+  color: var(--navy); font-size: 1.1rem; margin-bottom: 14px;
+}
+.client-input-row { display: flex; gap: 10px; margin-bottom: 10px; }
+.client-input {
+  flex: 1; padding: 10px 14px;
+  border: 2px solid #E8EDF5; border-radius: 8px;
+  font-family: 'DM Sans', sans-serif; font-size: 0.92rem;
+  color: var(--txt); background: var(--cream);
+  transition: border-color 0.2s;
+}
+.client-input:focus { outline: none; border-color: var(--navy); }
+[data-theme="dark"] .client-input { background: #151E2E; border-color: #2A3D58; color: #E8EDF5; }
+.client-btn {
+  padding: 10px 16px; border-radius: 8px;
+  border: none; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 600;
+  transition: all 0.15s;
+}
+.client-btn-primary { background: var(--navy); color: white; }
+.client-btn-primary:hover { background: var(--navy2); }
+.client-btn-gold { background: var(--gold); color: white; }
+.client-btn-gold:hover { background: #B8862E; }
+.client-btn-danger { background: #FDEDEC; color: var(--red); }
+.client-btn-danger:hover { background: #FADBD8; }
+.client-list { display: flex; flex-direction: column; gap: 6px; max-height: 220px; overflow-y: auto; }
+.client-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 12px; border-radius: 8px;
+  background: var(--cream); cursor: pointer;
+  border: 2px solid transparent; transition: all 0.15s;
+}
+[data-theme="dark"] .client-item { background: #151E2E; }
+.client-item:hover { border-color: var(--navy3); }
+.client-item.active { border-color: var(--gold); background: var(--gold3); }
+[data-theme="dark"] .client-item.active { background: #231A0A; }
+.client-item-name { flex: 1; font-weight: 600; font-size: 0.9rem; }
+.client-item-date { font-size: 0.74rem; color: var(--txt3); }
+.client-item-score { font-size: 0.78rem; font-weight: 600; color: var(--gold); }
+.client-empty { text-align: center; color: var(--txt3); font-size: 0.86rem; padding: 20px; }
+
+/* ── THEME TOGGLE ── */
+.theme-toggle {
+  background: none; border: 2px solid rgba(255,255,255,0.3);
+  color: white; border-radius: 20px; padding: 4px 12px;
+  font-size: 0.8rem; cursor: pointer; font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s;
+}
+.theme-toggle:hover { background: rgba(255,255,255,0.1); }
+
+/* ── HEADER ACTIONS ── */
+.header-actions { display: flex; align-items: center; gap: 8px; }
+
+
+
+
+/* ── HEALTHY ADULT ── */
+.ha-meter {
+  position: relative; height: 140px; display: flex;
+  align-items: center; justify-content: center; margin: 16px 0;
+}
+.ha-arc-bg { position: absolute; width: 180px; height: 90px; top: 0; overflow: hidden; }
+.ha-arc-bg svg { width: 180px; height: 90px; }
+.ha-score-display {
+  position: absolute; bottom: 0; text-align: center;
+}
+.ha-score-num { font-family: 'DM Serif Display',serif; font-size: 2.2rem; color: var(--navy); line-height: 1; }
+[data-theme="dark"] .ha-score-num { color: #E8EDF5; }
+.ha-score-lbl { font-size: 0.78rem; color: var(--txt3); margin-top: 2px; }
+.ha-trait-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.ha-trait-name { width: 160px; font-size: 0.82rem; color: var(--txt2); flex-shrink: 0; line-height: 1.3; }
+[data-theme="dark"] .ha-trait-name { color: #A8B8CC; }
+.ha-trait-track { flex: 1; height: 10px; background: #EEF2F9; border-radius: 5px; overflow: hidden; }
+[data-theme="dark"] .ha-trait-track { background: #2A3D58; }
+.ha-trait-fill { height: 100%; border-radius: 5px; background: linear-gradient(90deg, #1E8449, #27AE60); transition: width 0.8s ease; }
+.ha-trait-val { font-size: 0.8rem; font-weight: 700; color: var(--navy); min-width: 28px; text-align: right; }
+[data-theme="dark"] .ha-trait-val { color: #E8EDF5; }
+
+/* ── ATTACHMENT ── */
+.attach-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0; }
+.attach-card {
+  border-radius: 10px; padding: 14px; text-align: center;
+  border: 3px solid transparent; cursor: pointer; transition: all 0.2s;
+}
+.attach-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.attach-card.selected { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,151,58,0.2); }
+.attach-card-icon { font-size: 2rem; margin-bottom: 6px; }
+.attach-card-name { font-size: 0.88rem; font-weight: 700; margin-bottom: 4px; }
+.attach-card-desc { font-size: 0.74rem; color: var(--txt2); line-height: 1.4; }
+[data-theme="dark"] .attach-card-desc { color: #A8B8CC; }
+.attach-result {
+  border-radius: var(--radius); padding: 16px; margin-top: 14px;
+  border-left: 5px solid var(--gold);
+}
+
+/* ── DOSE INDICATOR ── */
+.dose-card {
+  background: white; border-radius: var(--radius);
+  box-shadow: var(--shadow); overflow: hidden; margin-bottom: 10px;
+}
+[data-theme="dark"] .dose-card { background: #1A2535; }
+.dose-header {
+  display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+  cursor: pointer;
+}
+.dose-priority {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; font-weight: 800; color: white; flex-shrink: 0;
+}
+.dose-name { flex: 1; font-size: 0.9rem; font-weight: 600; }
+.dose-score { font-size: 1rem; font-weight: 700; min-width: 36px; text-align: right; }
+.dose-rationale {
+  display: none; padding: 0 16px 14px;
+  font-size: 0.84rem; color: var(--txt2); line-height: 1.6;
+  border-top: 1px solid #F0F4FA;
+}
+[data-theme="dark"] .dose-rationale { border-color: #2A3D58; color: #A8B8CC; }
+.dose-rationale.open { display: block; }
+.dose-tag {
+  display: inline-block; padding: 2px 8px; border-radius: 8px;
+  font-size: 0.7rem; font-weight: 600; margin: 2px;
+  background: #EEF2F9; color: var(--navy);
+}
+[data-theme="dark"] .dose-tag { background: #2A3D58; color: #A8B8CC; }
+
+/* ── QUALITY OF LIFE ── */
+.qol-domain {
+  background: white; border-radius: var(--radius);
+  box-shadow: var(--shadow); overflow: hidden; margin-bottom: 10px;
+}
+[data-theme="dark"] .qol-domain { background: #1A2535; }
+.qol-header {
+  display: flex; align-items: center; gap: 10px; padding: 12px 16px;
+}
+.qol-icon { font-size: 1.4rem; flex-shrink: 0; }
+.qol-name { flex: 1; font-size: 0.9rem; font-weight: 600; }
+.qol-score-badge {
+  padding: 4px 12px; border-radius: 12px;
+  font-size: 0.82rem; font-weight: 700; color: white;
+}
+.qol-items { padding: 0 16px 14px; }
+.qol-item { margin-bottom: 10px; }
+.qol-item-text { font-size: 0.86rem; color: var(--txt); margin-bottom: 6px; line-height: 1.4; }
+[data-theme="dark"] .qol-item-text { color: #E8EDF5; }
+.qol-slider-row { display: flex; align-items: center; gap: 10px; }
+.qol-slider {
+  flex: 1; -webkit-appearance: none; appearance: none;
+  height: 6px; border-radius: 3px; background: #EEF2F9;
+  outline: none; cursor: pointer;
+}
+[data-theme="dark"] .qol-slider { background: #2A3D58; }
+.qol-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 22px; height: 22px;
+  border-radius: 50%; background: var(--navy); cursor: pointer;
+  box-shadow: 0 2px 8px rgba(27,42,74,0.3);
+}
+.qol-slider-val {
+  font-size: 1rem; font-weight: 700; color: var(--navy);
+  min-width: 28px; text-align: center;
+}
+[data-theme="dark"] .qol-slider-val { color: #E8EDF5; }
+.qol-labels { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--txt3); margin-top: 2px; }
+.qol-total-card {
+  background: linear-gradient(135deg, var(--navy), var(--navy3));
+  border-radius: var(--radius); padding: 20px; text-align: center;
+  color: white; margin-bottom: 14px; box-shadow: var(--shadow-lg);
+}
+.qol-total-num { font-family: 'DM Serif Display',serif; font-size: 3rem; color: var(--gold2); }
+.qol-total-lbl { font-size: 0.86rem; opacity: 0.8; margin-top: 4px; }
+
+/* ── ACTIVATION LOG ── */
+.log-entry {
+  background: white; border-radius: var(--radius);
+  box-shadow: var(--shadow); margin-bottom: 10px; overflow: hidden;
+}
+[data-theme="dark"] .log-entry { background: #1A2535; }
+.log-entry-header {
+  display: flex; align-items: center; gap: 10px; padding: 12px 16px;
+  cursor: pointer; border-bottom: 1px solid #F0F4FA;
+}
+[data-theme="dark"] .log-entry-header { border-color: #2A3D58; }
+.log-entry-date { font-size: 0.76rem; color: var(--txt3); }
+.log-entry-trigger { flex: 1; font-size: 0.88rem; font-weight: 500; }
+.log-entry-intensity {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.78rem; font-weight: 700; color: white; flex-shrink: 0;
+}
+.log-entry-body { display: none; padding: 12px 16px; }
+.log-entry-body.open { display: block; }
+.log-field { margin-bottom: 10px; }
+.log-field label { display: block; font-size: 0.76rem; font-weight: 700; color: var(--txt3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.log-field-val { font-size: 0.86rem; color: var(--txt2); line-height: 1.5; }
+[data-theme="dark"] .log-field-val { color: #A8B8CC; }
+.log-schema-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.log-new-form {
+  background: white; border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 16px; margin-bottom: 14px;
+}
+[data-theme="dark"] .log-new-form { background: #1A2535; }
+.log-new-form h3 { font-family: 'DM Serif Display',serif; color: var(--navy); font-size: 1rem; margin-bottom: 12px; }
+[data-theme="dark"] .log-new-form h3 { color: #E8EDF5; }
+.log-textarea {
+  width: 100%; border: 2px solid #E8EDF5; border-radius: 8px;
+  padding: 10px 12px; font-family: 'DM Sans',sans-serif; font-size: 0.88rem;
+  color: var(--txt); resize: vertical; min-height: 56px; background: var(--cream);
+  transition: border-color 0.2s; margin-bottom: 8px;
+}
+[data-theme="dark"] .log-textarea { background: #151E2E; border-color: #2A3D58; color: #E8EDF5; }
+.log-textarea:focus { outline: none; border-color: var(--navy); }
+.log-intensity-row { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+.log-intensity-btn {
+  flex: 1; min-width: 40px; padding: 8px 4px; border-radius: 8px;
+  border: 2px solid #E8EDF5; background: var(--cream); cursor: pointer;
+  font-size: 0.8rem; font-weight: 700; color: var(--txt3); text-align: center;
+  transition: all 0.15s;
+}
+.log-intensity-btn.selected { color: white; }
+.log-schema-select { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.log-schema-btn {
+  padding: 4px 10px; border-radius: 10px; border: 2px solid #E8EDF5;
+  background: var(--cream); cursor: pointer; font-size: 0.76rem; font-weight: 600;
+  color: var(--txt2); transition: all 0.15s;
+}
+[data-theme="dark"] .log-schema-btn { background: #1E2D40; border-color: #2A3D58; color: #A8B8CC; }
+.log-schema-btn.selected { color: white; border-color: transparent; }
+.log-save-btn {
+  width: 100%; padding: 12px; background: var(--navy); color: white;
+  border: none; border-radius: 8px; font-family: 'DM Sans',sans-serif;
+  font-size: 0.92rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+}
+.log-save-btn:hover { background: var(--navy2); }
+.log-empty { text-align: center; color: var(--txt3); font-size: 0.86rem; padding: 28px; }
+
+/* ── PSYCHOEDUCATION ── */
+.psycho-card {
+  background: white; border-radius: var(--radius);
+  box-shadow: var(--shadow); margin-bottom: 14px; overflow: hidden;
+}
+[data-theme="dark"] .psycho-card { background: #1A2535; }
+.psycho-hero {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy3) 100%);
+  padding: 28px 24px; text-align: center;
+}
+.psycho-hero h2 { font-family: 'DM Serif Display', serif; color: white; font-size: 1.6rem; margin-bottom: 6px; }
+.psycho-hero p { color: var(--gold2); font-size: 0.88rem; }
+.psycho-body { padding: 20px; }
+.psycho-section { margin-bottom: 18px; }
+.psycho-section h3 {
+  font-family: 'DM Serif Display', serif;
+  color: var(--navy); font-size: 1rem; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 8px;
+}
+[data-theme="dark"] .psycho-section h3 { color: #E8EDF5; }
+.psycho-section p { font-size: 0.88rem; color: var(--txt2); line-height: 1.7; }
+[data-theme="dark"] .psycho-section p { color: #A8B8CC; }
+.need-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px;
+}
+.need-item {
+  background: var(--cream); border-radius: 8px; padding: 10px 12px;
+  font-size: 0.82rem; color: var(--txt2); display: flex; gap: 8px; align-items: flex-start;
+}
+[data-theme="dark"] .need-item { background: #151E2E; color: #A8B8CC; }
+.need-icon { font-size: 1.1rem; flex-shrink: 0; }
+.domain-pill {
+  display: inline-block; padding: 4px 12px; border-radius: 12px;
+  color: white; font-size: 0.76rem; font-weight: 600; margin: 3px;
+}
+.accordion-item { border-bottom: 1px solid #F0F4FA; }
+[data-theme="dark"] .accordion-item { border-color: #2A3D58; }
+.accordion-header {
+  padding: 12px 16px; cursor: pointer;
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 0.9rem; font-weight: 600; color: var(--navy);
+}
+[data-theme="dark"] .accordion-header { color: #E8EDF5; }
+.accordion-header:hover { background: var(--cream); }
+[data-theme="dark"] .accordion-header:hover { background: #151E2E; }
+.accordion-body { display: none; padding: 0 16px 14px; font-size: 0.86rem; color: var(--txt2); line-height: 1.7; }
+[data-theme="dark"] .accordion-body { color: #A8B8CC; }
+.accordion-body.open { display: block; }
+
+/* ── YPI / MODE QUESTIONNAIRE ── */
+.ypi-progress {
+  background: #EEF2F9; border-radius: 8px; height: 8px; margin-bottom: 16px; overflow: hidden;
+}
+[data-theme="dark"] .ypi-progress { background: #2A3D58; }
+.ypi-progress-fill { height: 100%; background: var(--gold); border-radius: 8px; transition: width 0.4s; }
+.ypi-question-card {
+  background: white; border-radius: var(--radius);
+  box-shadow: var(--shadow); margin-bottom: 10px; overflow: hidden;
+}
+[data-theme="dark"] .ypi-question-card { background: #1A2535; }
+.ypi-q-top { padding: 14px 16px 6px; }
+.ypi-q-num { font-size: 0.72rem; color: var(--txt3); font-weight: 600; margin-bottom: 4px; }
+.ypi-q-text { font-size: 0.92rem; line-height: 1.5; color: var(--txt); }
+[data-theme="dark"] .ypi-q-text { color: #E8EDF5; }
+.ypi-q-category {
+  font-size: 0.7rem; font-weight: 700; padding: 2px 8px;
+  border-radius: 10px; color: white; display: inline-block; margin-top: 4px;
+}
+.ypi-likert { display: flex; gap: 4px; padding: 10px 16px 14px; }
+.ypi-btn {
+  flex: 1; padding: 8px 4px; border: 2px solid #E8EDF5;
+  border-radius: 8px; background: var(--cream); cursor: pointer;
+  font-size: 0.8rem; font-weight: 600; color: var(--txt3);
+  text-align: center; line-height: 1.3; transition: all 0.15s;
+  min-height: 44px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 2px;
+}
+[data-theme="dark"] .ypi-btn { background: #1E2D40; border-color: #2A3D58; color: #A8B8CC; }
+.ypi-btn:hover { border-color: var(--navy); }
+.ypi-btn.selected { background: var(--navy); border-color: var(--navy); color: white; }
+.ypi-btn-num { font-size: 1rem; font-weight: 700; }
+.ypi-btn-lbl { font-size: 0.62rem; opacity: 0.8; }
+.ypi-result-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.ypi-result-label { font-size: 0.84rem; font-weight: 600; color: var(--txt); width: 110px; flex-shrink: 0; }
+[data-theme="dark"] .ypi-result-label { color: #E8EDF5; }
+.ypi-result-track { flex: 1; height: 18px; background: #EEF2F9; border-radius: 9px; overflow: hidden; }
+[data-theme="dark"] .ypi-result-track { background: #2A3D58; }
+.ypi-result-fill { height: 100%; border-radius: 9px; transition: width 0.8s ease; display: flex; align-items: center; justify-content: flex-end; padding-right: 6px; }
+.ypi-result-val { font-size: 0.7rem; font-weight: 700; color: white; }
+.ypi-result-num { font-size: 0.84rem; font-weight: 700; color: var(--navy); min-width: 30px; text-align: right; }
+[data-theme="dark"] .ypi-result-num { color: #E8EDF5; }
+
+/* ── PDF SUMMARY STYLES ── */
+@media print {
+  .pdf-summary-only .app-header,
+  .pdf-summary-only .nav-tabs,
+  .pdf-summary-only .fab,
+  .pdf-summary-only .timer-bar,
+  .pdf-summary-only .autosave-badge,
+  .pdf-summary-only .filter-row,
+  .pdf-summary-only .start-btn,
+  .pdf-summary-only .client-panel,
+  .pdf-summary-only .ans-btn,
+  .pdf-summary-only .theme-toggle,
+  .pdf-summary-only .header-actions,
+  .pdf-summary-only .memo-area,
+  .pdf-summary-only .goal-area,
+  .pdf-summary-only .snapshot-btn { display: none !important; }
+  .pdf-summary { display: block !important; }
+  .pdf-summary-page {
+    max-width: 100%; padding: 0;
+    font-family: 'DM Sans', sans-serif;
+  }
+}
+.pdf-summary { display: none; }
+
+/* ── TABS WITHIN PAGE ── */
+.inner-tabs { display: flex; gap: 0; margin-bottom: 16px; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+.inner-tab {
+  flex: 1; padding: 10px 8px; text-align: center;
+  background: white; border: none; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; font-size: 0.8rem; font-weight: 600;
+  color: var(--txt2); transition: all 0.15s; border-bottom: 3px solid transparent;
+}
+[data-theme="dark"] .inner-tab { background: #1A2535; color: #A8B8CC; }
+.inner-tab.active { color: var(--navy); border-bottom-color: var(--gold); background: var(--gold3); }
+[data-theme="dark"] .inner-tab.active { background: #231A0A; color: var(--gold2); }
+.inner-view { display: none; }
+.inner-view.active { display: block; }
+
+/* ── TIMER ── */
+.timer-bar {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+  background: var(--navy); color: white;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 16px; font-size: 0.84rem;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.18);
+  transform: translateY(100%); transition: transform 0.3s ease;
+}
+.timer-bar.visible { transform: translateY(0); }
+.timer-display {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.2rem; letter-spacing: 0.05em;
+  color: var(--gold2);
+}
+.timer-label { font-size: 0.76rem; color: rgba(255,255,255,0.6); }
+.timer-controls { display: flex; gap: 6px; }
+.timer-btn {
+  background: rgba(255,255,255,0.12); border: none;
+  color: white; border-radius: 6px; padding: 4px 10px;
+  font-size: 0.78rem; cursor: pointer; transition: background 0.15s;
+}
+.timer-btn:hover { background: rgba(255,255,255,0.22); }
+.timer-btn.danger { background: rgba(192,57,43,0.3); }
+
+/* ── PAGED QUESTIONNAIRE ── */
+.page-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px; gap: 10px;
+}
+.page-btn {
+  padding: 10px 20px; border-radius: 8px; border: none;
+  font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 600;
+  cursor: pointer; transition: all 0.15s;
+}
+.page-btn-prev { background: var(--cream); color: var(--navy); border: 2px solid #E8EDF5; }
+.page-btn-prev:hover { background: #EEF2F9; }
+.page-btn-next { background: var(--navy); color: white; }
+.page-btn-next:hover { background: var(--navy2); }
+.page-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+[data-theme="dark"] .page-btn-prev { background: #1E2D40; border-color: #2A3D58; color: #E8EDF5; }
+.page-info { font-size: 0.82rem; color: var(--txt3); text-align: center; flex: 1; line-height: 1.4; }
+.page-dots { display: flex; gap: 4px; justify-content: center; margin-bottom: 12px; flex-wrap: wrap; }
+.page-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #E8EDF5; transition: all 0.2s; cursor: pointer;
+}
+.page-dot.done { background: var(--green); }
+.page-dot.current { background: var(--gold); width: 20px; border-radius: 4px; }
+[data-theme="dark"] .page-dot { background: #2A3D58; }
+
+/* ── AUTOSAVE INDICATOR ── */
+.autosave-badge {
+  position: fixed; top: 90px; right: 12px; z-index: 150;
+  background: var(--green); color: white;
+  border-radius: 20px; padding: 4px 12px;
+  font-size: 0.74rem; font-weight: 600;
+  opacity: 0; transition: opacity 0.4s;
+  pointer-events: none;
+}
+.autosave-badge.show { opacity: 1; }
+
+/* ── COMPARISON VIEW ── */
+.compare-card {
+  background: white; border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 20px; margin-bottom: 16px;
+}
+[data-theme="dark"] .compare-card { background: #1A2535; }
+.compare-card h3 {
+  font-family: 'DM Serif Display', serif;
+  color: var(--navy); font-size: 1.1rem; margin-bottom: 14px;
+}
+[data-theme="dark"] .compare-card h3 { color: #E8EDF5; }
+.compare-select-row { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+.compare-select {
+  flex: 1; min-width: 140px; padding: 8px 12px;
+  border: 2px solid #E8EDF5; border-radius: 8px;
+  font-family: 'DM Sans', sans-serif; font-size: 0.88rem;
+  color: var(--txt); background: var(--cream);
+}
+[data-theme="dark"] .compare-select { background: #151E2E; border-color: #2A3D58; color: #E8EDF5; }
+.compare-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 0; border-bottom: 1px solid #F0F4FA;
+}
+[data-theme="dark"] .compare-row { border-color: #2A3D58; }
+.compare-row:last-child { border-bottom: none; }
+.compare-label { font-size: 0.8rem; color: var(--txt2); width: 150px; flex-shrink: 0; line-height: 1.3; }
+[data-theme="dark"] .compare-label { color: #A8B8CC; }
+.compare-bars { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+.compare-bar-wrap { display: flex; align-items: center; gap: 6px; }
+.compare-bar-track { flex: 1; height: 10px; background: #EEF2F9; border-radius: 5px; overflow: hidden; }
+[data-theme="dark"] .compare-bar-track { background: #2A3D58; }
+.compare-bar-fill { height: 100%; border-radius: 5px; transition: width 0.8s ease; }
+.compare-bar-val { font-size: 0.72rem; font-weight: 700; width: 28px; text-align: right; }
+.compare-delta {
+  font-size: 0.78rem; font-weight: 700;
+  width: 48px; text-align: center; flex-shrink: 0;
+}
+.delta-pos { color: var(--green); }
+.delta-neg { color: var(--red); }
+.delta-neu { color: var(--txt3); }
+.compare-legend {
+  display: flex; gap: 16px; margin-bottom: 12px; flex-wrap: wrap;
+}
+.compare-legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--txt2); }
+.compare-legend-dot { width: 12px; height: 12px; border-radius: 3px; }
+.snapshot-btn {
+  padding: 8px 16px; border-radius: 8px; border: none;
+  font-family: 'DM Sans', sans-serif; font-size: 0.86rem; font-weight: 600;
+  cursor: pointer; transition: all 0.15s; margin-right: 8px; margin-bottom: 8px;
+}
+.snapshot-btn-save { background: var(--gold); color: white; }
+.snapshot-btn-save:hover { background: #B8862E; }
+
+/* ── PDF PRINT STYLES ── */
+@media print {
+  .app-header, .nav-tabs, .fab, .filter-row,
+  .start-btn, .client-panel, .ans-btn,
+  .theme-toggle, .header-actions,
+  .memo-area, .goal-area { display: none !important; }
+  body { background: white !important; color: black !important; }
+  .main { padding: 0 !important; max-width: 100% !important; }
+  .schema-result-card { break-inside: avoid; box-shadow: none !important;
+    border: 1px solid #ddd !important; margin-bottom: 8px !important; }
+  .schema-detail { display: block !important; }
+  .results-summary { break-inside: avoid; }
+  .chart-card { break-inside: avoid; }
+  .bar-fill { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .domain-banner { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .schema-result-level { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  h1, h2, h3 { color: black !important; }
+  .print-header {
+    display: block !important;
+    text-align: center; padding: 20px 0 10px;
+    border-bottom: 3px solid #1B2A4A; margin-bottom: 20px;
+  }
+  .print-header h1 { font-size: 1.6rem; color: #1B2A4A !important; }
+  .print-header p { color: #555; font-size: 0.9rem; margin-top: 4px; }
+}
+.print-header { display: none; }
+
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="header-inner">
+    <div>
+      <div class="header-title">Young Séma Kérdőív</div>
+      <div class="header-sub">YSQ-L · 244 állítás · 19 séma</div>
+    </div>
+    <div class="header-actions">
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙 Sötét</button>
+    <div class="progress-chip" id="progressChip">0%</div>
+  </div>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progressBar"></div>
+  </div>
+  <div class="nav-tabs" id="navTabs">
+    <button class="nav-tab active" onclick="showView('welcome')">🏠 Kezdőlap</button>
+    <button class="nav-tab" onclick="showView('questionnaire')">📋 Kérdőív</button>
+    <button class="nav-tab" onclick="showView('results')">📊 Eredmény</button>
+    <button class="nav-tab" onclick="showView('chart')">📈 Diagram</button>
+    <button class="nav-tab" onclick="showView('connections')">🗺️ Kapcsolatok</button>
+    <button class="nav-tab" onclick="showView('psycho')">🧠 Sématerápia</button>
+    <button class="nav-tab" onclick="showView('ypi')">👨‍👩‍👧 Szülői stílus</button>
+    <button class="nav-tab" onclick="showView('modes')">🔄 Séma módok</button>
+    <button class="nav-tab" onclick="showView('recommendations')">📚 Ajánlások</button>
+    <button class="nav-tab" onclick="showView('healthy')">💚 Egészséges én</button>
+    <button class="nav-tab" onclick="showView('attach')">🔗 Kötődés</button>
+    <button class="nav-tab" onclick="showView('dose')">🎯 Fókusz</button>
+    <button class="nav-tab" onclick="showView('qol')">🌿 Életminőség</button>
+    <button class="nav-tab" onclick="showView('log')">📓 Napló</button>
+    <button class="nav-tab" onclick="showView('compare')">📉 Összehasonlítás</button>
+    <button class="nav-tab" onclick="showView('clients')">👥 Kliensek</button>
+  </div>
+</div>
+
+<div class="main">
+<div class="print-header" id="printHeader">
+  <h1>Young Séma Kérdőív – YSQ-L</h1>
+  <p id="printMeta">Kiértékelés · Magyar adaptáció (Unoka Zs. és mtsai, 2004)</p>
+</div>
+
+
+<!-- ── WELCOME ── -->
+<div class="view active" id="view-welcome">
+  <div class="welcome-card fade-up">
+    <div class="welcome-hero">
+      <h1>Young Séma<br>Kérdőív</h1>
+      <p>Hosszú Verzió · YSQ-L · Magyar adaptáció</p>
+    </div>
+    <div class="gold-divider"></div>
+    <div class="welcome-body">
+      <h3>Értékelési skála</h3>
+      <div class="scale-grid">
+        <div class="scale-item"><span class="scale-num" style="color:var(--blue)">1</span><span class="scale-txt">Egyáltalán nem jellemző</span></div>
+        <div class="scale-item"><span class="scale-num" style="color:var(--dom4)">2</span><span class="scale-txt">Többnyire nem jellemző</span></div>
+        <div class="scale-item"><span class="scale-num" style="color:var(--yellow)">3</span><span class="scale-txt">Néha igen, néha nem</span></div>
+        <div class="scale-item"><span class="scale-num" style="color:var(--orange)">4</span><span class="scale-txt">Valamennyire jellemző</span></div>
+        <div class="scale-item"><span class="scale-num" style="color:var(--red)">5</span><span class="scale-txt">Többnyire jellemző</span></div>
+        <div class="scale-item"><span class="scale-num" style="color:#7B241C">6</span><span class="scale-txt">Tökéletesen jellemző</span></div>
+      </div>
+      <div class="warn-box">
+        ⚠️ <strong>Fontos:</strong> Ez a kérdőív önismereti célokat szolgál. Diagnosztikai célra kizárólag képzett pszichológus vagy sématerapeuta alkalmazhatja. Válaszoljon spontán, az első érzése alapján.
+      </div>
+      <button class="start-btn" onclick="showView('questionnaire')">Kitöltés megkezdése →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── QUESTIONNAIRE ── -->
+<div class="view" id="view-questionnaire">
+  <div id="questionnaireContent"></div>
+</div>
+
+<!-- ── RESULTS ── -->
+<div class="view" id="view-results">
+  <div id="resultsContent"></div>
+</div>
+
+<!-- ── CHART ── -->
+<div class="view" id="view-chart">
+  <div id="chartContent"></div>
+</div>
+
+<!-- ── CONNECTIONS ── -->
+<div class="view" id="view-connections">
+  <div id="connectionsContent"></div>
+</div>
+
+<!-- ── RECOMMENDATIONS ── -->
+<div class="view" id="view-recommendations">
+  <div id="recommendationsContent"></div>
+</div>
+
+
+<!-- ── HEALTHY ADULT ── -->
+<div class="view" id="view-healthy"><div id="healthyContent"></div></div>
+<!-- ── ATTACHMENT ── -->
+<div class="view" id="view-attach"><div id="attachContent"></div></div>
+<!-- ── DOSE ── -->
+<div class="view" id="view-dose"><div id="doseContent"></div></div>
+<!-- ── QOL ── -->
+<div class="view" id="view-qol"><div id="qolContent"></div></div>
+<!-- ── LOG ── -->
+<div class="view" id="view-log"><div id="logContent"></div></div>
+
+<!-- ── PSYCHO ── -->
+<div class="view" id="view-psycho">
+  <div id="psychoContent"></div>
+</div>
+
+<!-- ── YPI ── -->
+<div class="view" id="view-ypi">
+  <div id="ypiContent"></div>
+</div>
+
+<!-- ── MODES ── -->
+<div class="view" id="view-modes">
+  <div id="modesContent"></div>
+</div>
+
+<!-- ── COMPARE ── -->
+<div class="view" id="view-compare">
+  <div id="compareContent"></div>
+</div>
+
+<!-- ── CLIENTS ── -->
+<div class="view" id="view-clients">
+  <div id="clientsContent"></div>
+</div>
+
+</div><!-- /main -->
+
+<button class="fab" id="fab" onclick="showView('results')">Eredmény megtekintése →</button>
+
+<!-- Timer bar -->
+<div class="timer-bar" id="timerBar">
+  <div>
+    <div class="timer-label">⏱ Kitöltési idő</div>
+    <div class="timer-display" id="timerDisplay">00:00</div>
+  </div>
+  <div class="timer-controls">
+    <button class="timer-btn" id="timerToggleBtn" onclick="timerToggle()">⏸ Szünet</button>
+    <button class="timer-btn danger" onclick="timerReset()">↺ Reset</button>
+  </div>
+</div>
+
+<!-- Autosave badge -->
+<div class="autosave-badge" id="autosaveBadge">✓ Automatikusan mentve</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════
+const DOMAINS = [
+  {key:"I",   name:"I. Elszakítottság és Elutasítás",        color:"#1B2A4A"},
+  {key:"II",  name:"II. Károsult Autonómia és Teljesítmény", color:"#1F4068"},
+  {key:"III", name:"III. Károsult Határok",                  color:"#1A5276"},
+  {key:"IV",  name:"IV. Másokra Irányultság",                color:"#1E8BC3"},
+  {key:"V",   name:"V. Túlzott Éberség és Gátoltság",       color:"#117A65"},
+];
+
+const SCHEMAS = [
+  {kod:"ed", nev:"Érzelmi Depriváció",        dom:"I",   start:1,   end:9,
+   leiras:"Az Érzelmi Depriváció séma azzal a mélyen gyökerező meggyőződéssel jár, hogy alapvető érzelmi szükségleteid sohasem fognak kielégülni. Úgy érzed, senki sem fog igazán gondoskodni rólad, meghallgatni, megérteni vagy melegséget adni.",
+   eredet:"Jellemzően érzelmileg távolságtartó, hideg vagy elfoglalt szülők esetén alakul ki. A gyermek nem kapott elegendő szeretetet, figyelmet, empátiát vagy útmutatást. A szülők fizikailag jelen lehettek, de érzelmileg elérhetetlenek voltak.",
+   viselkedes:"Érzelmileg szűkös partnereket választasz. Nem mersz igényeket megfogalmazni. Magányosnak érzed magad még kapcsolatokban is. Esetleg túlzottan önellátóvá válsz.",
+   terapia:"Gyakorold az igények megfogalmazását kis lépésekben. Keresd azokat a kapcsolatokat, ahol valódi empátiát kapsz. Dolgozz azzal a hiedelmeddel, hogy nem érdemlem meg a gondoskodást.",
+   items:["Az emberek nem elérhetőek érzelmi szükségleteim kielégítésére.","Nem kaptam szeretetet és figyelmet.","Többnyire nem volt senkim, akihez tanácsért vagy érzelmi támogatásért fordulhattam volna.","Többnyire nem volt senkim, aki gondoskodott volna rólam, megosztotta volna velem az életét, vagy igazán érdekelte volna minden, ami velem történik.","Életem során legtöbbször nem volt olyan személy, aki közeledni próbált volna hozzám, és sok időt szánt volna arra, hogy együtt legyünk.","Általában nem voltak olyan emberek, akik melegséget, biztonságot, és szeretetet adtak volna.","Életem során többnyire nem éreztem, hogy valaki számára különösen fontos vagyok.","Többnyire nem volt olyan személy, aki valóban meghallgatott és megértett volna, tisztában lett volna valódi szükségleteimmel, érzelmeimmel.","Ritkán volt részem abban, hogy egy rátermett személy igaz tanácsot és útmutatást nyújtott volna, amikor nem tudtam, mihez kezdjek."]},
+  {kod:"ab", nev:"Elhagyatottság / Instabilitás", dom:"I", start:10, end:27,
+   leiras:"Az Elhagyatottság séma azzal a meggyőződéssel jár, hogy a számodra fontos személyek előbb-utóbb elhagynak, elveszíted őket, vagy kapcsolataid természetüknél fogva instabilak és végesek.",
+   eredet:"Korai veszteségélmények (szülő halála, válás, gyakori költözések), érzelmileg kiszámíthatatlan szülő, vagy a gyermek ismételt elhagyásának tapasztalata.",
+   viselkedes:"Túlzott ragaszkodás és féltékenység. Önbeteljesítő jóslat: elüldözöd az embereket. Pánikszerű reakció, ha valaki késik vagy nem elérhető.",
+   terapia:"Dolgozz az egyedüllét tolerálásán fokozatosan. Kérdezd meg: Van-e valódi bizonyíték az elhagyásra? Érzelmi szabályozási technikák segítenek szorongásos pillanatokban.",
+   items:["Aggódom, hogy azok, akiket szeretek hamarosan meghalnak, annak ellenére, hogy nincs olyan egészségügyi problémájuk, ami ezt indokolttá tenné.","Azt veszem észre, hogy a hozzám közel állókhoz betegesen ragaszkodom, mert attól félek, hogy el fognak hagyni.","Aggódom, hogy szeretteim elhagynak, vagy elhanyagolnak.","Úgy érzem, nincsen stabil érzelmi támaszom.","Nem hiszem, hogy a fontos kapcsolatok örökké tartanak, azt hiszem, előbb-utóbb véget érnek.","A függőségig ragaszkodom az olyan partnerkapcsolatokhoz, ahol a másik fél nem tudja elkötelezni magát irányomban.","Végül, azt hiszem, egyedül maradok.","Kétségbe esem, mikor azt érzem, hogy egy szeretett személy kezd eltávolodni tőlem.","Néha annyira félek, hogy elhagynak, hogy inkább elüldözöm magamtól az embereket.","Nagyon felzaklat, ha valaki elhagy, akár csak rövid időre is.","Nem számíthatok arra, hogy azok, akik támogatnak, rendszerint velem lesznek, amikor erre szükségem van.","Nem engedhetem meg magamnak, hogy túl közel kerüljek másokhoz, mert soha sem lehetek biztos benne, hogy mindig mellettem lesznek, amikor kell.","Úgy tűnik, az életemben legfontosabb szerepet játszó személyek mindig jönnek és mennek.","Sokat aggódom amiatt, hogy az általam szeretett személyek találnak valakit, akit nálam jobban szeretnek, és elhagynak.","A hozzám közel állók mindig nagyon kiszámíthatatlanok voltak. Egyik percben figyelmesek és kedvesek, a másikban haragosak, zaklatottak, magukba zárkóznak, veszekszenek stb.","Annyira szükségem van másokra, hogy aggódom, mi lesz, ha elveszítem őket.","Annyira védtelennek érzem magam, ha nincs mellettem valaki, aki megvédjen, hogy sokszor aggódom, elveszíthetem támaszaimat.","Nem adhatom igazán önmagamat, és nem fejezhetem ki azt, aki valójában vagyok, mert akkor elhagynának."]},
+  {kod:"ma", nev:"Bizalmatlanság / Abúzus",      dom:"I", start:28, end:44,
+   leiras:"A Bizalmatlanság/Abúzus séma azt a várakozást jelenti, hogy mások szándékosan bántani, kihasználni, becsapni vagy megalázni fognak.",
+   eredet:"Fizikai, érzelmi vagy szexuális bántalmazás gyermekkorban. Szülői kihasználás, manipuláció. Olyan környezet, ahol valóban veszélyes volt megbízni másokban.",
+   viselkedes:"Állandó éberség és gyanakvás. Mások próbára tétele. Védekezőség és nehézség az intimitással. Preemptív támadás.",
+   terapia:"Lassú bizalomépítés kis kockázatú helyzetekben. Különbségtétel múlt és jelen között. Kérdezd meg: Van-e valódi jele a rossz szándéknak?",
+   items:["Úgy érzem, ki akarnak használni.","Gyakran úgy érzem, meg kell védenem magam másoktól.","Úgy érzem, mások jelenlétében nem engedhetem el magam igazán, mert akkor szándékosan bántani próbálnának.","Ha valaki kedvesen viselkedik velem, feltételezem, hogy akar valamit.","Csak idő kérdése, mielőtt valaki elárul.","A legtöbb ember mindig csak magára gondol.","Nehezemre esik, hogy megbízzak másokban.","Elég gyanakvó vagyok mások hátsó szándékait illetően.","A legtöbb ember ritkán őszinte, és általában nem az, aminek látszik.","Általában próbálom kitalálni, mi lehet a másik hátsó gondolata.","Ha azt gondolom valakiről, hogy bántani akar, igyekszem, hogy én üssek először.","Ha valaki azt akarja, hogy megbízzak benne, előbb be kell bizonyítania a jó szándékát.","Próbára teszem az embereket, hogy lássam, igazat mondanak-e, és valóban jó szándékkal közelednek hozzám.","Hiszek a mondásban: Uralkodj, vagy mások fognak uralkodni rajtad.","Elönt a harag, ha arra gondolok, hogy életem során milyen sokan bántak méltánytalanul velem.","Életem során a hozzám közel állók kihasználtak, vagy felhasználtak saját céljaik érdekében.","Számomra fontos személyek testileg, érzelmileg vagy szexuálisan bántalmaztak."]},
+  {kod:"si", nev:"Társas Izoláció",              dom:"I", start:45, end:54,
+   leiras:"A Társas Izoláció séma azt az érzést jelenti, hogy alapvetően különbözöl másoktól, nem tartozol sehová. Ez a magány belső élmény – akkor is ott van, ha emberek vesznek körül.",
+   eredet:"Más kultúrájú vagy értékrendű famiglia, iskolai kiközösítés, tartós mobbing, vagy olyan különleges körülmények, amelyek elkülönítettek kortársaidtól.",
+   viselkedes:"Kerülöd a társas helyzeteket. Nem kezdeményezel kapcsolatokat. Csoporthelyzetekben kívülállónak érzed magad.",
+   terapia:"Keress egy olyan csoportot, ahol valódi hasonlóságot találsz. Teszteld a 'különbözöm' hiedelmeket. Fokozatosan növeld a társas expozíciót.",
+   items:["Nem illek sehova.","Alapvetően más vagyok, mint a többi ember.","Nem tartozom sehova; magamnak való vagyok.","Úgy érzem, a többi ember számára idegen vagyok.","Elszigeteltnek és magányosnak érzem magam.","Mindig csoporton kívülinek érzem magam.","Senki sem ért meg igazán.","A családom mindig is különbözött a környezetünkben élő más családoktól.","Néha úgy érzem magam, mint egy földön kívüli.","Ha holnap eltűnnék, senki sem venné észre."]},
+  {kod:"ds", nev:"Fogyatékosság / Szégyen",      dom:"I", start:55, end:69,
+   leiras:"A Fogyatékosság/Szégyen séma azt a mélyen gyökerező meggyőződést jelenti, hogy alapvetően hibás, értéktelen, szerethetetlen vagy elfogadhatatlan vagy.",
+   eredet:"Folyamatos kritika, megszégyenítés gyermekkorban. Feltételes szeretet: csak akkor szeretnek, ha tökéletes vagy.",
+   viselkedes:"Titkolózás és maszk viselése. Önszabotázs sikeres helyzetekben. Vonzódás kritikus emberekhez.",
+   terapia:"Az önszánat fejlesztése kulcsfontosságú. Dolgozz a szégyenre jellemző titkokkal. Kérdezd meg: Mit mondanék egy barátomnak, ha így érezne?",
+   items:["Senki, akire vágyom, nem kívánna, nem szeretne, ha ismerné a hiányosságaimat.","Senki, akire vágyom, nem maradna a közelemben, ha megismerné valódi énemet.","Alapvetően hibás, és tökéletlen vagyok.","Bárhogyan is próbálom, úgy érzem, képtelen vagyok elnyerni egy számomra fontos nő/férfi megbecsülését, vagy elismerését.","Nem érdemlem meg mások szeretetét, figyelmét, és megbecsülését.","Úgy érzem, nem vagyok méltó a szeretetre.","Alapvető tulajdonságaim túlságosan elfogadhatatlanok ahhoz, hogy felfedjem magam mások előtt.","Ha valaki felfedezné alapvető hibáimat, nem tudnék többé a szemébe nézni.","Ha valaki kedvel, úgy érzem, félrevezettem.","Azt hiszem, vonzódom az olyan emberekhez, akik keményen kritizálnak, és elutasítanak.","Vannak olyan mély titkaim, melyekről nem szeretném, ha a hozzám közel állók tudomást szereznének.","Az én hibám, hogy a szüleim nem tudtak eléggé szeretni.","Nem hagyom, hogy az emberek felfedezzék a valódi énemet.","Egyik legnagyobb félelmem, hogy felfedezik a hibáimat.","Nem értem, hogyan szerethetne engem bárki."]},
+  {kod:"su", nev:"Társas Nemkívánatosság",        dom:"I", start:70, end:78,
+   leiras:"A Társas Nemkívánatosság séma azt jelenti, hogy társadalmilag vonzatlannak, érdektelennek tartod magad – akár megjelenésed, akár szociális készségeid alapján.",
+   eredet:"Gúnyolódás, kiközösítés kortársak részéről. Szülői üzenetek a külső megjelenéssel kapcsolatban.",
+   viselkedes:"Kerülöd a társas helyzeteket. Nehézséged van új kapcsolatok kialakításával. Belső kritikus hang.",
+   terapia:"Teszteld a feltevéseket: valóban unalmasnak tartanak? Keress bizonyítékot az ellenkezőjére. Fokozatos szociális expozíció.",
+   items:["Nem vagyok szexuálisan vonzó.","Túl kövér vagyok.","Csúnya vagyok.","Nem tudok normálisan lefolytatni egy beszélgetést.","Társasági helyzetben buta és unalmas vagyok.","Azok az emberek, akiket tisztelek, nem állnának szóba velem, alacsony társadalmi helyzetem miatt.","Soha nem tudom, mit kellene éppen mondanom.","Az emberek nem akarják, hogy a körükhöz tartozzam.","Mások jelenlétében nagyon zavarban vagyok."]},
+  {kod:"fa", nev:"Teljesítmény Kudarc",           dom:"II", start:79, end:87,
+   leiras:"A Teljesítmény Kudarc séma azt a meggyőződést jelenti, hogy kudarcra ítélt vagy a munkában, iskolában – alapvetően inkompetens vagy, mások mindig jobbak nálad.",
+   eredet:"Szülők, akik más gyerekekkel hasonlítgatták a teljesítményed. Korai kudarcélmények. Túlzottan kritikus tanárok.",
+   viselkedes:"Kerülöd a kihívásokat. Önbeteljesítő jóslat. Teljesítményed leértékelése. Állandó összehasonlítgatás.",
+   terapia:"Dokumentáld a valódi sikereket. Kérdezd meg: Tényleg rosszabb vagyok, vagy csak így érzem? Tűzz ki kis, elérhető célokat.",
+   items:["Szinte semmi, amit a munkahelyemen (iskolában) csinálok, nem annyira jó, mint amit mások meg tudnak csinálni.","Ha teljesítenem kell, nem tudok megfelelni.","A legtöbb ember nálam többre képes a munka, és a teljesítmény terén.","Mindig kudarcot vallok.","Nem vagyok olyan tehetséges a munkámban, mint a legtöbb ember.","Ha munkáról (iskoláról) van szó, nem vagyok olyan intelligens, mint legtöbben.","A munka területén érő kudarcok és hiányosságok miatt megalázva érzem magam.","Gyakran szégyenkezem mások előtt, mert teljesítményem nem mérhető az övékhez.","Gyakran összevetem a teljesítményemet másokéval, és azt érzem, hogy ők sokkal sikeresebbek nálam."]},
+  {kod:"di", nev:"Funkcionális Függőség",          dom:"II", start:88, end:102,
+   leiras:"A Funkcionális Függőség séma azt a hitet jelenti, hogy képtelen vagy egyedül megbirkózni a mindennapokkal – döntéseket hozni, problémákat megoldani, önállóan funkcionálni.",
+   eredet:"Túlvédő szülők, akik mindent elvégeztek helyetted. Vagy elhanyagolás, ahol senki sem tanított meg az alapvető készségekre.",
+   viselkedes:"Állandó megerősítést keresel döntéseidhez. Ráhagyatkozol másokra. Szorongsz, ha egyedül kell döntened.",
+   terapia:"Fokozatosan növeld az önálló döntések számát. Tartsd számon, mikor oldottál meg valamit egyedül.",
+   items:["Úgy érzem, egyedül nem tudok elboldogulni a mindennapi életben.","Ahhoz hogy boldoguljak, szükségem van mások segítségére.","Nem hiszem, hogy egyedül is jól elboldogulnék.","Azt hiszem, mások jobban tudnak gondoskodni rólam, mint én magam.","A munkahelyemen kívül nehezen birkózom meg az új feladatokkal, hacsak nem segít valaki eligazodni.","Úgy gondolom, hogy a hétköznapi életben másoktól függő személy vagyok.","Mindent elrontok, amihez csak nyúlok, és nem csak a munkámban (az iskolában).","Az élet legtöbb területén ostoba vagyok.","Ha a hétköznapi helyzetekben saját ítélőképességemben bízom, rossz döntéseket hozok.","Nincs józan ítélőképességem.","A hétköznapi életben nem támaszkodhatom saját véleményemre.","Nem érzem magam képesnek a mindennapi életben felmerülő problémák megoldására.","Úgy érzem, szükségem van egy megbízható személyre, aki tanácsot ad gyakorlati kérdésekben.","Inkább gyereknek, mintsem felnőttnek érzem magam, amikor hétköznapi feladataimat kell elintézni.","A mindennapi élet feladatait rendkívül megterhelőnek érzem."]},
+  {kod:"vh", nev:"Sérülékenység",                  dom:"II", start:103, end:116,
+   leiras:"A Sérülékenység séma állandó félelemmel jár, hogy bármikor katasztrófa történhet – egészségügyi, anyagi, természeti vagy bűncselekmény áldozata leszel.",
+   eredet:"Szorongó, katasztrofizáló szülő. Valódi korai traumatikus élmény. Kiszámíthatatlan, kaotikus gyermekkor.",
+   viselkedes:"Állandó aggodalom. Kerülöd a kockázatot. Túlzott óvatosság. Testi tünetek katasztrofizálása.",
+   terapia:"Kérdezd meg: Mi a valódi valószínűsége ennek? Relaxációs és mindfulness technikák. A kockázat tolerálásának fokozatos növelése.",
+   items:["Úgy tűnik, nem tudok megszabadulni a gondolattól, hogy bármelyik percben történhet valami.","Úgy érzem, bármelyik percben jöhet valami katasztrófa (természeti, bűncselekmény, gazdasági, vagy egészségügyi).","Attól félek otthontalanná, vagy csavargóvá válok.","Félek, hogy megtámadnak.","Úgy érzem, igen óvatosan kell bánnom a pénzzel, máskülönben a végén földönfutóvá válok.","Nagyon elővigyázatos vagyok, nehogy megbetegedjem, vagy megsebesüljek.","Attól félek, hogy minden pénzemet elvesztem, és nyomorogni fogok.","Aggódom, hogy valami komoly betegségem van, annak ellenére, hogy semmi ilyesmit nem mondott az orvosom.","Félelemmel teli ember vagyok.","Sokat aggódom a világban történő rossz dolgok miatt: bűnözés, környezet szennyezés, stb.","Gyakran úgy érzem, hogy megbolondulok.","Gyakran úgy érzem, hogy mindjárt rám tör egy szorongásos roham.","Gyakran aggódom, hogy szívinfarktusom lesz, annak ellenére, hogy szinte semmi okom az aggodalomra.","Úgy érzem, a világ veszélyes."]},
+  {kod:"em", nev:"Behálózottság",                  dom:"II", start:117, end:127,
+   leiras:"A Behálózottság séma azt jelenti, hogy annyira összefonódtál egy fontos személlyel, hogy nehezen tudod, ki vagy valójában – milyen a saját véleményed, vágyaid, identitásod.",
+   eredet:"Szülő, aki érzelmileg túlzottan függővé tette a gyermeket. Bűntudatot keltett az önállóság minden kísérleténél.",
+   viselkedes:"Nehézség önálló döntésekkel. Szülővel vagy partnerrel való túlzott egybeolvadás. Bűntudat, ha saját utadon jársz.",
+   terapia:"Dolgozz az identitás építésén. Fokozatosan növeld az egészséges távolságot. Kérdezd meg: Ha senki sem nézné, mit választanék?",
+   items:["Nem tudtam olyan mértékben leválni a szüleimről, mint ahogy ezt -- látszólag -- a velem egykorú emberek tették.","A szüleim és én túlságosan is hajlamosak vagyunk beleszólni egymás életébe és problémáiba.","A szüleimnek és nekem nagyon nehezen megy, hogy bűntudat és csalódás érzése nélkül bármilyen intim apróságot elhallgassunk egymás elől.","A szüleimnek és nekem naponta kell beszélnünk egymással, e nélkül valamelyik félre rátör a bűntudat, sértődés, csalódás, vagy magányosság érzete.","Gyakran érzem, hogy nincs saját identitásom, ami elkülönítene a szüleimtől vagy a partneremtől.","Gyakran érzem, hogy a szüleim rajtam keresztül élnek – nincs saját, külön életem.","Nagyon nehezen tartok távolságot intim kapcsolatokban; nehezen tudom megőrizni azt az érzést, hogy saját független személyiségem van.","Annyira belefolyok a szüleim, és partnerem életébe, hogy nem is tudom, ki vagyok, és mit akarok.","Nehezemre esik, hogy elkülönítsem saját nézőpontomat a szüleim, vagy partnerem nézőpontjától.","Gyakran érzem, hogy a szüleimtől, vagy partneremtől nincs független magánéletem.","Úgy érzem, hogy a szüleimet nagyon bántja, vagy bántaná, ha egyedül, tőlük függetlenül élek/nék."]},
+  {kod:"sb", nev:"Leigázottság",                   dom:"IV", start:128, end:137,
+   leiras:"A Leigázottság séma azt jelenti, hogy feladod saját akaratodat mások kedvéért – félelemből, büntetéstől vagy elutasítástól való rettegésből nem mersz nemet mondani.",
+   eredet:"Domináns, kontrollálló szülő. Olyan légkör, ahol a saját akarat kifejezése következményekkel járt.",
+   viselkedes:"Nem mersz nemet mondani. Mások igényei mindig előrébb. Passzív-agresszív viselkedés a közvetlen konfrontáció helyett.",
+   terapia:"Asszertivitás tréning. Kis lépésekben gyakorold a saját igény kifejezését. Mi a legrosszabb, ami történhet, ha nemet mondok?",
+   items:["Hagyom, hogy mások irányítsák a dolgokat, mert félek vállalni a következményeket.","Azt hiszem, sok bajom származna abból, ha azt csinálnám, amit akarok.","Úgy érzem, nincs más választásom, mint hogy mások kéréseire beadjam a derekam, különben valamilyen módon megtorolnák, vagy elutasítanának.","Kapcsolataimban hagyom, hogy a másik fél diktáljon.","Mindig hagytam, hogy mások hozzanak döntéseket helyettem, így valójában nem tudom, hogy én magam mit akarok.","Úgy érzem, életem legfontosabb döntéseit nem én magam hoztam.","Nagyon odafigyelek, hogy eleget tegyek mások kívánságának, hogy ne utasítsanak el.","Nehezemre esik, hogy megköveteljem saját jogaim tiszteletben tartását, és érzelmeim figyelembe vételét.","Ahelyett, hogy kimutatnám a haragom, különféle apró húzásokkal bosszulom meg sérelmeimet.","A konfliktus elkerülésének érdekében sokkal tovább megyek, mint más emberek."]},
+  {kod:"ss", nev:"Önfeláldozás",                   dom:"IV", start:138, end:154,
+   leiras:"Az Önfeláldozás séma azt jelenti, hogy önkéntesen mások szükségleteit helyezed a sajátéid elé – bűntudatot érzel, ha magadra is gondolsz.",
+   eredet:"Olyan szülő, akinek gondoskodnia kellett (beteg, depressziós, alkoholista). Vallásos vagy kulturális üzenetek az önzetlenségről.",
+   viselkedes:"Folyamatosan mások problémáival foglalkozol. Kimerülés, de képtelenség leállni. Titkos neheztelés.",
+   terapia:"Engedélyt adni magadnak a saját igényekre. Kérdezd meg naponta: Ma mit szeretnék én?",
+   items:["Mások szükségleteit előbbre helyezem a sajátjaimnál, különben bűntudatot érzek.","Bűntudatot érzek, ha másokat cserbenhagyok, vagy csalódást okozok.","Többet nyújtok másoknak, mint amennyit én kapok.","Legtöbbször végül én vagyok az, aki gondoskodik a hozzám közel állókról.","Szinte semmi sincs, amit ne tudnék elviselni, ha szeretek valakit.","Jó ember vagyok, mert másokkal többet törődöm, mint saját magammal.","A munkahelyemen általában én végzem el az önkéntes alapon vállalható plusz-munkát, vagy ha kell, ott maradok munkaidő után.","Bármilyen sok is a dolgom, másokra mindig van időm.","Nagyon kevéssel beérem, mert a szükségleteim minimálisak.","Csak akkor vagyok boldog, ha a körülöttem élők boldogok.","Annyira lefoglal, hogy szeretteimről gondoskodjak, hogy magamra alig marad időm.","Mindig is én voltam az, aki mindenki mást meghallgatott.","Kényelmesebben érzem magam, ha én adom az ajándékot, mint ha kapom.","Más emberek úgy látják, hogy túl sok mindent teszek meg másokért, és túl keveset magamért.","Mindegy milyen sokat adok, az sosem elég.","Ha azt csinálom, amit akarok, nagyon kényelmetlenül érzem magam.","Nagyon nehezemre esik másokat arra kérni, hogy szükségleteimről gondoskodjanak."]},
+  {kod:"ei", nev:"Érzelmi Gátoltság",              dom:"V",  start:155, end:163,
+   leiras:"Az Érzelmi Gátoltság séma azt jelenti, hogy elfojtod érzelmeidet – mert úgy hiszed, az érzelmek kifejezése veszélyes, zavaró vagy szégyenletes.",
+   eredet:"Érzelmileg gátolt szülők. Olyan üzenetek, mint: ne sírj, légy erős. Az érzelmek kifejezése következményekkel járt.",
+   viselkedes:"Nehézség az érzelmek felismerésével. Elfojtott harag, ami robbanáshoz vezet. Mások hidegnek, érzéketlennek látnak.",
+   terapia:"Érzelemnapló: naponta írd le, mit éreztél. Kis lépésekben gyakorold az érzelmi önkifejezést biztonságos kapcsolatokban.",
+   items:["Félek, hogy elveszítem a viselkedésem fölötti uralmamat.","Aggódom, hogy valakit komolyan bántalmazok, testileg, vagy érzelmileg, ha elszabadul a haragom.","Úgy érzem, hogy muszáj kordában tartanom érzelmeimet és az indulataimat, különben valami rossz történhet.","Sok harag, és neheztelés gyűlt össze bennem, amit nem fejezek ki.","Túlságosan zavarban vagyok, ha pozitív érzelmeimet kell kifejeznem mások előtt (pl. szeretet, törődés kimutatása).","Szégyellem kifejezni az érzelmeimet mások előtt.","Nehezemre esik, hogy barátságos, és spontán legyek.","Annyira uralkodom magamon, hogy az emberek azt hiszik, nincsenek érzelmeim.","Az emberek úgy látják, érzelmileg merev vagyok."]},
+  {kod:"us", nev:"Könyörtelen Mércék",             dom:"V",  start:164, end:179,
+   leiras:"A Könyörtelen Mércék séma azt jelenti, hogy belső kényszert érzel a tökéletességre – és soha nem engedheted meg magadnak, hogy elégedett legyél az elért eredménnyel.",
+   eredet:"Perfekcionista szülők. Feltételes szeretet: csak akkor voltál elfogadható, ha teljesítettél. A hibázás megszégyenítéssel járt.",
+   viselkedes:"Soha nem vagy elégedett. Túlórázás, kimerülés. Kapcsolatok elhanyagolása. Nehézség a relaxálással.",
+   terapia:"Kérdezd meg: Mit veszítek, ha nem vagyok tökéletes? Tudatos pihenés beépítése. Dolgozz az 'elég jó' koncepciójával.",
+   items:["Muszáj, hogy mindenben, amit csinálok, a legjobb legyek; nem fogadhatom el a második helyet.","Arra törekszem, hogy szinte mindent a legnagyobb rendben tartsak.","Szinte mindig a lehető legjobb formámat kell nyújtanom.","Próbálom a lehető legjobbat nyújtani, a megfelelő nem elég jó.","Annyi mindent kell elérnem, hogy szinte egyáltalán nincs időm a pihenésre.","Szinte semmi sem elég jó, amit csinálok; mindig lehet még jobban.","Minden feladatomat teljesítenem kell.","Úgy érzem, állandó nyomás alatt állok, hogy teljesítsek, és véghez vigyek dolgokat.","A kapcsolataim kárát látják annak, hogy olyan keményen dolgozom.","Az egészségem kárát látja, hogy olyan nagy nyomás alá helyezem magam, hogy jól tudjak teljesíteni.","Gyakran feláldozom az élvezetet és a boldogságot, hogy megfeleljek saját követelményeimnek.","Ha hibázok, szigorú kritikát érdemlek.","Nem engedhetem meg magamnak, hogy könnyelműen elnézzek magamnak dolgokat, vagy kifogásokat találjak a hibáimra.","Erősen versengő beállítottságú vagyok.","A pénz és a társadalmi helyzet nagyon fontos szerepet játszik nálam.","Teljesítményemnek mindig első rangúnak kell lennie."]},
+  {kod:"et", nev:"Feljogosítottság",               dom:"III", start:180, end:190,
+   leiras:"A Feljogosítottság séma azt jelenti, hogy különlegesnek érzed magad, a normál szabályok rád nem vonatkoznak, és jogod van mindent megkapni, amit akarsz.",
+   eredet:"Elkényeztetett gyermekkor, ahol nem volt határ. Szülők, akik nem tanítottak kompromisszumra.",
+   viselkedes:"Nehézség a visszautasítás elfogadásával. Harag, ha nem kapod, amit akarsz. Kapcsolati konfliktusok.",
+   terapia:"Empátia fejlesztése. Határok elfogadásának gyakorlása. Valóban jogos az elvárásam, vagy csak azt akarom?",
+   items:["Amikor akarok valamit másoktól, nagyon nehezemre esik elfogadni a visszautasítást.","Gyakran megharagszom, és ingerült leszek, ha nem kapom meg, amit akarok.","Különleges ember vagyok, és nem kell elfogadnom a többi emberre vonatkozó korlátokat.","Utálom, ha korlátoznak, vagy visszatartanak attól, hogy azt csináljam, amit akarok.","Úgy érzem, nem kellene elvárni, hogy betartsam a normális szabályokat, és azokat a megkötéseket, amelyeket mások betartanak.","Úgy érzem, amit én tudok nyújtani, az többet ér mások hozzájárulásánál.","Általában a saját szükségleteimet helyezem az első helyre mások szükségleteivel szemben.","Gyakran azon kapom magam, hogy annyira lekötnek a saját dolgaim, hogy nem jut időm a barátaimra és a családomra.","Gyakran mondogatják nekem, hogy folyton irányítani akarom, hogyan történjenek a dolgok.","Nagyon ingerült leszek, ha valaki nem teljesíti a kérésemet.","Nem tűröm el, hogy mások mondják meg, mit csináljak."]},
+  {kod:"is", nev:"Elégtelen Önkontroll",            dom:"III", start:191, end:205,
+   leiras:"Az Elégtelen Önkontroll séma azt jelenti, hogy nehézséged van az impulzusaid szabályozásával – azonnali kielégülést keresel a hosszú távú célok rovására.",
+   eredet:"Következetlenül határokat szabó szülők. Elkényeztetés vagy kaotikus otthon. Nem tanultad meg az impulzuskontrollt.",
+   viselkedes:"Impulzív döntések. Nehézség a rutinok betartásával. Könnyen feladsz. Káros szokások.",
+   terapia:"Fokozatos önfegyelem-építés. Impulzus és cselekvés közé szünetet iktatni. Strukturált napirend.",
+   items:["Nagyon nehezemre esik, hogy leszokjam az ivásról, dohányzásról, túlevésről, vagy más káros viselkedésről.","Úgy tűnik, képtelen vagyok erőt venni magamon, hogy elvégezzek egy unalmas vagy rutin feladatot.","Gyakran megtörténik, hogy lobbanékonyan viselkedem, vagy szabadon kifejezem az érzelmeimet, amivel bajba sodrom saját magam, és megbántok másokat.","Ha nem sikerül elérnem a célom, könnyen frusztrált leszek, és feladom.","Nagyon nehezemre esik, hogy az azonnali kielégülést feláldozzam egy hosszú-távú cél elérése érdekében.","Gyakran megtörténik, hogy miután dühbe gurultam, már nem tudok uralkodni magamon.","Gyakran túlzásba viszem a dolgokat, bár tudom, hogy ez ártalmas nekem.","Könnyen elunom magam.","Amikor egy feladat nehézzé válik, általában nem tudok kitartani, és félbe hagyom.","Semmire sem tudok sokáig odafigyelni.","Nem tudom magam arra kényszeríteni, hogy olyasmit csináljak, amit nem élvezek. Még akkor sem, ha tudom, hogy ez a jól felfogott érdekem.","A legkisebb sértésre is elvesztem a fejem.","Ritkán tudtam betartani elhatározásaimat.","Szinte sosem tudom visszafogni magam, hogy elrejtsem az emberek elől valódi érzéseimet, függetlenül attól, hogy ennek mi az ára.","Gyakran viselkedem lobbanékonyan, amit később megbánok."]},
+  {kod:"as", nev:"Elismerés Keresése",              dom:"IV", start:206, end:219,
+   leiras:"Az Elismerés Keresése séma azt jelenti, hogy önbecsülésed mások véleményétől függ – folyamatosan mások jóváhagyását keresed.",
+   eredet:"Feltételes szeretet gyermekkorban. Szülők, akik a gyermek értékét teljesítményéhez kötötték.",
+   viselkedes:"Mások véleményétől függő önértékelés. Önmaga megváltoztatása különböző emberek kedvéért.",
+   terapia:"Belső értékelési rendszer fejlesztése. Kérdezd meg: Ez az én vágyam, vagy mások elvárása?",
+   items:["Fontos számomra, hogy szinte mindenki, akit ismerek, szeressen.","Azért hogy jobban szeressenek, attól függően változtatok magamon, hogy éppen kivel vagyok.","Keményen küzdök, hogy elfogadtassam magam.","Önbecsülésem elsősorban azon múlik, hogy mások milyennek tartanak.","Ha van pénzem, és fontos embereket ismerek, úgy érzem, értékesebb vagyok.","Sok időt töltök külsőm ápolásával, hogy értékesnek tartsanak az emberek.","A teljesítmény akkor ér a legtöbbet számomra, ha mások is észreveszik.","Annyira figyelek arra, hogy elfogadtassam magam másokkal, hogy néha nem is tudom, ki vagyok.","Nehezemre esik célokat tűzni magam elé anélkül, hogy figyelembe venném mások véleményét a választásomról.","Ha visszatekintek életem fontos döntéseire, azt látom, hogy többnyire arra gondoltam: másoknak tetszeni fog, amit teszek.","Azt akarom, hogy szeressenek, még azok is, akiket nem kedvelek.","Ha nem kapok másoktól elég figyelmet, kevésbé fontosnak érzem magam.","Ha egy gyűlésen felszólalok vagy bemutatnak egy találkozón, alig várom, hogy elismerésben részesüljek és csodáljanak.","Sok dicséretre és bókra van szükségem, hogy értékesnek érezzem magam."]},
+  {kod:"np", nev:"Negativizmus",                    dom:"V",  start:220, end:230,
+   leiras:"A Negativizmus/Pesszimizmus séma azt jelenti, hogy automatikusan a negatív oldalra fókuszálsz, és elvársz, hogy a dolgok rosszul sülnek el.",
+   eredet:"Pesszimista, aggodalmaskodó szülők. Korai traumatikus tapasztalatok. Csalódások sorozata.",
+   viselkedes:"Automatikus negatív gondolatok. Jó dolgok leértékelése. Mások optimizmusának lehűtése.",
+   terapia:"Kognitív átstrukturálás. Hála-napló. Mindfulness a jelenbeli pozitív élményekre.",
+   items:["Még ha jól is mennek a dolgok, azt érzem, hogy ez csak átmeneti.","Ha valami jó történik, aggódom, hogy valószínűleg valami rossz fogja követni.","Nem lehet az ember elég elővigyázatos; szinte mindig akad valami, ami rosszul sül el.","Bármennyire keményen dolgozom, aggódom, hogy anyagilag teljesen tönkremehetek.","Aggódom, hogy egy rossz döntés katasztrófához vezethet.","Gyakran kisebb döntéseken is sokat rágódom, mert ha hibát követek el, annak komoly következményei lehetnek.","Jobban érzem magam, ha eleve feltételezem, hogy a dolgok nem fognak sikerülni, így nem fogok csalódni, amikor bekövetkezik a kudarc.","Többet foglalkozom az élet, és a velem történt dolgok negatív oldalával, mint a pozitívval.","Hajlamos vagyok a pesszimizmusra.","A hozzám közelállók aggodalmaskodónak tartanak.","Ha az emberek túlságosan lelkesednek valamiért, kellemetlenül kezdem magam érezni, és úgy érzem, figyelmeztetnem kell őket a fenyegető veszélyekre."]},
+  {kod:"pu", nev:"Büntető Készenlét",               dom:"V",  start:231, end:244,
+   leiras:"A Büntető Készenlét séma azt jelenti, hogy az embereknek (önmagamat is beleértve) szigorúan meg kell bűnhődniük hibáikért – nincs helye megbocsátásnak.",
+   eredet:"Szigorú, büntetős szülők. Vallásos vagy kulturális üzenetek a bűnhődésről mint legfőbb értékről.",
+   viselkedes:"Szigorú önkritika. Nehézség mások hibáinak megbocsátásával. Tartós harag és neheztelés.",
+   terapia:"Az önszánat gyakorlása. Mit mondanék egy barátomnak? Megbocsátás mint erő, nem gyengeség.",
+   items:["Ha hibázok, megérdemlem a büntetést.","Ha nem adok bele mindent, számíthatok a bukásra.","Ha hibázok, nincs bocsánat.","Akik nem veszik ki a részüket a munkából, azokat meg kell büntetni.","Többnyire nem fogadom el mások kifogásait. Egyszerűen csak nem akarják felvállalni a felelőségüket, és nem akarnak fizetni a következményekért.","Ha nem végzem el a munkámat, számolnom kell a következményekkel.","Gyakran eszembe jutnak az általam elkövetett hibák, és dühös leszek magamra.","Ha valaki valami rosszat követ el, nehezemre esik alkalmazni a Felejtsd el és bocsásd meg elvét.","Még az után is neheztelek, hogy valaki bocsánatot kért.","Felidegesít, ha arra gondolok, hogy valaki túl könnyen megúszott valamit.","Megharagszom, ha valaki kifogásokat talál maga számára, és másokat vádol problémái miatt.","Nem számít, miért követtem el a hibát, amikor valamit rosszul csinálok, meg kell fizetnem az árát.","Sokszor leszidom magam azokért a dolgokért, amiket elrontottam.","Rossz ember vagyok, aki megérdemli a büntetést."]},
+];
+
+const CONNECTIONS = {
+  ed:{kapcsolatok:["ab","ma","si","ds","ss"],leiras:"Az Érzelmi Depriváció gyakran együtt jár az Elhagyatottsággal (mindkettő a gondoskodás hiányából ered), a Bizalmatlansággal (ha soha nem kaptál érzelmi támaszt, nehéz megbízni másokban), a Társas Izolációval, a Fogyatékossággal (ha nem szeretnek, talán azért van, mert hibás vagyok), és az Önfeláldozással (ha én adok, talán kapok is).",triggerek:"Egyedüllét, intim kapcsolatok, amikor valaki nem érhető el érzelmileg, ünnepnapok, mélységes személyes megnyilvánulások."},
+  ab:{kapcsolatok:["ed","ma","ds","em","sb"],leiras:"Az Elhagyatottság szorosan kapcsolódik az Érzelmi Deprivációhoz (mindkettő a biztonságos kötődés hiányát tükrözi), a Bizalmatlansághoz (ha elhagynak, az megerősíti, hogy nem lehet megbízni), a Fogyatékossággal (azért hagynak el, mert hibás vagyok), a Behálózottsággal és a Leigázottsággal (behódolok, hogy ne hagyjanak el).",triggerek:"Partner késése, kritika, kapcsolat bizonytalansága, távolság, halál és veszteség témák."},
+  ma:{kapcsolatok:["ab","ds","et","ei","sb"],leiras:"A Bizalmatlanság összefonódik az Elhagyatottsággal, a Fogyatékossággal (azért bántanak, mert megérdemlem), a Feljogosítottsággal (én üssek először, védekezésből), az Érzelmi Gátoltsággal (nem mutatom ki érzéseim, mert felhasználnák) és a Leigázottsággal.",triggerek:"Mások kedvessége, ismeretlen szándékok, közeledési kísérletek, sebezhető helyzetek."},
+  si:{kapcsolatok:["ed","ds","su","fa","as"],leiras:"A Társas Izoláció kapcsolódik az Érzelmi Deprivációhoz (senki sem ért meg), a Fogyatékossággal (azért vagyok kívülálló, mert hibás vagyok), a Társas Nemkívánatossággal, a Teljesítmény Kudarcával és az Elismerés Keresésével.",triggerek:"Csoportos helyzetek, bemutatások, társasági összejövetelek, valahová nem meghívás."},
+  ds:{kapcsolatok:["ed","ab","ma","si","pu"],leiras:"A Fogyatékosság/Szégyen az egyik legtöbb sémával összekapcsolódó séma. Táplálja az Érzelmi Deprivációt, az Elhagyatottságot, a Bizalmatlanságot, a Társas Izolációt és a Büntető Készenlétet (megérdemlem a büntetést).",triggerek:"Kritika, kudarc, intimitás, siker (nem érdemlem), mások dicsérete."},
+  su:{kapcsolatok:["si","ds","fa","as","sb"],leiras:"A Társas Nemkívánatosság szorosan kötődik a Társas Izolációhoz, a Fogyatékosság sémával, a Teljesítmény Kudarcával, az Elismerés Keresésével (mások elismerése bizonyítja az értékem) és a Leigázottsággal.",triggerek:"Tükör, fotók, társasági helyzetek, vonzalom, visszautasítás."},
+  fa:{kapcsolatok:["ds","di","us","su","np"],leiras:"A Teljesítmény Kudarc összefonódik a Fogyatékoság sémával, a Funkcionális Függőséggel, a Könyörtelen Mércékkel (paradox: vagy nem próbálom, vagy tökéletesnek kell lennem), a Társas Nemkívánatossággal és a Negativizmussal.",triggerek:"Kihívások, értékelés, mások sikere, új feladatok, visszajelzés."},
+  di:{kapcsolatok:["em","fa","vh","sb","ab"],leiras:"A Funkcionális Függőség kapcsolódik a Behálózottsággal, a Teljesítmény Kudarcával, a Sérülékenységgel, a Leigázottsággal és az Elhagyatottsággal.",triggerek:"Önálló döntési helyzetek, új kihívások, segítség hiánya, egyedüllét."},
+  vh:{kapcsolatok:["di","np","ab","em","ei"],leiras:"A Sérülékenység szorosan kapcsolódik a Funkcionális Függőséggel, a Negativizmussal, az Elhagyatottsággal, a Behálózottsággal és az Érzelmi Gátoltsággal.",triggerek:"Egészségügyi hírek, gazdasági változások, egyedüllét, ismeretlen helyzetek."},
+  em:{kapcsolatok:["di","ab","sb","as","ed"],leiras:"A Behálózottság összefonódik a Funkcionális Függőséggel, az Elhagyatottsággal, a Leigázottsággal, az Elismerés Keresésével és az Érzelmi Deprivációval.",triggerek:"Önálló döntések, szülőtől való távolság, saját igények felfedezése, párkapcsolat."},
+  sb:{kapcsolatok:["ss","ab","ma","em","ei"],leiras:"A Leigázottság szorosan kötődik az Önfeláldozással, az Elhagyatottsággal, a Bizalmatlansággal, a Behálózottsággal és az Érzelmi Gátoltsággal.",triggerek:"Kérések, elvárások, nemet mondás szükségessége, mások elégedetlensége."},
+  ss:{kapcsolatok:["sb","ed","em","as","ei"],leiras:"Az Önfeláldozás kapcsolódik a Leigázottsággal, az Érzelmi Deprivációval, a Behálózottsággal, az Elismerés Keresésével és az Érzelmi Gátoltsággal.",triggerek:"Mások problémái, segítségkérés, pihenés, saját igények megfogalmazása."},
+  ei:{kapcsolatok:["us","sb","ma","ds","np"],leiras:"Az Érzelmi Gátoltság összefonódik a Könyörtelen Mércékkel, a Leigázottsággal, a Bizalmatlansággal, a Fogyatékoság sémával és a Negativizmussal.",triggerek:"Intimitás, mások érzelmi megnyilvánulása, konfliktus, siker és öröm pillanatai."},
+  us:{kapcsolatok:["ei","fa","pu","as","np"],leiras:"A Könyörtelen Mércék kapcsolódik az Érzelmi Gátoltsággal, a Teljesítmény Kudarcával, a Büntető Készenléti sémával, az Elismerés Keresésével és a Negativizmussal.",triggerek:"Hibák, mások sikere, pihenés, dicséret (nem elég), visszajelzés."},
+  et:{kapcsolatok:["is","ma","us","as","sb"],leiras:"A Feljogosítottság összefonódik az Elégtelen Önkontrollal, a Bizalmatlansággal, a Könyörtelen Mércékkel, az Elismerés Keresésével és a Leigázottsággal.",triggerek:"Határok, visszautasítás, szabályok, mások sikere, várakozás."},
+  is:{kapcsolatok:["et","fa","np","ei","us"],leiras:"Az Elégtelen Önkontroll kapcsolódik a Feljogosítottsággal, a Teljesítmény Kudarcával, a Negativizmussal, az Érzelmi Gátoltsággal és a Könyörtelen Mércékkel.",triggerek:"Unalom, frusztráció, kudarc, azonnali kielégülés lehetősége, stressz."},
+  as:{kapcsolatok:["ds","em","ss","sb","us"],leiras:"Az Elismerés Keresése összefonódik a Fogyatékossággal, a Behálózottsággal, az Önfeláldozással, a Leigázottsággal és a Könyörtelen Mércékkel.",triggerek:"Kritika, figyelmetlenség, mások sikere, csoportos helyzetek, visszajelzés hiánya."},
+  np:{kapcsolatok:["vh","us","fa","ei","pu"],leiras:"A Negativizmus/Pesszimizmus kapcsolódik a Sérülékenységgel, a Könyörtelen Mércékkel, a Teljesítmény Kudarcával, az Érzelmi Gátoltsággal és a Büntető Készenléttel.",triggerek:"Jó hírek, siker, tervek, mások optimizmusa, jövőre vonatkozó kérdések."},
+  pu:{kapcsolatok:["us","ds","np","ma","ei"],leiras:"A Büntető Készenlét összefonódik a Könyörtelen Mércékkel, a Fogyatékoság sémával, a Negativizmussal, a Bizalmatlansággal és az Érzelmi Gátoltsággal.",triggerek:"Hibák, mások hibái, bocsánatkérés, igazságtalanság élménye."},
+};
+
+const RECOMMENDATIONS = {
+  ed:{konyvek:["Jeffrey Young: Szabadulj meg életcsapdáidtól!","Kristin Neff: Önszánat – Az önmagunkkal való barátság ereje","John Bowlby: Attachment (kötődéselmélet klasszikus)"],technikak:["Naponta 1 igény megfogalmazása kis lépésekben","Érzelemnapló: mit kaptam ma másoktól?","Korlátozott reparenting – keress gondoskodó mentort"],podcast:["Therapist Uncensored","The Mindfulness and Grief Podcast"]},
+  ab:{konyvek:["Amir Levine & Rachel Heller: Ragaszkodj hozzám!","Pete Walker: Complex PTSD – From Surviving to Thriving","Susan Anderson: The Journey from Abandonment to Healing"],technikak:["Grounding technikák (5-4-3-2-1 érzékek)","Egyedüllét tolerálás fokozatos növelése","Biztonságos hely vizualizáció"],podcast:["Attachment Theory in Action","We Can Do Hard Things – Glennon Doyle"]},
+  ma:{konyvek:["Bessel van der Kolk: A test eltárolja a traumát","Judith Herman: Trauma és gyógyulás","Peter Levine: Waking the Tiger"],technikak:["Biztonságos kapcsolatok leltára","Fokozatos bizalomépítés tesztelés helyett","EMDR vagy testi alapú traumafeldolgozás"],podcast:["Trauma Therapist Podcast","The Body Keeps the Score"]},
+  si:{konyvek:["Brené Brown: A sebezhetőség ereje","Susan Cain: Csend – Az introvertáltak ereje","Nora Bateson: Small Arcs of Larger Circles"],technikak:["Keress értékalapú közösséget","Heti 1 új társas expozíció kis kockázattal","Önelfogadási napló"],podcast:["Dare to Lead – Brené Brown","Quiet: The Power of Introverts"]},
+  ds:{konyvek:["Kristin Neff: Önszánat","John Bradshaw: Healing the Shame That Binds You","Tara Brach: Radical Acceptance"],technikak:["Self-compassion break: Mit mondanék egy barátomnak?","Szégyen-titkok fokozatos megosztása","Loving-kindness meditáció naponta 10 percben"],podcast:["Tara Brach – Mindfulness & Psychotherapy","The Shame-Free Zone Podcast"]},
+  su:{konyvek:["Matthew McKay: Self-Esteem (munkafüzet)","Ellen Hendriksen: How to Be Yourself","Leil Lowndes: Hogyan kommunikáljunk bárkivel?"],technikak:["Szociális kísérlet napló: tesztelj egy feltevést hetente","Pozitív visszajelzések tudatos befogadása","Fokozatos szociális expozíció hierarchia"],podcast:["Dare to Lead","The Social Skills Guidebook"]},
+  fa:{konyvek:["Carol Dweck: Szemléletváltás (growth mindset)","Angela Duckworth: Grit – szenvedély és kitartás","Barbara Sher: I Could Do Anything..."],technikak:["Siker-napló: minden nap 3 dolog, amit jól csináltál","Kis, megvalósítható célok sorozata","Összehasonlítás helyett saját fejlődés mérése"],podcast:["The Growth Mindset Coach Podcast","Hidden Brain"]},
+  di:{konyvek:["David D. Burns: Feeling Good","Susan Jeffers: Érezd a félelmet és csináld meg!","Henry Cloud & John Townsend: Határok"],technikak:["Naponta 1 kis döntés önállóan","Probléma-megoldási napló","Fokozatosan növelő felelősségvállalás"],podcast:["The Confidence Gap Podcast","Dare to Lead"]},
+  vh:{konyvek:["Edmund Bourne: The Anxiety & Phobia Workbook","Claire Weekes: Hope and Help for Your Nerves","Jon Kabat-Zinn: Bárhova mész, ott vagy"],technikak:["4-7-8 légzéstechnika szorongásos pillanatokban","Aggodalom idő: napi 20 perc szabad aggodalom","Valószínűség-tesztelés"],podcast:["Ten Percent Happier – Dan Harris","Anxiety Slayer Podcast"]},
+  em:{konyvek:["Lindsay Gibson: Adult Children of Emotionally Immature Parents","Susan Forward: Toxic Parents","Harriet Lerner: A táncot ketten táncolják"],technikak:["Identitás-lista: Mi az, ami igazán én vagyok?","Határok fokozatos felállítása","Önálló döntések naplója"],podcast:["Going No Contact Podcast","Therapy in a Nutshell"]},
+  sb:{konyvek:["Randy Paterson: Hogyan mondjunk nemet?","Manuel Smith: When I Say No, I Feel Guilty","Henry Cloud & John Townsend: Határok"],technikak:["Asszertivitás tréning","DEAR MAN technika (DBT)","Belső igény napló"],podcast:["The Boundaries Course – Nedra Tawwab","Therapy in a Nutshell"]},
+  ss:{konyvek:["Melody Beattie: Codependent No More","Cheryl Richardson: The Art of Extreme Self-Care","Harriet Lerner: A táncot ketten táncolják"],technikak:["Napi önmagamnak tett egy gesztus","Gondoskodás-mérleg: mit adtam, mit kaptam?","Engedélyadás: Szabad nekem is szükségleteim lenniük."],podcast:["We Can Do Hard Things","The Self-Care Revolution"]},
+  ei:{konyvek:["Daniel Siegel: Mindsight","Bessel van der Kolk: A test eltárolja a traumát","Marc Brackett: Permission to Feel"],technikak:["Érzelemnapló: naponta 3 érzelem azonosítása","Testi érzetek figyelése","Progresszív izomlazítás"],podcast:["Therapy in a Nutshell","The Feeling Good Podcast"]},
+  us:{konyvek:["Brené Brown: A tökéletesség mítosza","Kristin Neff: Önszánat","Greg McKeown: Esszencializmus"],technikak:["80%-os szabály","Heti kötelező pihenőnap","Értéklista: mi az, ami valóban számít?"],podcast:["The Perfectionism Project Podcast","Dare to Lead"]},
+  et:{konyvek:["Henry Cloud: Integrity","Marshall Rosenberg: Erőszakmentes kommunikáció","Simon Baron-Cohen: Zero Degrees of Empathy"],technikak:["Nézőpontváltás: hogyan éli meg a másik?","Visszautasítás-tűrési gyakorlatok","Értéklista: mi az, ami valóban fontos?"],podcast:["The School of Life","Hidden Brain – Empátia"]},
+  is:{konyvek:["Russell Barkley: Taking Charge of ADHD","Roy Baumeister: Willpower","Kelly McGonigal: The Willpower Instinct"],technikak:["Pause technika: 10 másodperc szünet","Ha-Akkor tervek","Micro-szokások: napi 2 perces rutin"],podcast:["Huberman Lab – Dopamin és motiváció","The Self-Control Podcast"]},
+  as:{konyvek:["Nathaniel Branden: Az önbecsülés hat pillére","Tara Mohr: Playing Big","Susan Cain: Csend"],technikak:["Belső értékelési napló","Social media detox: 1 nap","Értéklista: mi az, ami valóban fontos?"],podcast:["The Confidence Gap","We Can Do Hard Things"]},
+  np:{konyvek:["Martin Seligman: Flourish","Rick Hanson: Hardwiring Happiness","Barbara Fredrickson: Positivity"],technikak:["Hála-napló: este 3 pozitív dolog","Jó dolgok savoring: 20 másodperc tudatos élvezet","Pesszimizmus-teszt: mi cáfolja a feltevésemet?"],podcast:["Ten Percent Happier","The Happiness Lab – Dr. Laurie Santos"]},
+  pu:{konyvek:["Kristin Neff: Önszánat","Fred Luskin: Forgive for Good","Tara Brach: Radical Compassion"],technikak:["Önmegbocsátás-levél: írj egy levelet magadnak","Megbocsátás meditáció","Hibaelemzés helyett: Mit tanultam ebből?"],podcast:["Tara Brach – Radical Compassion","The Forgiveness Project"]},
+};
+
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+let answers = {};
+let memos = {};
+let goals = {};
+
+const TOTAL = 244;
+
+function getSchemaForItem(itemNum) {
+  return SCHEMAS.find(s => itemNum >= s.start && itemNum <= s.end);
+}
+
+function getDomainColor(domKey) {
+  const d = DOMAINS.find(d => d.key === domKey);
+  return d ? d.color : '#1B2A4A';
+}
+
+function getScore(schema) {
+  const items = [];
+  for (let i = schema.start; i <= schema.end; i++) {
+    if (answers[i] !== undefined) items.push(answers[i]);
+  }
+  if (items.length === 0) return null;
+  return items.reduce((a, b) => a + b, 0) / items.length;
+}
+
+function getLevel(score) {
+  if (score === null) return null;
+  if (score >= 5) return {label:'🔴 Nagyon magas', cls:'lvl-5', barCls:'bar-lvl-5'};
+  if (score >= 4) return {label:'🟠 Magas',        cls:'lvl-4', barCls:'bar-lvl-4'};
+  if (score >= 3) return {label:'🟡 Közepes',      cls:'lvl-3', barCls:'bar-lvl-3'};
+  if (score >= 2) return {label:'🟢 Alacsony',     cls:'lvl-2', barCls:'bar-lvl-2'};
+  return               {label:'🔵 Nagyon alacsony', cls:'lvl-1', barCls:'bar-lvl-1'};
+}
+
+function getBarColor(score) {
+  if (score >= 5) return '#C0392B';
+  if (score >= 4) return '#E67E22';
+  if (score >= 3) return '#D4AC0D';
+  if (score >= 2) return '#1E8449';
+  return '#1A5276';
+}
+
+function answeredCount() {
+  return Object.keys(answers).length;
+}
+
+function updateProgress() {
+  const n = answeredCount();
+  const pct = Math.round(n / TOTAL * 100);
+  document.getElementById('progressChip').textContent = pct + '%';
+  document.getElementById('progressBar').style.width = pct + '%';
+  const fab = document.getElementById('fab');
+  if (n > 0) fab.classList.add('visible'); else fab.classList.remove('visible');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════════
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  const tabs = document.querySelectorAll('.nav-tab');
+  const order = ['welcome','questionnaire','results','chart','connections','recommendations','compare','clients','psycho','ypi','modes','healthy','attach','dose','qol','log'];
+  const idx = order.indexOf(name);
+  if (idx >= 0) tabs[idx].classList.add('active');
+  window.scrollTo(0, 0);
+
+  if (name === 'results')         renderResults();
+  if (name === 'chart')           renderChart();
+  if (name === 'connections')     renderConnections();
+  if (name === 'recommendations') renderRecommendations();
+  if (name === 'clients')         renderClients();
+  if (name === 'compare')         renderCompare();
+  if (name === 'psycho')          renderPsycho();
+  if (name === 'ypi')             renderYPI();
+  if (name === 'modes')           renderModes();
+  if (name === 'healthy')         renderHealthy();
+  if (name === 'attach')          renderAttach();
+  if (name === 'dose')            renderDose();
+  if (name === 'qol')             renderQoL();
+  if (name === 'log')             renderLog();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// QUESTIONNAIRE
+// ═══════════════════════════════════════════════════════════════
+// ── PAGED QUESTIONNAIRE STATE ──
+let currentPage = 0; // 0 = domain index
+const TOTAL_PAGES = 5; // one per domain
+
+function renderQuestionnaire() {
+  const domSchemas = DOMAINS.map(dom =>
+    SCHEMAS.filter(s => s.dom === dom.key)
+  );
+  const dom = DOMAINS[currentPage];
+  const pageSchemas = domSchemas[currentPage];
+  const totalInPage = pageSchemas.reduce((a,s) => a + s.items.length, 0);
+  const answeredInPage = pageSchemas.reduce((a,s) => {
+    return a + s.items.filter((_,i) => answers[s.start+i] !== undefined).length;
+  }, 0);
+
+  // Dots
+  let dots = '<div class="page-dots">';
+  DOMAINS.forEach((d,i) => {
+    const schemas = domSchemas[i];
+    const total = schemas.reduce((a,s) => a+s.items.length, 0);
+    const done = schemas.reduce((a,s) =>
+      a + s.items.filter((_,j) => answers[s.start+j] !== undefined).length, 0);
+    const cls = i === currentPage ? 'current' : (done === total ? 'done' : '');
+    dots += `<div class="page-dot ${cls}" onclick="goToPage(${i})" title="${d.name}"></div>`;
+  });
+  dots += '</div>';
+
+  let html = dots;
+  html += `<div class="page-nav">
+    <button class="page-btn page-btn-prev" onclick="goToPage(${currentPage-1})" ${currentPage===0?'disabled':''}>← Előző</button>
+    <div class="page-info">
+      <strong>${dom.name}</strong><br>
+      ${answeredInPage} / ${totalInPage} kérdés megválaszolva
+    </div>
+    <button class="page-btn page-btn-next" onclick="goToPage(${currentPage+1})" ${currentPage===TOTAL_PAGES-1?'disabled':''}>Következő →</button>
+  </div>`;
+
+  html += `<div class="domain-banner dom-${dom.key}"><span>◈</span> ${dom.name}</div>`;
+
+  pageSchemas.forEach(schema => {
+    schema.items.forEach((item, idx) => {
+      const itemNum = schema.start + idx;
+      const val = answers[itemNum];
+      html += `<div class="question-card fade-up">
+        <div class="question-top">
+          <span class="q-num">${itemNum}.</span>
+          <span class="q-text">${item}</span>
+          <span class="q-schema dom-${schema.dom}">${schema.nev}</span>
+        </div>
+        <div class="answer-row">
+          ${[1,2,3,4,5,6].map(v => `
+            <button class="ans-btn ${val===v?'selected':''}" data-val="${v}"
+              onclick="setAnswer(${itemNum}, ${v}, this)">${v}</button>`).join('')}
+        </div>
+      </div>`;
+    });
+  });
+
+  // Bottom nav
+  html += `<div class="page-nav" style="margin-top:16px">
+    <button class="page-btn page-btn-prev" onclick="goToPage(${currentPage-1})" ${currentPage===0?'disabled':''}>← Előző tartomány</button>
+    <div class="page-info">${currentPage+1} / ${TOTAL_PAGES}</div>
+    <button class="page-btn page-btn-next" onclick="goToPage(${currentPage+1})" ${currentPage===TOTAL_PAGES-1?'disabled':''}>
+      ${currentPage===TOTAL_PAGES-1 ? '✓ Kész' : 'Következő →'}
+    </button>
+  </div>`;
+
+  document.getElementById('questionnaireContent').innerHTML = html;
+  window.scrollTo(0, 0);
+}
+
+function goToPage(idx) {
+  if (idx < 0 || idx >= TOTAL_PAGES) {
+    if (idx >= TOTAL_PAGES) showView('results');
+    return;
+  }
+  currentPage = idx;
+  renderQuestionnaire();
+}
+
+function setAnswer(itemNum, val, btn) {
+  answers[itemNum] = val;
+  const row = btn.closest('.answer-row');
+  row.querySelectorAll('.ans-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  updateProgress();
+  saveMemos();
+  autoSaveLocal();
+  timerStart();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RESULTS
+// ═══════════════════════════════════════════════════════════════
+function renderResults() {
+  const n = answeredCount();
+  if (n === 0) {
+    document.getElementById('resultsContent').innerHTML = `
+      <div class="incomplete-notice">
+        <h3>📋 Még nincs kitöltve</h3>
+        <p>Kérjük, töltse ki a kérdőívet az eredmények megtekintéséhez.</p>
+        <button class="start-btn" style="margin-top:12px" onclick="showView('questionnaire')">Kérdőív megkezdése →</button>
+      </div>`;
+    return;
+  }
+
+  // Calculate scores
+  const scored = SCHEMAS.map(s => ({...s, score: getScore(s)}))
+    .filter(s => s.score !== null)
+    .sort((a,b) => b.score - a.score);
+
+  const top3 = scored.slice(0, 3);
+  const avgAll = scored.reduce((a,b) => a + b.score, 0) / scored.length;
+
+  // Summary
+  let html = `<div class="results-summary fade-up">
+    <div class="results-hero">
+      <h2>Séma Profil</h2>
+      <p>${n} / ${TOTAL} tétel kitöltve · ${Math.round(n/TOTAL*100)}% · Átlag: ${avgAll.toFixed(2)}</p>
+    </div>
+    <div class="gold-divider"></div>
+    <div class="top-schemas">
+      <h3>Legerősebb sémáid</h3>`;
+
+  top3.forEach((s, i) => {
+    const pct = (s.score / 6 * 100).toFixed(1);
+    html += `<div class="top-schema-item">
+      <div class="top-schema-rank">${i+1}</div>
+      <div class="top-schema-name">${s.nev}</div>
+      <div class="top-schema-bar-wrap">
+        <div class="top-schema-bar" style="width:${pct}%;background:${getBarColor(s.score)}"></div>
+      </div>
+      <div class="top-schema-val">${s.score.toFixed(2)}</div>
+    </div>`;
+  });
+  html += `</div></div>`;
+
+  // Filter chips
+  html += `<div class="filter-row" id="domFilter">
+    <button class="filter-chip active" onclick="filterDom('all',this)">Mind</button>
+    <button class="filter-chip" onclick="filterDom('high',this)" style="background:var(--red);color:white;border-color:var(--red)">🔴 Csak magas (≥4)</button>
+    ${DOMAINS.map(d => `<button class="filter-chip" onclick="filterDom('${d.key}',this)">${d.name.split('. ')[1]||d.name}</button>`).join('')}
+  </div>`;
+
+  html += `<div class="section-title">Részletes séma profil</div>
+  <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+    <button class="snapshot-btn snapshot-btn-save" onclick="saveSnapshot(null)">
+      📸 Snapshot mentése összehasonlításhoz
+    </button>
+  </div>`;
+  html += `<div id="schemaCards">`;
+
+  SCHEMAS.forEach(schema => {
+    const score = getScore(schema);
+    if (score === null) return;
+    const lvl = getLevel(score);
+    const pct = (score / 6 * 100).toFixed(1);
+    const color = getDomainColor(schema.dom);
+    const memo = memos[schema.kod] || '';
+    const goal = goals[schema.kod] || '';
+
+    html += `<div class="schema-result-card fade-up" data-dom="${schema.dom}" data-score="${score.toFixed(2)}" onclick="toggleDetail('${schema.kod}')">
+      <div class="schema-result-header">
+        <div class="schema-result-dot" style="background:${color}"></div>
+        <div class="schema-result-name">${schema.nev}</div>
+        <span class="schema-result-level ${lvl.cls}">${lvl.label}</span>
+        <div class="schema-result-score" style="color:${getBarColor(score)}">${score.toFixed(2)}</div>
+      </div>
+      <div class="schema-bar-row">
+        <div class="schema-bar-bg">
+          <div class="schema-bar ${lvl.barCls}" style="width:${pct}%"></div>
+        </div>
+      </div>
+      <div class="schema-detail" id="detail-${schema.kod}">
+        <div class="detail-section">
+          <h4>📌 Mit jelent?</h4>
+          <p>${schema.leiras}</p>
+        </div>
+        <div class="detail-section">
+          <h4>👶 Gyermekkori eredet</h4>
+          <p>${schema.eredet}</p>
+        </div>
+        <div class="detail-section">
+          <h4>🔄 Tipikus viselkedési minták</h4>
+          <p>${schema.viselkedes}</p>
+        </div>
+        <div class="detail-section">
+          <h4>🌱 Hogyan dolgozz rajta?</h4>
+          <p>${schema.terapia}</p>
+        </div>
+        <div class="detail-section">
+          <h4>✏️ Személyes megjegyzés</h4>
+          <textarea class="memo-area" id="memo-${schema.kod}" placeholder="Ide írhatod gondolataidat ezzel a sémával kapcsolatban..."
+            onclick="event.stopPropagation()" onchange="saveMemoFor('${schema.kod}')">${memo}</textarea>
+        </div>
+        <div class="detail-section">
+          <h4>🎯 Terápiás célkitűzés</h4>
+          <textarea class="goal-area" id="goal-${schema.kod}" placeholder="Mit szeretnél változtatni ennél a sémánál? Mi az első kis lépés?"
+            onclick="event.stopPropagation()" onchange="saveGoalFor('${schema.kod}')">${goal}</textarea>
+        </div>
+      </div>
+    </div>`;
+  });
+
+  html += `</div>`;
+  document.getElementById('resultsContent').innerHTML = html;
+}
+
+function toggleDetail(kod) {
+  const detail = document.getElementById('detail-' + kod);
+  detail.classList.toggle('open');
+}
+
+function filterDom(key, btn) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.schema-result-card').forEach(card => {
+    card.style.display = (key === 'all' || card.dataset.dom === key) ? 'block' : 'none';
+  });
+}
+
+function saveMemoFor(kod) {
+  memos[kod] = document.getElementById('memo-' + kod).value;
+}
+function saveGoalFor(kod) {
+  goals[kod] = document.getElementById('goal-' + kod).value;
+}
+function saveMemos() { /* auto-save on answer */ }
+
+// ═══════════════════════════════════════════════════════════════
+// CHART
+// ═══════════════════════════════════════════════════════════════
+function renderChart() {
+  const n = answeredCount();
+  if (n === 0) {
+    document.getElementById('chartContent').innerHTML = `<div class="incomplete-notice"><h3>📈 Töltsd ki előbb a kérdőívet!</h3></div>`;
+    return;
+  }
+
+  const sorted = SCHEMAS.map(s => ({...s, score: getScore(s)}))
+    .filter(s => s.score !== null)
+    .sort((a,b) => b.score - a.score);
+
+  let html = `<div class="chart-card fade-up">
+    <h3>Séma Profil – Vizuális Áttekintés</h3>
+    <div class="bar-chart">`;
+
+  sorted.forEach(s => {
+    const pct = (s.score / 6 * 100).toFixed(1);
+    const color = getBarColor(s.score);
+    const domColor = getDomainColor(s.dom);
+    html += `<div class="bar-row">
+      <div class="bar-label" style="color:${domColor};font-weight:600">${s.nev}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${pct}%;background:${color}">
+          <span class="bar-val">${s.score.toFixed(1)}</span>
+        </div>
+      </div>
+      <div class="bar-val-outside">${s.score.toFixed(2)}</div>
+    </div>`;
+  });
+
+  html += `</div></div>`;
+
+  // Domain averages
+  html += `<div class="chart-card fade-up">
+    <h3>Tartomány Összesítők</h3>
+    <div class="bar-chart">`;
+
+  DOMAINS.forEach(dom => {
+    const schemas = SCHEMAS.filter(s => s.dom === dom.key);
+    const scores = schemas.map(s => getScore(s)).filter(s => s !== null);
+    if (scores.length === 0) return;
+    const avg = scores.reduce((a,b) => a+b, 0) / scores.length;
+    const pct = (avg / 6 * 100).toFixed(1);
+    const color = getBarColor(avg);
+    html += `<div class="bar-row">
+      <div class="bar-label" style="color:${dom.color};font-weight:700">${dom.name}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${pct}%;background:${color}">
+          <span class="bar-val">${avg.toFixed(1)}</span>
+        </div>
+      </div>
+      <div class="bar-val-outside">${avg.toFixed(2)}</div>
+    </div>`;
+  });
+
+  html += `</div></div>`;
+  document.getElementById('chartContent').innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CONNECTIONS
+// ═══════════════════════════════════════════════════════════════
+function renderConnections() {
+  let html = `<div class="section-title">Séma Kapcsolatok Térképe</div>
+  <p style="color:var(--txt2);font-size:0.86rem;margin-bottom:16px;line-height:1.6">
+    A sémák ritkán jelennek meg egyedül. Ez a térkép megmutatja, melyik sémák erősítik egymást, 
+    és mi váltja ki őket.
+  </p>`;
+
+  let domFilter = `<div class="filter-row">
+    <button class="filter-chip active" onclick="filterConnDom('all',this)">Mind</button>
+    ${DOMAINS.map(d => `<button class="filter-chip" onclick="filterConnDom('${d.key}',this)">${d.name.split('. ')[1]||d.name}</button>`).join('')}
+  </div>`;
+  html += domFilter;
+
+  SCHEMAS.forEach(schema => {
+    const conn = CONNECTIONS[schema.kod] || {};
+    const color = getDomainColor(schema.dom);
+    const score = getScore(schema);
+    const scoreStr = score !== null ? ` · ${score.toFixed(2)}` : '';
+
+    const relNames = (conn.kapcsolatok || []).map(k => {
+      const s = SCHEMAS.find(x => x.kod === k);
+      return s ? s.nev : k;
+    });
+
+    html += `<div class="conn-card fade-up" data-dom="${schema.dom}">
+      <div class="conn-header" onclick="toggleConn('${schema.kod}')">
+        <span class="conn-badge dom-${schema.dom}">${schema.kod.toUpperCase()}</span>
+        <span class="conn-name">${schema.nev}${scoreStr}</span>
+        <span class="conn-arrow" id="connarrow-${schema.kod}">▼</span>
+      </div>
+      <div class="conn-body" id="connbody-${schema.kod}">
+        <p class="conn-desc">${conn.leiras || '–'}</p>
+        <div class="conn-tags">
+          ${relNames.map(n => `<span class="conn-tag">${n}</span>`).join('')}
+        </div>
+        <div class="trigger-box">
+          <strong>⚡ Kiváltó helyzetek:</strong> ${conn.triggerek || '–'}
+        </div>
+      </div>
+    </div>`;
+  });
+
+  document.getElementById('connectionsContent').innerHTML = html;
+}
+
+function toggleConn(kod) {
+  const body = document.getElementById('connbody-' + kod);
+  const arrow = document.getElementById('connarrow-' + kod);
+  body.classList.toggle('open');
+  arrow.classList.toggle('open');
+}
+
+function filterConnDom(key, btn) {
+  document.querySelectorAll('#connectionsContent .filter-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.conn-card').forEach(card => {
+    card.style.display = (key === 'all' || card.dataset.dom === key) ? 'block' : 'none';
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RECOMMENDATIONS
+// ═══════════════════════════════════════════════════════════════
+function renderRecommendations() {
+  const n = answeredCount();
+  let html = `<div class="section-title">Személyre Szóló Ajánlások</div>`;
+
+  if (n > 0) {
+    const sorted = SCHEMAS.map(s => ({...s, score: getScore(s)}))
+      .filter(s => s.score !== null && s.score >= 3.5)
+      .sort((a,b) => b.score - a.score);
+    if (sorted.length > 0) {
+      html += `<div class="warn-box" style="margin-bottom:16px">
+        📌 Az alábbi ajánlások a <strong>${sorted.length} kiemelt sémád</strong> alapján szerepelnek elöl (átlag ≥ 3.5).
+        A többi séma ajánlásait lejjebb görgetve éred el.
+      </div>`;
+    }
+  }
+
+  // Sort by score if available
+  const schemasOrdered = [...SCHEMAS].sort((a, b) => {
+    const sa = getScore(a) || 0;
+    const sb = getScore(b) || 0;
+    return sb - sa;
+  });
+
+  schemasOrdered.forEach(schema => {
+    const rec = RECOMMENDATIONS[schema.kod] || {};
+    const score = getScore(schema);
+    const color = getDomainColor(schema.dom);
+    const lvl = score !== null ? getLevel(score) : null;
+    const isHigh = score !== null && score >= 3.5;
+
+    html += `<div class="rec-card fade-up" style="${isHigh ? 'border:2px solid '+color : ''}">
+      <div class="rec-header" onclick="toggleRec('${schema.kod}')">
+        <span class="conn-badge dom-${schema.dom}">${schema.kod.toUpperCase()}</span>
+        <span class="conn-name">${schema.nev}</span>
+        ${lvl ? `<span class="schema-result-level ${lvl.cls}" style="font-size:0.7rem">${score.toFixed(2)}</span>` : ''}
+        <span class="conn-arrow" id="recarrow-${schema.kod}">▼</span>
+      </div>
+      <div class="rec-body" id="recbody-${schema.kod}">
+        <div class="rec-section">
+          <h4>📖 Ajánlott könyvek</h4>
+          ${(rec.konyvek||[]).map(b => `<div class="rec-item"><span class="rec-dot">◆</span>${b}</div>`).join('')}
+        </div>
+        <div class="rec-section">
+          <h4>🧘 Technikák és gyakorlatok</h4>
+          ${(rec.technikak||[]).map(t => `<div class="rec-item"><span class="rec-dot">◆</span>${t}</div>`).join('')}
+        </div>
+        <div class="rec-section">
+          <h4>🎧 Podcastok</h4>
+          ${(rec.podcast||[]).map(p => `<div class="rec-item"><span class="rec-dot">◆</span>${p}</div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+  });
+
+  document.getElementById('recommendationsContent').innerHTML = html;
+}
+
+function toggleRec(kod) {
+  const body = document.getElementById('recbody-' + kod);
+  const arrow = document.getElementById('recarrow-' + kod);
+  body.classList.toggle('open');
+  arrow.classList.toggle('open');
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// DARK MODE
+// ═══════════════════════════════════════════════════════════════
+let darkMode = localStorage.getItem('ysq_dark') === '1';
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
+  document.getElementById('themeToggle').textContent = darkMode ? '☀️ Világos' : '🌙 Sötét';
+}
+function toggleTheme() {
+  darkMode = !darkMode;
+  localStorage.setItem('ysq_dark', darkMode ? '1' : '0');
+  applyTheme();
+}
+applyTheme();
+
+// ═══════════════════════════════════════════════════════════════
+// CLIENT MANAGER
+// ═══════════════════════════════════════════════════════════════
+let clients = JSON.parse(localStorage.getItem('ysq_clients') || '[]');
+let activeClient = null;
+
+function saveClients() {
+  localStorage.setItem('ysq_clients', JSON.stringify(clients));
+}
+
+function loadClient(idx) {
+  const c = clients[idx];
+  if (!c) return;
+  activeClient = idx;
+  answers = {...(c.answers || {})};
+  memos   = {...(c.memos   || {})};
+  goals   = {...(c.goals   || {})};
+  updateProgress();
+  renderQuestionnaire();
+  renderClients();
+  // Update print header
+  const d = new Date(c.date).toLocaleDateString('hu-HU');
+  document.getElementById('printMeta').textContent =
+    `Kliens: ${c.name} · ${d} · YSQ-L Magyar`;
+  showView('questionnaire');
+}
+
+function saveCurrentClient() {
+  if (activeClient === null) return;
+  clients[activeClient].answers = {...answers};
+  clients[activeClient].memos   = {...memos};
+  clients[activeClient].goals   = {...goals};
+  clients[activeClient].date    = new Date().toISOString();
+  // Calculate avg score
+  const scores = SCHEMAS.map(s => getScore(s)).filter(s => s !== null);
+  clients[activeClient].avgScore = scores.length
+    ? (scores.reduce((a,b) => a+b, 0) / scores.length).toFixed(2) : null;
+  saveClients();
+  renderClients();
+}
+
+function newClient(name) {
+  if (!name.trim()) return;
+  const c = {
+    id: Date.now(), name: name.trim(),
+    date: new Date().toISOString(),
+    answers: {}, memos: {}, goals: {}, avgScore: null
+  };
+  clients.push(c);
+  saveClients();
+  activeClient = clients.length - 1;
+  answers = {}; memos = {}; goals = {};
+  updateProgress();
+  renderQuestionnaire();
+  renderClients();
+  document.getElementById('printMeta').textContent =
+    `Kliens: ${c.name} · YSQ-L Magyar`;
+  showView('questionnaire');
+}
+
+function deleteClient(idx, e) {
+  e.stopPropagation();
+  if (!confirm(`Törli ezt a klienst? "${clients[idx].name}"`)) return;
+  if (activeClient === idx) {
+    activeClient = null; answers = {}; memos = {}; goals = {};
+    updateProgress();
+  }
+  clients.splice(idx, 1);
+  if (activeClient !== null && activeClient > idx) activeClient--;
+  saveClients();
+  renderClients();
+}
+
+function renderClients() {
+  let newName = '';
+  let html = `<div class="client-panel fade-up">
+    <h3>👥 Terapeuta Mód · Klienskezelő</h3>
+    <div class="client-input-row">
+      <input class="client-input" id="newClientName" type="text"
+        placeholder="Kliens neve (pl. Kovács Anna)..."
+        onkeydown="if(event.key==='Enter') addNewClient()">
+      <button class="client-btn client-btn-primary" onclick="addNewClient()">+ Új kliens</button>
+    </div>`;
+
+  if (clients.length === 0) {
+    html += `<div class="client-empty">Még nincs kliens.<br>Adj hozzá egyet a fenti mezőben.</div>`;
+  } else {
+    html += `<div class="client-list">`;
+    clients.forEach((c, i) => {
+      const date = new Date(c.date).toLocaleDateString('hu-HU');
+      const n = Object.keys(c.answers || {}).length;
+      const pct = Math.round(n / 244 * 100);
+      const isActive = activeClient === i;
+      html += `<div class="client-item ${isActive ? 'active' : ''}" onclick="loadClient(${i})">
+        <div>
+          <div class="client-item-name">${c.name}</div>
+          <div class="client-item-date">${date} · ${pct}% kitöltve</div>
+        </div>
+        ${c.avgScore ? `<div class="client-item-score">Átlag: ${c.avgScore}</div>` : ''}
+        <button class="client-btn client-btn-danger" style="padding:4px 10px;font-size:0.76rem"
+          onclick="deleteClient(${i}, event)">Töröl</button>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  if (activeClient !== null) {
+    const c = clients[activeClient];
+    const n = Object.keys(answers).length;
+    html += `<div style="margin-top:14px;padding-top:14px;border-top:2px solid #EEF2F9">
+      <p style="font-size:0.84rem;color:var(--txt2);margin-bottom:10px">
+        Aktív kliens: <strong style="color:var(--navy)">${c.name}</strong>
+        · ${n}/244 tétel kitöltve
+      </p>
+      <div class="client-input-row">
+        <button class="client-btn client-btn-gold" onclick="saveCurrentClient()">💾 Mentés</button>
+        <button class="client-btn client-btn-primary" onclick="exportPDF()">🖨️ Teljes PDF</button>
+        <button class="client-btn client-btn-gold" onclick="exportClientPDF()">📄 Kliens összefoglaló</button>
+        <button class="client-btn client-btn-primary" onclick="showView('results')">📊 Eredmény</button>
+      </div>
+    </div>`;
+  }
+
+  html += `</div>
+
+  <div class="client-panel fade-up" style="margin-top:0">
+    <h3>🖨️ PDF Export</h3>
+    <p style="font-size:0.86rem;color:var(--txt2);margin-bottom:12px;line-height:1.6">
+      A PDF export a böngésző nyomtatási funkciójával működik.
+      Válaszd a <strong>„Mentés PDF-ként"</strong> opciót a nyomtatónál.
+      Az eredmény lap kerül exportálásra a séma profilokkal.
+    </p>
+    <div class="client-input-row">
+      <button class="client-btn client-btn-primary" onclick="exportPDF()" style="flex:1">
+        🖨️ Eredmény exportálása PDF-ként
+      </button>
+    </div>
+    <div style="margin-top:10px;padding:10px 12px;background:var(--cream);border-radius:8px">
+      <p style="font-size:0.8rem;color:var(--txt3);line-height:1.5">
+        💡 Tipp: Chrome/Safari → Nyomtatás → Célhely: PDF mentése → Háttérgrafika bekapcsolása a színes verzióhoz.
+      </p>
+    </div>
+  </div>`;
+
+  document.getElementById('clientsContent').innerHTML = html;
+}
+
+function addNewClient() {
+  const inp = document.getElementById('newClientName');
+  if (inp && inp.value.trim()) {
+    newClient(inp.value);
+    inp.value = '';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PDF EXPORT
+// ═══════════════════════════════════════════════════════════════
+function exportPDF() {
+  // First render results, expand all details, then print
+  showView('results');
+  setTimeout(() => {
+    // Open all schema details for print
+    document.querySelectorAll('.schema-detail').forEach(d => d.classList.add('open'));
+    // Set print meta
+    if (activeClient !== null) {
+      const c = clients[activeClient];
+      const d = new Date(c.date).toLocaleDateString('hu-HU');
+      document.getElementById('printMeta').textContent =
+        `Kliens: ${c.name} · ${d} · ${Object.keys(answers).length}/244 tétel`;
+    }
+    setTimeout(() => {
+      window.print();
+      // Close all details again after print
+      setTimeout(() => {
+        document.querySelectorAll('.schema-detail').forEach(d => d.classList.remove('open'));
+      }, 1000);
+    }, 300);
+  }, 400);
+}
+
+// Auto-save when switching views
+
+
+
+
+// ═══════════════════════════════════════════════════════════════
+// HEALTHY ADULT MODE
+// ═══════════════════════════════════════════════════════════════
+const HA_TRAITS = [
+  { key:"onszanat",  name:"Önszánat és önelfogadás",    desc:"Képes vagy kedvesen és megértően bánni magaddal, különösen hibák esetén.", items:["Hibázáskor kedvesen bánok magammal, nem ostorzom magam.","El tudom fogadni, hogy senki sem tökéletes – én sem.","Meg tudom bocsátani magamnak a múltbeli hibáimat.","Tudok vigasztalni magam nehéz pillanatokban.","Nem ítélem meg magam szigorúbban, mint ahogy egy jó barátot ítélnék meg."] },
+  { key:"hatarszab", name:"Egészséges határok",          desc:"Képes vagy nemet mondani és saját igényeidet érvényesíteni.", items:["Meg tudom fogalmazni, mire van szükségem, és azt kérem.","Nemet mondok, ha valami nem fér bele az értékeimbe vagy erőmbe.","Nem érzek bűntudatot, ha saját szükségleteimet is figyelembe veszem.","Tudom kezelni a konfliktusgot anélkül, hogy elnémulnék vagy robbanásig halmoznám.","Nem hagyom, hogy mások áthágják az én határaimat."] },
+  { key:"erzelmi",   name:"Érzelmi tudatosság",          desc:"Képes vagy érzelmeidet felismerni, elfogadni és kifejezni.", items:["Tudatában vagyok annak, mit érzek az adott pillanatban.","Tudom megnevezni és kifejezni az érzelmeimet.","Az érzelmeimet információnak tekintem, nem ellenségnek.","Megengedem magamnak, hogy pozitív érzelmeket is megéljek (öröm, büszkeség, szeretet).","Nem fojtom el az érzéseimet, de nem is ragadnak el teljesen."] },
+  { key:"autonomia", name:"Autonómia és önazonosság",    desc:"Tisztában vagy azzal, ki vagy és mit akarsz.", items:["Tudom, mik az értékeim és azok szerint élek.","Döntéseimet belső meggyőződés alapján hozom, nem csak mások elvárásai szerint.","Érzem, hogy saját életem irányítója vagyok.","Ismerem az erősségeimet és gyengeségeimet.","Tisztában vagyok azzal, mi az, ami igazán fontos nekem."] },
+  { key:"kapcsolat", name:"Egészséges kapcsolódás",      desc:"Képes vagy intim, kölcsönös kapcsolatokra.", items:["Bizalommal tudok közeledni másokhoz.","Tudok adni és kapni is a kapcsolataimban.","Megengedem magamnak, hogy sebezhetőnek mutassam magam biztonságos kapcsolatokban.","Tudom élvezni az intimitást anélkül, hogy elveszíteném magam.","Meg tudom tartani az egyéni identitásom akkor is, amikor közel vagyok valakihez."] },
+  { key:"jelenbeli", name:"Jelenlét és élvezetképesség", desc:"Képes vagy a jelenben lenni és örömöt átélni.", items:["Tudok a jelen pillanatban lenni anélkül, hogy folyamatosan aggódnék.","Képes vagyok élvezni a kis örömöket a mindennapokban.","Tudok lazítani és feltöltődni.","Nem érzem bűnösnek magam, amikor pihenek vagy szórakozom.","Képes vagyok megbecsülni azt, amim van."] },
+];
+
+let haAnswers = {};
+let haPage = 0;
+
+function renderHealthy() {
+  const answered = Object.keys(haAnswers).length;
+  const total = HA_TRAITS.reduce((a,t) => a+t.items.length, 0);
+  const pct = Math.round(answered/total*100);
+
+  let html = `<div class="section-title">💚 Egészséges Felnőtt Mód</div>
+  <p style="font-size:0.86rem;color:var(--txt2);line-height:1.6;margin-bottom:14px">
+    Az <strong>Egészséges Felnőtt Mód</strong> a sématerápia egyik legfontosabb célja: az a belső hang és erő, 
+    amely képes gondoskodni rólad, határokat szabni, és egészségesen kezelni az érzelmeket.<br>
+    Értékeld 1–5-ig, mennyire jellemzők rád az alábbi állítások.
+  </p>
+  <div class="ypi-progress"><div class="ypi-progress-fill" style="width:${pct}%"></div></div>`;
+
+  html += `<div class="inner-tabs">
+    ${HA_TRAITS.map((t,i) => `<button class="inner-tab ${haPage===i?'active':''}" onclick="haGoTab(${i})">${t.name.split(' ')[0]}</button>`).join('')}
+  </div>`;
+
+  const trait = HA_TRAITS[haPage];
+  html += `<div class="psycho-card fade-up" style="border-left:4px solid #1E8449">
+    <div style="padding:12px 16px 8px">
+      <div style="font-size:0.76rem;font-weight:700;color:#1E8449;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px">💚 ${trait.name}</div>
+      <p style="font-size:0.84rem;color:var(--txt2);line-height:1.5">${trait.desc}</p>
+    </div>
+  </div>`;
+
+  trait.items.forEach((item, idx) => {
+    const key = `${trait.key}_${idx}`;
+    const val = haAnswers[key];
+    html += `<div class="ypi-question-card fade-up">
+      <div class="ypi-q-top">
+        <div class="ypi-q-num">${trait.name} · ${idx+1}/${trait.items.length}</div>
+        <div class="ypi-q-text">${item}</div>
+      </div>
+      <div class="ypi-likert">
+        ${[1,2,3,4,5].map(v => `
+          <button class="ypi-btn ${val===v?'selected':''}" onclick="setHA('${key}',${v},this)">
+            <span class="ypi-btn-num">${v}</span>
+            <span class="ypi-btn-lbl">${['Nem','Inkább nem','Részben','Inkább igen','Igen'][v-1]}</span>
+          </button>`).join('')}
+      </div>
+    </div>`;
+  });
+
+  html += `<div style="display:flex;gap:8px;margin-top:8px">
+    <button class="page-btn page-btn-prev" style="flex:1" onclick="haGoTab(${haPage-1})" ${haPage===0?'disabled':''}>← Előző</button>
+    <button class="page-btn page-btn-next" style="flex:1" onclick="haGoTab(${haPage+1})" ${haPage===HA_TRAITS.length-1?'disabled':''}>
+      ${haPage===HA_TRAITS.length-1?'Eredmény ↓':'Következő →'}
+    </button>
+  </div>`;
+
+  if (answered >= total * 0.5) html += renderHAResults();
+  else html += `<div class="incomplete-notice" style="margin-top:14px"><h3>💚 Töltsd ki a kérdőívet</h3><p>${answered}/${total} megválaszolva</p></div>`;
+
+  document.getElementById('healthyContent').innerHTML = html;
+}
+
+function renderHAResults() {
+  const scores = {};
+  HA_TRAITS.forEach(t => {
+    const vals = t.items.map((_,i) => haAnswers[`${t.key}_${i}`]).filter(v=>v!==undefined);
+    scores[t.key] = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
+  });
+  const overall = Object.values(scores).filter(v=>v>0);
+  const avg = overall.length ? overall.reduce((a,b)=>a+b,0)/overall.length : 0;
+  const pct = Math.round(avg/5*100);
+  const color = avg >= 4 ? '#1E8449' : avg >= 3 ? '#D4AC0D' : avg >= 2 ? '#E67E22' : '#C0392B';
+  const label = avg >= 4 ? 'Erős Egészséges Felnőtt' : avg >= 3 ? 'Fejlődőben lévő' : avg >= 2 ? 'Gyenge, fejlesztésre szorul' : 'Nagyon gyenge – kiemelt terület';
+
+  let html = `<div class="compare-card fade-up" style="margin-top:16px">
+    <h3>💚 Egészséges Felnőtt Profil</h3>
+    <div style="text-align:center;padding:16px 0">
+      <div style="font-family:'DM Serif Display',serif;font-size:3rem;color:${color};line-height:1">${avg.toFixed(2)}</div>
+      <div style="font-size:0.88rem;font-weight:600;color:${color};margin-top:4px">${label}</div>
+      <div style="font-size:0.78rem;color:var(--txt3);margin-top:2px">Összesített átlag (1–5 skála)</div>
+    </div>`;
+
+  [...HA_TRAITS].sort((a,b) => scores[b.key]-scores[a.key]).forEach(t => {
+    const sc = scores[t.key]||0;
+    const pct2 = (sc/5*100).toFixed(0);
+    const c = sc>=4?'#1E8449':sc>=3?'#D4AC0D':sc>=2?'#E67E22':'#C0392B';
+    html += `<div class="ha-trait-row">
+      <div class="ha-trait-name">${t.name}</div>
+      <div class="ha-trait-track"><div class="ha-trait-fill" style="width:${pct2}%;background:${c}"></div></div>
+      <div class="ha-trait-val">${sc.toFixed(1)}</div>
+    </div>`;
+  });
+
+  // Weakest trait advice
+  const weakest = Object.entries(scores).sort((a,b)=>a[1]-b[1])[0];
+  const weakTrait = HA_TRAITS.find(t=>t.key===weakest[0]);
+  const HA_TIPS = {
+    onszanat:"Gyakorold a self-compassion break technikát: 'Ez fáj. Szenvedés az élet része. Kedves leszek magamhoz.' Kristin Neff önszánat-gyakorlatai nagyon hasznosak lehetnek.",
+    hatarszab:"Kezdj kis határokkal: mondj nemet egyszer ezen a héten valami kisebb dologra. Fokozatosan növeld. DEAR MAN (DBT) technika segít a határok asszertív kommunikálásában.",
+    erzelmi:"Vezess érzelemaplót: naponta egyszer kérdezd meg magadtól 'Mit érzek most?'. Kezdd 3 alapérzelemmel (öröm, szomorúság, félelem), és fokozatosan bővítsd.",
+    autonomia:"Kérdezd meg magadtól hetente: 'Mit akarnék valójában, ha senki sem nézne?' Vezess döntési naplót – mikor döntöttél belső meggyőződés alapján?",
+    kapcsolat:"Próbálj meg hetente egyszer valami kis, személyes dolgot megosztani egy megbízható emberrel. Figyeld meg, mi történik – biztonságban vagy-e?",
+    jelenbeli:"5 perces 'jelen pillanat' gyakorlat naponta: mit látsz, hallasz, érzel most? Írd le 3 dolgot, amiért hálás vagy ma.",
+  };
+  if (weakest[1] < 3.5) {
+    html += `<div style="margin-top:14px;padding:12px 14px;background:#EAFAF1;border-radius:8px;border-left:4px solid #1E8449">
+      <div style="font-size:0.8rem;font-weight:700;color:#1E8449;margin-bottom:6px">🌱 Fejlesztendő terület: ${weakTrait.name}</div>
+      <p style="font-size:0.84rem;color:var(--txt2);line-height:1.6">${HA_TIPS[weakest[0]]}</p>
+    </div>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+function setHA(key, val, btn) {
+  haAnswers[key] = val;
+  btn.closest('.ypi-likert').querySelectorAll('.ypi-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  autoSaveLocal();
+}
+function haGoTab(idx) {
+  if (idx<0) return;
+  if (idx>=HA_TRAITS.length) { renderHealthy(); return; }
+  haPage=idx; renderHealthy(); window.scrollTo(0,0);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ATTACHMENT STYLE
+// ═══════════════════════════════════════════════════════════════
+const ATTACH_STYLES = [
+  { key:"secure",   icon:"🟢", name:"Biztonságos",    color:"#1E8449",
+    desc:"Kényelmes vagy az intimitással és az önállósággal egyaránt. Megbízol másokban és magadban. Könnyen kérsz és adsz támogatást.",
+    schemas:["Kevés magas séma jellemző. Az esetleges sémák tudatosan kezelhetők."],
+    tip:"A biztonságos kötődés a legegészségesebb alap. Fontos fenntartani és ápolni a kötődési biztonságot adó kapcsolatokat.",
+    items:["Általában könnyen bízom meg másokban.","Kényelmes érzés, ha valaki közel kerül hozzám.","Nem aggódom sokat amiatt, hogy magányos maradok.","Könnyen kérek segítséget, ha szükségem van rá.","Egyszerre tudok közel lenni valakihez és mégis önmagam maradni."]},
+  { key:"anxious",  icon:"🟡", name:"Sóvárgó/Aggódó", color:"#D4AC0D",
+    desc:"Intenzíven vágyódsz a közelségre, de közben félsz az elhagyástól. Függőséget érezhetsz, és az elutasítástól való félelem irányíthatja a viselkedésedet.",
+    schemas:["Elhagyatottság (ab)", "Érzelmi Depriváció (ed)", "Leigázottság (sb)", "Önfeláldozás (ss)", "Elismerés Keresése (as)"],
+    tip:"A sóvárgó kötődés mögött az elhagyatottság és az érzelmi depriváció sémái állnak leggyakrabban. A terápiás munka középpontjában az egyedüllét tolerálása és az önértékelés belső forrásainak fejlesztése áll.",
+    items:["Aggódom, hogy a párom nem szeret annyira, mint én őt.","Nehéz elviselni, ha valaki, akit szeretek, nem elérhető.","Sokszor keresem a megerősítést, hogy szeretnek és értékelnek.","Olyan kapcsolatokba ragadok bele, amelyek nem tesznek jól, mert félek egyedül maradni.","Jobban érzem magam, ha valaki közel van – akkor is, ha az a valaki nem mindig jó nekem."]},
+  { key:"avoidant", icon:"🔵", name:"Elkerülő",        color:"#1A5276",
+    desc:"Kényelmetlennek érzed a közelséget és az intimitást. Önellátónak tartod magad, és nehezen fogadod el mások segítségét vagy szeretetét.",
+    schemas:["Érzelmi Gátoltság (ei)", "Érzelmi Depriváció (ed)", "Bizalmatlanság (ma)", "Behálózottság (em)", "Könyörtelen Mércék (us)"],
+    tip:"Az elkerülő kötődés mögött az érzelmi gátoltság és a bizalmatlanság sémái állnak leggyakrabban. A terápiás munka a sérülékenység fokozatos megengedésére és a biztonságos intimitás megtapasztalására fókuszál.",
+    items:["Kényelmetlenül érzem magam, ha valaki túl közel kerül hozzám.","Inkább egyedül oldom meg a problémáimat.","Bosszantónak érzem, ha a párom nagyon sokat igényel tőlem.","Nehéz kimondanom, hogy szükségem van valakire.","Előfordul, hogy szándékosan tartok távolságot, hogy ne sérülhessek meg."]},
+  { key:"disorg",   icon:"🔴", name:"Dezorganizált",   color:"#C0392B",
+    desc:"Egyszerre vágyódsz a közelségre és félsz tőle. A kapcsolatok kaotikusnak érzik magukat, és nehéz kiszámítható mintákat kialakítani.",
+    schemas:["Elhagyatottság (ab)", "Bizalmatlanság (ma)", "Fogyatékosság (ds)", "Sérülékenység (vh)", "Behálózottság (em)"],
+    tip:"A dezorganizált kötődés általában korai traumával vagy kiszámíthatatlan gondoskodással függ össze. A terápiás munka a biztonság megtapasztalásán és a kapcsolatok kiszámíthatóbbá tételén alapul.",
+    items:["A kapcsolataim kaotikusnak és kiszámíthatatlannak éreznek.","Egyszerre akarom, hogy valaki közel legyen, és el is akarom küldeni.","A közelség néha ijesztőnek érzi magát, még ha vágyom is rá.","Nehéz megbíznom valakiben, de az egyedüllét is elviselhetetlen.","A kapcsolataimban sűrűn váltakoznak az intenzív közelség és az eltávolodás periódusai."]},
+];
+
+let attachAnswers = {};
+let selectedAttach = null;
+
+function renderAttach() {
+  const answered = Object.keys(attachAnswers).length;
+  const total = ATTACH_STYLES.reduce((a,s)=>a+s.items.length,0);
+  const pct = Math.round(answered/total*100);
+
+  let html = `<div class="section-title">🔗 Kötődési Stílus</div>
+  <p style="font-size:0.86rem;color:var(--txt2);line-height:1.6;margin-bottom:14px">
+    A <strong>kötődési stílus</strong> megmutatja, hogyan viszonyulsz az intimitáshoz és a közelséghez. 
+    John Bowlby és Mary Ainsworth kutatásain alapul. Értékeld 1–5 skálán az állításokat.
+  </p>
+  <div class="ypi-progress"><div class="ypi-progress-fill" style="width:${pct}%"></div></div>`;
+
+  ATTACH_STYLES.forEach((style, si) => {
+    const styleAnswered = style.items.filter((_,i) => attachAnswers[`${style.key}_${i}`] !== undefined).length;
+    html += `<div class="psycho-card fade-up" style="border-left:4px solid ${style.color};margin-bottom:10px">
+      <div style="padding:12px 16px 4px;display:flex;align-items:center;gap:8px">
+        <span style="font-size:1.3rem">${style.icon}</span>
+        <div>
+          <div style="font-size:0.88rem;font-weight:700;color:${style.color}">${style.name}</div>
+          <div style="font-size:0.78rem;color:var(--txt3)">${styleAnswered}/${style.items.length} megválaszolva</div>
+        </div>
+      </div>`;
+    style.items.forEach((item, idx) => {
+      const key = `${style.key}_${idx}`;
+      const val = attachAnswers[key];
+      html += `<div style="padding:8px 16px 4px">
+        <div style="font-size:0.84rem;color:var(--txt);line-height:1.4;margin-bottom:6px">${item}</div>
+        <div class="ypi-likert" style="padding:0">
+          ${[1,2,3,4,5].map(v => `
+            <button class="ypi-btn ${val===v?'selected':''}" onclick="setAttach('${key}',${v},this)">
+              <span class="ypi-btn-num">${v}</span>
+            </button>`).join('')}
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+
+  if (answered >= total * 0.6) html += renderAttachResults();
+  else html += `<div class="incomplete-notice" style="margin-top:14px"><h3>🔗 Töltsd ki a kérdőívet</h3><p>${answered}/${total} megválaszolva</p></div>`;
+
+  document.getElementById('attachContent').innerHTML = html;
+}
+
+function renderAttachResults() {
+  const scores = {};
+  ATTACH_STYLES.forEach(style => {
+    const vals = style.items.map((_,i) => attachAnswers[`${style.key}_${i}`]).filter(v=>v!==undefined);
+    scores[style.key] = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
+  });
+  const dominant = Object.entries(scores).sort((a,b)=>b[1]-a[1])[0];
+  const dominantStyle = ATTACH_STYLES.find(s=>s.key===dominant[0]);
+
+  let html = `<div class="compare-card fade-up" style="margin-top:16px">
+    <h3>🔗 Kötődési Profil</h3>`;
+
+  [...ATTACH_STYLES].sort((a,b)=>scores[b.key]-scores[a.key]).forEach(style => {
+    const sc = scores[style.key]||0;
+    const pct2 = (sc/5*100).toFixed(0);
+    html += `<div class="ypi-result-bar">
+      <div class="ypi-result-label">${style.icon} ${style.name}</div>
+      <div class="ypi-result-track">
+        <div class="ypi-result-fill" style="width:${pct2}%;background:${style.color}">
+          <span class="ypi-result-val">${sc.toFixed(1)}</span>
+        </div>
+      </div>
+      <div class="ypi-result-num">${sc.toFixed(2)}</div>
+    </div>`;
+  });
+
+  html += `<div style="margin-top:14px;padding:14px;background:var(--cream);border-radius:8px;border-left:4px solid ${dominantStyle.color}">
+    <div style="font-size:0.82rem;font-weight:700;color:${dominantStyle.color};margin-bottom:6px">${dominantStyle.icon} Domináns kötődési stílus: ${dominantStyle.name}</div>
+    <p style="font-size:0.84rem;color:var(--txt2);line-height:1.6;margin-bottom:8px">${dominantStyle.desc}</p>
+    <div style="font-size:0.78rem;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px">Kapcsolódó sémák:</div>
+    <div style="font-size:0.82rem;color:var(--txt2)">${dominantStyle.schemas.join(' · ')}</div>
+    <div style="margin-top:8px;padding-top:8px;border-top:1px solid #E8EDF5;font-size:0.82rem;color:var(--txt2);line-height:1.5">${dominantStyle.tip}</div>
+  </div></div>`;
+  return html;
+}
+
+function setAttach(key, val, btn) {
+  attachAnswers[key] = val;
+  btn.closest('.ypi-likert').querySelectorAll('.ypi-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  autoSaveLocal();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DOSE INDICATOR – TERAPEUTA FÓKUSZ JELZŐ
+// ═══════════════════════════════════════════════════════════════
+function renderDose() {
+  const n = answeredCount();
+  if (n < 50) {
+    document.getElementById('doseContent').innerHTML = `<div class="incomplete-notice"><h3>🎯 Töltsd ki előbb az YSQ-L kérdőívet</h3><p>Legalább 50 kérdés szükséges a fókuszterületek meghatározásához.</p></div>`;
+    return;
+  }
+
+  // Calculate priority score for each schema
+  // Factors: 1) raw score, 2) schema connections (more connections = higher priority),
+  // 3) domain weight (I. domain schemas tend to be more foundational)
+  const DOMAIN_WEIGHTS = {"I":1.3,"II":1.1,"III":0.9,"IV":1.0,"V":1.0};
+  const CONN_COUNTS = {ed:5,ab:5,ma:5,si:5,ds:5,su:4,fa:4,di:5,vh:4,em:5,sb:5,ss:5,ei:5,us:5,et:4,is:4,as:5,np:5,pu:5};
+
+  const scored = SCHEMAS.map(s => {
+    const raw = getScore(s);
+    if (raw === null) return null;
+    const connWeight = 1 + (CONN_COUNTS[s.kod]||3) * 0.04;
+    const domWeight = DOMAIN_WEIGHTS[s.dom] || 1.0;
+    const priority = raw * connWeight * domWeight;
+    return { ...s, raw, priority };
+  }).filter(Boolean).sort((a,b) => b.priority - a.priority);
+
+  const top = scored.slice(0, 8);
+  const maxP = top[0]?.priority || 1;
+
+  let html = `<div class="section-title">🎯 Terápiás Fókusz Jelző</div>
+  <p style="font-size:0.86rem;color:var(--txt2);line-height:1.6;margin-bottom:14px">
+    Ez az eszköz segít <strong>prioritizálni a terápiás munkát</strong>. A sorrend nem csak a nyers pontszámot,
+    hanem a séma kapcsolódásait és tartomány-súlyát is figyelembe veszi. A legfelül lévő sémák
+    rendszerint a legfontosabb belépési pontok.
+  </p>`;
+
+  top.forEach((s, i) => {
+    const pct = (s.priority/maxP*100).toFixed(0);
+    const lvl = getLevel(s.raw);
+    const color = getBarColor(s.raw);
+    const rankColor = i===0?'#C9973A':i<=2?'#1B2A4A':i<=4?'#2E4270':'#8898A8';
+    const why = getDoseRationale(s);
+
+    html += `<div class="dose-card fade-up">
+      <div class="dose-header" onclick="toggleDose('dose${i}')">
+        <div class="dose-priority" style="background:${rankColor}">${i+1}</div>
+        <div>
+          <div class="dose-name">${s.nev}</div>
+          <div style="font-size:0.74rem;color:var(--txt3)">${s.dom.split('. ')[0]}. tartomány · ${CONN_COUNTS[s.kod]||3} kapcsolódó séma</div>
+        </div>
+        <span class="schema-result-level ${lvl.cls}" style="font-size:0.72rem">${s.raw.toFixed(2)}</span>
+        <span style="color:var(--txt3);font-size:0.9rem">▼</span>
+      </div>
+      <div class="dose-rationale" id="dose${i}">
+        <p style="margin-bottom:8px">${why}</p>
+        <div>${getDoseTags(s).map(t=>`<span class="dose-tag">${t}</span>`).join('')}</div>
+      </div>
+    </div>`;
+  });
+
+  // Summary recommendation
+  const topSchema = top[0];
+  if (topSchema) {
+    html += `<div style="background:var(--gold3);border:2px solid var(--gold2);border-radius:var(--radius);padding:16px;margin-top:6px">
+      <div style="font-size:0.8rem;font-weight:700;color:var(--navy);margin-bottom:6px">💡 Javasolt első fókuszterület</div>
+      <p style="font-size:0.86rem;color:var(--txt2);line-height:1.6">
+        A <strong>${topSchema.nev}</strong> séma a legmagasabb prioritású terület. 
+        Ez az a pont, ahol a terápiás munka valószínűleg a legnagyobb hatással lesz más sémákra is.
+        Az ajánlások lapon részletes könyv- és technikajavaslatokat találsz ehhez a sémához.
+      </p>
+      <button class="start-btn" style="margin-top:10px;padding:10px" onclick="showView('recommendations')">
+        Ajánlások megtekintése →
+      </button>
+    </div>`;
+  }
+
+  document.getElementById('doseContent').innerHTML = html;
+}
+
+function getDoseRationale(s) {
+  const reasons = [];
+  if (s.raw >= 5) reasons.push("Nagyon magas pontszám (≥5.0) – erősen jelen lévő séma.");
+  else if (s.raw >= 4) reasons.push("Magas pontszám (≥4.0) – jelentősen jelen lévő séma.");
+  if (s.dom === "I") reasons.push("Az I. tartományba tartozik (Elszakítottság és Elutasítás), amely általában a legalapvetőbb, legkorábbi sémákat tartalmazza.");
+  if ((CONN_COUNTS[s.kod]||3) >= 5) reasons.push("Sok más sémával kapcsolódik össze – munkája más sémákat is pozitívan érinthet.");
+  if (reasons.length === 0) reasons.push("Közepes prioritású séma – érdemes a magasabb prioritásúak után foglalkozni vele.");
+  return reasons.join(" ");
+}
+
+function getDoseTags(s) {
+  const tags = [s.dom.split('. ')[1] || s.dom];
+  if (s.raw >= 4) tags.push("Kiemelt");
+  if (s.dom === "I") tags.push("Alapséma");
+  if ((CONN_COUNTS[s.kod]||3) >= 5) tags.push("Sokat kapcsolódó");
+  return tags;
+}
+
+function toggleDose(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('open');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// QUALITY OF LIFE
+// ═══════════════════════════════════════════════════════════════
+const QOL_DOMAINS = [
+  { key:"kapcsolatok", icon:"💑", name:"Kapcsolatok és intimitás", color:"#C0392B",
+    items:[
+      {text:"Képes vagyok mély, kölcsönös kapcsolatokat kialakítani és fenntartani.", key:"q1"},
+      {text:"Biztonságban érzem magam a közel álló személyek közelében.", key:"q2"},
+      {text:"Meg tudom osztani igazi érzéseimet és gondolataimat a hozzám közel állókkal.", key:"q3"},
+    ]},
+  { key:"munka", icon:"💼", name:"Munka és teljesítmény", color:"#1A5276",
+    items:[
+      {text:"Elégedett vagyok a munkámban nyújtott teljesítményemmel.", key:"q4"},
+      {text:"Képes vagyok kitűzni és elérni a szakmai céljaimat.", key:"q5"},
+      {text:"A munka nem emésztette fel teljesen az egyéb életterületeimet.", key:"q6"},
+    ]},
+  { key:"onmaga", icon:"🪞", name:"Önismeret és önbecsülés", color:"#117A65",
+    items:[
+      {text:"Alapvetően pozitívan gondolok magamra.", key:"q7"},
+      {text:"Elégedett vagyok azzal, aki vagyok.", key:"q8"},
+      {text:"Nem gyötör folyamatosan az önkritika vagy szégyen.", key:"q9"},
+    ]},
+  { key:"autonomia", icon:"🦋", name:"Autonómia és döntéshozatal", color:"#1E8BC3",
+    items:[
+      {text:"Saját értékeim és vágyaim alapján hozom a döntéseimet.", key:"q10"},
+      {text:"Képes vagyok önállóan megbirkózni a mindennapi kihívásokkal.", key:"q11"},
+      {text:"Érzem, hogy az életem irányítója vagyok.", key:"q12"},
+    ]},
+  { key:"erzelmi", icon:"🌊", name:"Érzelmi egyensúly", color:"#8E44AD",
+    items:[
+      {text:"Az érzelmeim nem ragadnak el, de nem is fojtom el őket.", key:"q13"},
+      {text:"Képes vagyok megbirkózni a stresszel és a nehézségekkel.", key:"q14"},
+      {text:"Általában egyensúlyban érzem magam érzelmileg.", key:"q15"},
+    ]},
+  { key:"elet", icon:"🌿", name:"Általános életminőség", color:"#C9973A",
+    items:[
+      {text:"Elégedett vagyok az életem egészével.", key:"q16"},
+      {text:"Képes vagyok örömöt és boldogságot átélni a mindennapokban.", key:"q17"},
+      {text:"Az életem megfelel az értékeimnek és vágyaimnak.", key:"q18"},
+    ]},
+];
+
+let qolAnswers = JSON.parse(localStorage.getItem('ysq_qol') || '{}');
+
+function renderQoL() {
+  const allItems = QOL_DOMAINS.flatMap(d => d.items);
+  const answered = allItems.filter(i => qolAnswers[i.key] !== undefined).length;
+  const total = allItems.length;
+
+  let domScores = {};
+  QOL_DOMAINS.forEach(dom => {
+    const vals = dom.items.map(i => qolAnswers[i.key]).filter(v=>v!==undefined);
+    domScores[dom.key] = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
+  });
+  const overall = Object.values(domScores).filter(v=>v!==null);
+  const avgAll = overall.length ? overall.reduce((a,b)=>a+b,0)/overall.length : null;
+
+  let html = `<div class="section-title">🌿 Életminőség Mérő</div>
+  <p style="font-size:0.86rem;color:var(--txt2);line-height:1.6;margin-bottom:14px">
+    Értékeld, mennyire elégedett vagy az életedés különböző területein. 
+    A csúszka segítségével add meg a választ (1 = egyáltalán nem, 10 = teljesen).
+  </p>`;
+
+  if (avgAll !== null) {
+    const color = avgAll>=7?'#1E8449':avgAll>=5?'#D4AC0D':avgAll>=3?'#E67E22':'#C0392B';
+    const lbl = avgAll>=7?'Jó életminőség':avgAll>=5?'Közepes':avgAll>=3?'Alacsony':'Nagyon alacsony';
+    html += `<div class="qol-total-card">
+      <div class="qol-total-num">${avgAll.toFixed(1)}</div>
+      <div style="font-size:1rem;font-weight:600;color:${color};margin-top:4px">${lbl}</div>
+      <div class="qol-total-lbl">Összesített életminőség (1–10)</div>
+    </div>`;
+  }
+
+  QOL_DOMAINS.forEach(dom => {
+    const sc = domScores[dom.key];
+    const bcolor = sc===null?'#8898A8':sc>=7?'#1E8449':sc>=5?'#D4AC0D':sc>=3?'#E67E22':'#C0392B';
+    html += `<div class="qol-domain fade-up">
+      <div class="qol-header">
+        <span class="qol-icon">${dom.icon}</span>
+        <span class="qol-name">${dom.name}</span>
+        ${sc!==null?`<span class="qol-score-badge" style="background:${bcolor}">${sc.toFixed(1)}</span>`:''}
+      </div>
+      <div class="qol-items">`;
+    dom.items.forEach(item => {
+      const val = qolAnswers[item.key] !== undefined ? qolAnswers[item.key] : 5;
+      html += `<div class="qol-item">
+        <div class="qol-item-text">${item.text}</div>
+        <div class="qol-slider-row">
+          <input type="range" class="qol-slider" min="1" max="10" value="${val}"
+            oninput="setQoL('${item.key}',this.value,this)"
+            style="background:linear-gradient(to right,${dom.color} 0%,${dom.color} ${(val-1)/9*100}%,#EEF2F9 ${(val-1)/9*100}%,#EEF2F9 100%)">
+          <div class="qol-slider-val" id="qolval_${item.key}">${val}</div>
+        </div>
+        <div class="qol-labels"><span>Egyáltalán nem</span><span>Teljesen igen</span></div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  });
+
+  document.getElementById('qolContent').innerHTML = html;
+}
+
+function setQoL(key, val, slider) {
+  qolAnswers[key] = parseInt(val);
+  document.getElementById('qolval_'+key).textContent = val;
+  const pct = (val-1)/9*100;
+  const dom = QOL_DOMAINS.find(d => d.items.some(i=>i.key===key));
+  if (dom) slider.style.background = `linear-gradient(to right,${dom.color} 0%,${dom.color} ${pct}%,#EEF2F9 ${pct}%,#EEF2F9 100%)`;
+  localStorage.setItem('ysq_qol', JSON.stringify(qolAnswers));
+  // Re-render total without re-rendering whole view
+  const allItems = QOL_DOMAINS.flatMap(d=>d.items);
+  const vals = allItems.map(i=>qolAnswers[i.key]).filter(v=>v!==undefined);
+  if (vals.length > 0) {
+    const avg = vals.reduce((a,b)=>a+b,0)/vals.length;
+    const color = avg>=7?'#1E8449':avg>=5?'#D4AC0D':avg>=3?'#E67E22':'#C0392B';
+    const lbl = avg>=7?'Jó életminőség':avg>=5?'Közepes':avg>=3?'Alacsony':'Nagyon alacsony';
+    const card = document.querySelector('.qol-total-card');
+    if (card) {
+      card.querySelector('.qol-total-num').textContent = avg.toFixed(1);
+      card.querySelector('[style*="font-weight:600"]').textContent = lbl;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ACTIVATION LOG
+// ═══════════════════════════════════════════════════════════════
+let activationLog = JSON.parse(localStorage.getItem('ysq_log') || '[]');
+let newLogEntry = { trigger:'', emotion:'', reaction:'', insight:'', intensity:5, schemas:[] };
+
+function renderLog() {
+  let html = `<div class="section-title">📓 Séma Aktivációs Napló</div>
+  <p style="font-size:0.86rem;color:var(--txt2);line-height:1.6;margin-bottom:14px">
+    Rögzítsd, mikor aktiválódik egy sémád: mi váltotta ki, mit éreztél, hogyan reagáltál.
+    Ez segít felismerni a mintákat és tudatosan dolgozni rajtuk.
+  </p>`;
+
+  // New entry form
+  html += `<div class="log-new-form fade-up">
+    <h3>➕ Új bejegyzés</h3>
+    <div style="font-size:0.76rem;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px">Mi váltotta ki?</div>
+    <textarea class="log-textarea" id="logTrigger" placeholder="Pl. A párom késett, és nem hívott. Azonnal azt gondoltam, hogy valami baj van, vagy megunt...">${newLogEntry.trigger}</textarea>
+    <div style="font-size:0.76rem;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px">Mit éreztem?</div>
+    <textarea class="log-textarea" id="logEmotion" placeholder="Pl. Pánik, félelem, düh, szomorúság...">${newLogEntry.emotion}</textarea>
+    <div style="font-size:0.76rem;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px">Hogyan reagáltam?</div>
+    <textarea class="log-textarea" id="logReaction" placeholder="Pl. Felhívtam tízszer, majd dühösen fogadtam, amikor megérkezett...">${newLogEntry.reaction}</textarea>
+    <div style="font-size:0.76rem;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px">Melyik sémám aktiválódott?</div>
+    <div class="log-schema-select" id="logSchemaSelect">
+      ${SCHEMAS.map(s => `<button class="log-schema-btn ${newLogEntry.schemas.includes(s.kod)?'selected dom-'+s.dom:''}"
+        onclick="toggleLogSchema('${s.kod}',this)" style="${newLogEntry.schemas.includes(s.kod)?'background:'+getDomainColor(s.dom)+';color:white;border-color:'+getDomainColor(s.dom):''}"
+        >${s.nev}</button>`).join('')}
+    </div>
+    <div style="font-size:0.76rem;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px">Intenzitás (1–10)</div>
+    <div class="log-intensity-row">
+      ${[1,2,3,4,5,6,7,8,9,10].map(v => {
+        const c = v<=3?'#1E8449':v<=5?'#D4AC0D':v<=7?'#E67E22':'#C0392B';
+        return `<button class="log-intensity-btn ${newLogEntry.intensity===v?'selected':''}"
+          style="${newLogEntry.intensity===v?'background:'+c+';border-color:'+c:''}"
+          onclick="setLogIntensity(${v},this,'${c}')">${v}</button>`;
+      }).join('')}
+    </div>
+    <div style="font-size:0.76rem;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px">Felismerés / Mit tanultam</div>
+    <textarea class="log-textarea" id="logInsight" placeholder="Pl. Megint az elhagyatottság sémám aktiválódott. Legközelebb megpróbálok várni, mielőtt reagálok...">${newLogEntry.insight}</textarea>
+    <button class="log-save-btn" onclick="saveLogEntry()">💾 Bejegyzés mentése</button>
+  </div>`;
+
+  // Log entries
+  html += `<div class="section-title" style="margin-top:8px">Korábbi bejegyzések (${activationLog.length} db)</div>`;
+
+  if (activationLog.length === 0) {
+    html += `<div class="log-empty">Még nincs bejegyzés.<br>Az első aktivációs élményt jegyezd le fent!</div>`;
+  } else {
+    [...activationLog].reverse().forEach((entry, i) => {
+      const realIdx = activationLog.length - 1 - i;
+      const date = new Date(entry.date).toLocaleDateString('hu-HU');
+      const time = new Date(entry.date).toLocaleTimeString('hu-HU', {hour:'2-digit',minute:'2-digit'});
+      const intColor = entry.intensity<=3?'#1E8449':entry.intensity<=5?'#D4AC0D':entry.intensity<=7?'#E67E22':'#C0392B';
+      html += `<div class="log-entry fade-up">
+        <div class="log-entry-header" onclick="toggleLogEntry('logentry${i}')">
+          <div>
+            <div class="log-entry-date">${date} ${time}</div>
+            <div class="log-entry-trigger">${entry.trigger.substring(0,60)}${entry.trigger.length>60?'...':''}</div>
+          </div>
+          <div class="log-entry-intensity" style="background:${intColor}">${entry.intensity}</div>
+        </div>
+        <div class="log-entry-body" id="logentry${i}">
+          ${entry.emotion?`<div class="log-field"><label>Érzés</label><div class="log-field-val">${entry.emotion}</div></div>`:''}
+          ${entry.reaction?`<div class="log-field"><label>Reakció</label><div class="log-field-val">${entry.reaction}</div></div>`:''}
+          ${entry.schemas&&entry.schemas.length>0?`<div class="log-field"><label>Aktiválódott sémák</label><div class="log-schema-tags">${entry.schemas.map(k=>{const s=SCHEMAS.find(x=>x.kod===k);return s?`<span class="conn-badge dom-${s.dom}" style="font-size:0.72rem">${s.nev}</span>`:''}).join('')}</div></div>`:''}
+          ${entry.insight?`<div class="log-field"><label>Felismerés</label><div class="log-field-val">${entry.insight}</div></div>`:''}
+          <button onclick="deleteLogEntry(${realIdx})" style="margin-top:8px;padding:4px 10px;border:1px solid #FDEDEC;background:#FDEDEC;color:#C0392B;border-radius:6px;font-size:0.76rem;cursor:pointer">Töröl</button>
+        </div>
+      </div>`;
+    });
+  }
+
+  document.getElementById('logContent').innerHTML = html;
+}
+
+function toggleLogSchema(kod, btn) {
+  const idx = newLogEntry.schemas.indexOf(kod);
+  const s = SCHEMAS.find(x=>x.kod===kod);
+  const color = getDomainColor(s.dom);
+  if (idx === -1) {
+    newLogEntry.schemas.push(kod);
+    btn.classList.add('selected');
+    btn.style.background = color;
+    btn.style.color = 'white';
+    btn.style.borderColor = color;
+  } else {
+    newLogEntry.schemas.splice(idx, 1);
+    btn.classList.remove('selected');
+    btn.style.background = '';
+    btn.style.color = '';
+    btn.style.borderColor = '';
+  }
+}
+
+function setLogIntensity(val, btn, color) {
+  newLogEntry.intensity = val;
+  document.querySelectorAll('.log-intensity-btn').forEach(b => {
+    b.classList.remove('selected');
+    b.style.background = ''; b.style.borderColor = '';
+  });
+  btn.classList.add('selected');
+  btn.style.background = color; btn.style.borderColor = color;
+}
+
+function saveLogEntry() {
+  const trigger = document.getElementById('logTrigger').value.trim();
+  if (!trigger) { alert('Kérjük, töltsd ki legalább a kiváltó okot!'); return; }
+  const entry = {
+    date: new Date().toISOString(),
+    trigger,
+    emotion: document.getElementById('logEmotion').value.trim(),
+    reaction: document.getElementById('logReaction').value.trim(),
+    insight: document.getElementById('logInsight').value.trim(),
+    intensity: newLogEntry.intensity,
+    schemas: [...newLogEntry.schemas],
+  };
+  activationLog.push(entry);
+  localStorage.setItem('ysq_log', JSON.stringify(activationLog));
+  newLogEntry = { trigger:'', emotion:'', reaction:'', insight:'', intensity:5, schemas:[] };
+  renderLog();
+}
+
+function deleteLogEntry(idx) {
+  if (!confirm('Törli ezt a bejegyzést?')) return;
+  activationLog.splice(idx, 1);
+  localStorage.setItem('ysq_log', JSON.stringify(activationLog));
+  renderLog();
+}
+
+function toggleLogEntry(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('open');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PSYCHOEDUCATION
+// ═══════════════════════════════════════════════════════════════
+function renderPsycho() {
+  const faqs = [
+    {q:"Mi az a séma?", a:"A sémák mélyen gyökerező, ismétlődő minták, amelyek magunkról és a világról alkotott hiedelmeinket tartalmazzák. Gyermekkorban alakulnak ki, és felnőttkorban is meghatározzák gondolkodásunkat, érzéseinket és viselkedésünket – még akkor is, ha már nem felelnek meg a valóságnak."},
+    {q:"Hogyan alakulnak ki a sémák?", a:"A sémák általában olyan gyermekkori tapasztalatokból erednek, amikor alapvető érzelmi szükségletek (biztonság, szeretet, autonómia, önkifejezés, határok) nem teljesültek. Egy elhagyó szülő, folyamatos kritika, vagy túlvédés egyaránt hozzájárulhat egy-egy séma kialakulásához."},
+    {q:"Miért nehéz változtatni rajtuk?", a:"A sémák ismerősnek érzik magukat – még ha fájdalmasak is. Az agyunk az ismerős mintákat biztonságosabbnak értékeli az ismeretlennél. Ráadásul a sémák önmagukat erősítik: olyan helyzeteket keresünk és értelmezünk, amelyek megerősítik a meglévő hiedelmeinket."},
+    {q:"Mi a sématerápia célja?", a:"A sématerápia célja nem a sémák 'törlése', hanem a tudatosítás és az egészségesebb megküzdési módok kialakítása. A terapeuta segít azonosítani a sémákat, megérteni eredetüket, és fokozatosan megváltoztatni a régi, káros mintákat."},
+    {q:"Mennyi ideig tart?", a:"A sématerápia jellemzően középtávú (1–3 év), de már az első néhány ülés után érezhető változás. A hosszabb időtartam azért szükséges, mert mélyen gyökerező mintákkal dolgozik, amelyek megváltoztatásához idő és ismétlés kell."},
+  ];
+
+  let html = `<div class="psycho-card fade-up">
+    <div class="psycho-hero">
+      <h2>Mi a Sématerápia?</h2>
+      <p>Bevezető – értsd meg a kérdőívet kitöltés előtt</p>
+    </div>
+    <div class="gold-divider"></div>
+    <div class="psycho-body">
+
+      <div class="psycho-section">
+        <h3>🧩 Az alapgondolat</h3>
+        <p>A sématerápiát Jeffrey Young dolgozta ki az 1990-es években, elsősorban olyan személyek számára, akiknél a hagyományos kognitív-viselkedésterápia nem hozott elegendő változást. A módszer az életcsapdák – mélyen gyökerező negatív minták – azonosítására és megváltoztatására fókuszál.</p>
+      </div>
+
+      <div class="psycho-section">
+        <h3>💛 Az 5 alapvető érzelmi szükséglet</h3>
+        <p>A sématerápia szerint minden embernek 5 alapvető érzelmi szükséglete van. Ha ezek gyermekkorban nem teljesülnek, sémák alakulnak ki:</p>
+        <div class="need-grid">
+          <div class="need-item"><span class="need-icon">🔒</span><div><strong>Biztonság és kötődés</strong><br>Stabil, megbízható kapcsolatok</div></div>
+          <div class="need-item"><span class="need-icon">🦋</span><div><strong>Autonómia</strong><br>Önállóság és kompetencia érzése</div></div>
+          <div class="need-item"><span class="need-icon">💬</span><div><strong>Szabad önkifejezés</strong><br>Érzelmek és igények megélése</div></div>
+          <div class="need-item"><span class="need-icon">🎮</span><div><strong>Spontaneitás</strong><br>Játék, öröm, kreativitás</div></div>
+          <div class="need-item"><span class="need-icon">⚖️</span><div><strong>Reális határok</strong><br>Szabályok és önkontroll</div></div>
+        </div>
+      </div>
+
+      <div class="psycho-section">
+        <h3>🗺️ Az 5 sématartomány</h3>
+        <p>A 19 séma 5 nagy csoportba rendeződik, mindegyik egy-egy alapszükséglethez kapcsolódik:</p>
+        ${DOMAINS.map(d => `<span class="domain-pill dom-${d.key}">${d.name}</span>`).join('')}
+      </div>
+
+      <div class="psycho-section">
+        <h3>🔄 Hogyan reagálunk a sémáinkra?</h3>
+        <p>Mindenki három alapvető módon reagálhat a sémáira – ezeket séma-módoknak nevezzük:</p>
+        <div class="need-grid">
+          <div class="need-item"><span class="need-icon">🏃</span><div><strong>Elkerülés</strong><br>Elkerüljük a sémát kiváltó helyzeteket</div></div>
+          <div class="need-item"><span class="need-icon">🙇</span><div><strong>Behódolás</strong><br>Hagyjuk, hogy a séma irányítson</div></div>
+          <div class="need-item"><span class="need-icon">💪</span><div><strong>Kompenzáció</strong><br>Túlkompenzálunk, ellentétesen viselkedünk</div></div>
+        </div>
+      </div>
+
+      <div class="psycho-section">
+        <h3>❓ Gyakori kérdések</h3>
+        ${faqs.map((f,i) => `
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion('faq${i}')">
+            ${f.q} <span id="faqarrow${i}">▼</span>
+          </div>
+          <div class="accordion-body" id="faq${i}">${f.a}</div>
+        </div>`).join('')}
+      </div>
+
+      <button class="start-btn" onclick="showView('questionnaire')">
+        Megértettem – Kérdőív kitöltése →
+      </button>
+    </div>
+  </div>`;
+
+  document.getElementById('psychoContent').innerHTML = html;
+}
+
+function toggleAccordion(id) {
+  const body = document.getElementById(id);
+  const isOpen = body.classList.contains('open');
+  document.querySelectorAll('.accordion-body').forEach(b => b.classList.remove('open'));
+  if (!isOpen) body.classList.add('open');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// YPI – SZÜLŐI STÍLUS KÉRDŐÍV (simplified)
+// ═══════════════════════════════════════════════════════════════
+const YPI_PATTERNS = [
+  { key:"hideg",   name:"Érzelmi hidegség",  color:"#1B2A4A", desc:"A szülő érzelmileg távolságtartó, nem mutat melegséget vagy empátiát.",
+    items:["A szülőm ritkán fejezett ki szeretetet vagy melegséget felém.","Nem éreztem, hogy a szülőm igazán érdeklődne az érzéseim iránt.","A szülőm elvárásokat támasztott, de ritkán dicsért vagy bátorított.","Nehezen emlékszem arra, hogy a szülőm megölelne vagy fizikailag közel lenne hozzám.","A szülőm 'erősnek' tartotta az érzelmek visszatartását."] },
+  { key:"kritikus", name:"Kritikus/Büntető", color:"#C0392B", desc:"A szülő szigorú, kritizáló, büntető stílusú volt.",
+    items:["A szülőm gyakran kritizált, ha hibáztam.","Úgy éreztem, sosem vagyok elég jó a szülőm szemében.","A büntetés volt a fő módszer, amivel a szülőm a viselkedésemet szabályozta.","A szülőm ritkán bocsátotta meg a hibáimat.","Attól féltem, hogy a szülőm megbüntet, ha nem teszem azt, amit akar."] },
+  { key:"tulmedo", name:"Túlvédő/Aggódó",   color:"#1E8BC3", desc:"A szülő túlzottan védelmező, aggódó volt, nem engedte az önállóságot.",
+    items:["A szülőm túlságosan aggódott a biztonságomért.","Nehéz volt önállóan dönteni, mert a szülőm mindig beleszólt.","A szülőm megvédett a nehézségektől ahelyett, hogy megtanított volna megküzdeni velük.","Sok mindent nem volt szabad kipróbálnom, mert a szülőm félt, hogy valami baj ér.","A szülőm mindig pontosan tudni akarta, hol vagyok és mit csinálok."] },
+  { key:"elkenye", name:"Elkényeztető",      color:"#C9973A", desc:"A szülő nem szabott határokat, mindent megengedett.",
+    items:["A szülőm ritkán mondott nemet a kéréseimre.","Nem volt sok szabály vagy elvárás otthon.","A szülőm inkább barátként, mint szülőként viselkedett velem.","Ha valamit akartam, általában megkaptam, még ha nem is volt jó nekem.","A szülőm nehezen tartott ki a határok mellett."] },
+  { key:"instabil", name:"Kiszámíthatatlan", color:"#117A65", desc:"A szülő érzelmileg kiszámíthatatlan, változékony volt.",
+    items:["A szülőm hangulatai gyorsan és előre nem láthatóan változtak.","Soha nem tudtam pontosan, mire számíthatok otthon.","Néha nagyon szerető volt a szülőm, máskor hideg vagy dühös – ok nélkül.","Sokat foglalkoztam azzal, hogy ne hozzam rossz hangulatba a szülőmet.","A szülőm reakciói aránytalanok voltak a helyzethez képest."] },
+];
+
+let ypiAnswers = {};
+let ypiPage = 0;
+const YPI_TOTAL = YPI_PATTERNS.reduce((a,p) => a + p.items.length, 0);
+
+function renderYPI() {
+  // Build flat item list
+  const allItems = [];
+  YPI_PATTERNS.forEach(pattern => {
+    pattern.items.forEach((item, idx) => {
+      allItems.push({ ...pattern, item, localIdx: idx, globalIdx: allItems.length });
+    });
+  });
+
+  const answered = Object.keys(ypiAnswers).length;
+  const pct = Math.round(answered / YPI_TOTAL * 100);
+
+  let html = `<div class="section-title">👨‍👩‍👧 Szülői Stílus Kérdőív</div>
+  <p style="font-size:0.86rem;color:var(--txt2);line-height:1.6;margin-bottom:14px">
+    Ez a kérdőív arra kérdez, <strong>hogyan viselkedtek a szüleid gyermekkorodban</strong>.
+    A válaszok segítenek megérteni, milyen szülői minták alakíthatták ki a sémáidat.<br>
+    Értékelési skála: <strong>1 = Egyáltalán nem jellemző · 5 = Teljesen jellemző</strong>
+  </p>
+  <div class="ypi-progress">
+    <div class="ypi-progress-fill" style="width:${pct}%"></div>
+  </div>`;
+
+  // Inner tabs per pattern
+  html += `<div class="inner-tabs">
+    ${YPI_PATTERNS.map((p,i) => `<button class="inner-tab ${ypiPage===i?'active':''}" onclick="ypiGoTab(${i})">${p.name.split('/')[0]}</button>`).join('')}
+  </div>`;
+
+  const pattern = YPI_PATTERNS[ypiPage];
+  html += `<div class="psycho-card fade-up" style="border-left:4px solid ${pattern.color}">
+    <div style="padding:14px 16px 8px">
+      <div style="font-size:0.76rem;font-weight:700;color:${pattern.color};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px">${pattern.name}</div>
+      <p style="font-size:0.84rem;color:var(--txt2);line-height:1.5">${pattern.desc}</p>
+    </div>
+  </div>`;
+
+  pattern.items.forEach((item, idx) => {
+    const key = `${pattern.key}_${idx}`;
+    const val = ypiAnswers[key];
+    html += `<div class="ypi-question-card fade-up">
+      <div class="ypi-q-top">
+        <div class="ypi-q-num">${pattern.name} · ${idx+1}/${pattern.items.length}</div>
+        <div class="ypi-q-text">${item}</div>
+      </div>
+      <div class="ypi-likert">
+        ${[1,2,3,4,5].map(v => `
+          <button class="ypi-btn ${val===v?'selected':''}" onclick="setYPI('${key}',${v},this)">
+            <span class="ypi-btn-num">${v}</span>
+            <span class="ypi-btn-lbl">${['Nem','Inkább nem','Részben','Inkább igen','Igen'][v-1]}</span>
+          </button>`).join('')}
+      </div>
+    </div>`;
+  });
+
+  html += `<div style="display:flex;gap:8px;margin-top:8px">
+    <button class="page-btn page-btn-prev" style="flex:1" onclick="ypiGoTab(${ypiPage-1})" ${ypiPage===0?'disabled':''}>← Előző</button>
+    <button class="page-btn page-btn-next" style="flex:1" onclick="ypiGoTab(${ypiPage+1})" ${ypiPage===YPI_PATTERNS.length-1?'disabled':''}>
+      ${ypiPage===YPI_PATTERNS.length-1?'Eredmény ↓':'Következő →'}
+    </button>
+  </div>`;
+
+  // Results if enough answered
+  if (answered >= YPI_TOTAL * 0.6) {
+    html += renderYPIResults();
+  } else {
+    html += `<div class="incomplete-notice" style="margin-top:14px">
+      <h3>📊 Töltsd ki a kérdőívet az eredményekhez</h3>
+      <p>${answered} / ${YPI_TOTAL} kérdés megválaszolva (${pct}%)</p>
+    </div>`;
+  }
+
+  document.getElementById('ypiContent').innerHTML = html;
+}
+
+function renderYPIResults() {
+  const scores = {};
+  YPI_PATTERNS.forEach(pattern => {
+    const vals = pattern.items.map((_,i) => ypiAnswers[`${pattern.key}_${i}`]).filter(v => v !== undefined);
+    scores[pattern.key] = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
+  });
+
+  let html = `<div class="compare-card fade-up" style="margin-top:16px">
+    <h3>📊 Szülői Stílus Profil</h3>
+    <p style="font-size:0.84rem;color:var(--txt2);margin-bottom:14px;line-height:1.5">
+      A magasabb pontszám erősebb jelenlétet jelez. Az 3.5 feletti értékek különösen relevánsak lehetnek a sémák megértéséhez.
+    </p>`;
+
+  YPI_PATTERNS.sort((a,b) => scores[b.key] - scores[a.key]).forEach(pattern => {
+    const sc = scores[pattern.key] || 0;
+    const pct = (sc / 5 * 100).toFixed(1);
+    html += `<div class="ypi-result-bar">
+      <div class="ypi-result-label">${pattern.name}</div>
+      <div class="ypi-result-track">
+        <div class="ypi-result-fill" style="width:${pct}%;background:${pattern.color}">
+          <span class="ypi-result-val">${sc.toFixed(1)}</span>
+        </div>
+      </div>
+      <div class="ypi-result-num">${sc.toFixed(2)}</div>
+    </div>`;
+  });
+
+  // Top pattern connection to schemas
+  const topPattern = Object.entries(scores).sort((a,b)=>b[1]-a[1])[0];
+  const topPatternData = YPI_PATTERNS.find(p => p.key === topPattern[0]);
+  const PATTERN_SCHEMA_LINKS = {
+    hideg:    ["ed","ab","ds","si","su"],
+    kritikus: ["ds","pu","us","fa","ei"],
+    tulmedo:  ["di","vh","em","ab","np"],
+    elkenye:  ["et","is","fa","em"],
+    instabil: ["ab","ma","vh","np","ei"],
+  };
+  const linkedSchemas = (PATTERN_SCHEMA_LINKS[topPattern[0]] || [])
+    .map(k => SCHEMAS.find(s => s.kod === k))
+    .filter(Boolean);
+
+  if (linkedSchemas.length > 0 && topPattern[1] >= 2.5) {
+    html += `<div style="margin-top:14px;padding:12px 14px;background:var(--gold3);border-radius:8px;border-left:4px solid var(--gold)">
+      <div style="font-size:0.8rem;font-weight:700;color:var(--navy);margin-bottom:6px">
+        💡 A legerősebb szülői stílus (${topPatternData.name}) kapcsolódó sémák:
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        ${linkedSchemas.map(s => `<span class="domain-pill dom-${s.dom}">${s.nev}</span>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  html += `</div>`;
+  return html;
+}
+
+function setYPI(key, val, btn) {
+  ypiAnswers[key] = val;
+  const row = btn.closest('.ypi-likert');
+  row.querySelectorAll('.ypi-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  autoSaveLocal();
+}
+
+function ypiGoTab(idx) {
+  if (idx < 0) return;
+  if (idx >= YPI_PATTERNS.length) { renderYPI(); return; }
+  ypiPage = idx;
+  renderYPI();
+  window.scrollTo(0, 0);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SÉMA MÓDOK KÉRDŐÍV
+// ═══════════════════════════════════════════════════════════════
+const MODE_STYLES = [
+  { key:"elkeru",   name:"Elkerülés",    color:"#1A5276", emoji:"🏃",
+    desc:"Elkerülöd a sémát kiváltó helyzeteket, érzéseket, embereket. Távolságtartás, visszahúzódás, zsibbadás.",
+    items:[
+      "Ha egy helyzet kellemetlen érzéseket vált ki, inkább elkerülöm azt.",
+      "Vannak témák, amelyekre nem szívesen gondolok rá, és igyekszem elterelni a figyelmemet.",
+      "Inkább magányosan maradok, mint hogy kényelmetlennek érzem magam mások közelében.",
+      "Ha valami fájdalmas emléket idéz fel, gyorsan 'kikapcsolok'.",
+      "Inkább elfoglalom magam (munkával, telefon, evés), mint hogy érzelmekkel foglalkozzam.",
+      "Vannak kapcsolatok vagy helyzetek, amiket tudatosan kerülök.",
+      "Ha valaki túl közel kerül hozzám érzelmileg, inkább visszahúzódom.",
+      "Könnyebb nem gondolni a problémáimra, mint szembenézni velük.",
+    ]},
+  { key:"behod",    name:"Behódolás",    color:"#117A65", emoji:"🙇",
+    desc:"Megadod magad a sémának – belemélyedsz a negatív érzésekbe, elfogadod a séma igazságát.",
+    items:[
+      "Ha rosszul érzem magam, úgy gondolom, ez természetes – és hagyom, hogy elvigyen.",
+      "Ha valaki kritizál, hajlamos vagyok azt hinni, hogy igaza van.",
+      "Nehéz nemet mondani, még ha az elvárás túlzott is.",
+      "Amikor bajba kerülök, általában mások segítségét várom.",
+      "Ha valaki elhidegül tőlem, azonnal feltételezem, hogy a hibám.",
+      "Nehézséget okoz, hogy megvédjük saját álláspontunkat.",
+      "Inkább elfogadom a dolgokat olyannak, amilyenek, mint hogy változtassak rajtuk.",
+      "Azt érzem, az életem nagy részét mások igényei szerint élem.",
+    ]},
+  { key:"kompenz",  name:"Kompenzáció",  color:"#B7770D", emoji:"💪",
+    desc:"Túlkompenzálsz – az ellenkezőjét csinálod annak, amit a séma sugall. Teljesítmény, kontroll, dominancia.",
+    items:[
+      "Ha úgy érzem, nem vagyok elég jó, még keményebben dolgozom.",
+      "Hajlamom van arra, hogy mások előtt magabiztosnak mutassam magam, még ha belül nem érzem.",
+      "Ha valaki nem értékel, inkább büszke vagyok és nem mutatom, hogy fáj.",
+      "Fontos számomra, hogy sikeresnek, erősnek vagy kompetensnek lássanak.",
+      "Ha valami félelem fog el, inkább konfrontálódom, mint visszahúzódom.",
+      "Addig dolgozom valamin, amíg tökéletes nem lesz, hogy ne érjen kritika.",
+      "Ha valaki közel próbál kerülni, inkább én veszem át az irányítást a kapcsolatban.",
+      "Dühvel vagy humorral reagálok, ha sebezhető helyzetbe kerülök.",
+    ]},
+];
+
+let modeAnswers = {};
+let modePage = 0;
+const MODE_TOTAL = MODE_STYLES.reduce((a,m) => a + m.items.length, 0);
+
+function renderModes() {
+  const answered = Object.keys(modeAnswers).length;
+  const pct = Math.round(answered / MODE_TOTAL * 100);
+
+  let html = `<div class="section-title">🔄 Séma Módok – Hogyan reagálsz?</div>
+  <p style="font-size:0.86rem;color:var(--txt2);line-height:1.6;margin-bottom:14px">
+    Mindenki <strong>három alapvető módon reagálhat</strong> a sémáira. Ez a kérdőív segít megérteni,
+    melyik a domináns reakciómódod. Értékelj 1–5 skálán, mennyire jellemző rád az állítás.
+  </p>
+  <div class="ypi-progress">
+    <div class="ypi-progress-fill" style="width:${pct}%"></div>
+  </div>`;
+
+  html += `<div class="inner-tabs">
+    ${MODE_STYLES.map((m,i) => `<button class="inner-tab ${modePage===i?'active':''}" onclick="modeGoTab(${i})">${m.emoji} ${m.name}</button>`).join('')}
+  </div>`;
+
+  const mode = MODE_STYLES[modePage];
+  html += `<div class="psycho-card fade-up" style="border-left:4px solid ${mode.color}">
+    <div style="padding:14px 16px 8px">
+      <div style="font-size:0.76rem;font-weight:700;color:${mode.color};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px">${mode.emoji} ${mode.name}</div>
+      <p style="font-size:0.84rem;color:var(--txt2);line-height:1.5">${mode.desc}</p>
+    </div>
+  </div>`;
+
+  mode.items.forEach((item, idx) => {
+    const key = `${mode.key}_${idx}`;
+    const val = modeAnswers[key];
+    html += `<div class="ypi-question-card fade-up">
+      <div class="ypi-q-top">
+        <div class="ypi-q-num">${mode.emoji} ${mode.name} · ${idx+1}/${mode.items.length}</div>
+        <div class="ypi-q-text">${item}</div>
+      </div>
+      <div class="ypi-likert">
+        ${[1,2,3,4,5].map(v => `
+          <button class="ypi-btn ${val===v?'selected':''}" onclick="setMode('${key}',${v},this)">
+            <span class="ypi-btn-num">${v}</span>
+            <span class="ypi-btn-lbl">${['Nem','Inkább nem','Részben','Inkább igen','Igen'][v-1]}</span>
+          </button>`).join('')}
+      </div>
+    </div>`;
+  });
+
+  html += `<div style="display:flex;gap:8px;margin-top:8px">
+    <button class="page-btn page-btn-prev" style="flex:1" onclick="modeGoTab(${modePage-1})" ${modePage===0?'disabled':''}>← Előző</button>
+    <button class="page-btn page-btn-next" style="flex:1" onclick="modeGoTab(${modePage+1})" ${modePage===MODE_STYLES.length-1?'disabled':''}>
+      ${modePage===MODE_STYLES.length-1?'Eredmény ↓':'Következő →'}
+    </button>
+  </div>`;
+
+  if (answered >= MODE_TOTAL * 0.6) {
+    html += renderModeResults();
+  } else {
+    html += `<div class="incomplete-notice" style="margin-top:14px">
+      <h3>📊 Töltsd ki a kérdőívet</h3>
+      <p>${answered} / ${MODE_TOTAL} kérdés megválaszolva</p>
+    </div>`;
+  }
+
+  document.getElementById('modesContent').innerHTML = html;
+}
+
+function renderModeResults() {
+  const scores = {};
+  MODE_STYLES.forEach(mode => {
+    const vals = mode.items.map((_,i) => modeAnswers[`${mode.key}_${i}`]).filter(v => v !== undefined);
+    scores[mode.key] = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
+  });
+
+  const sorted = [...MODE_STYLES].sort((a,b) => scores[b.key] - scores[a.key]);
+  const dominant = sorted[0];
+  const dominantScore = scores[dominant.key];
+
+  let html = `<div class="compare-card fade-up" style="margin-top:16px">
+    <h3>📊 Séma Mód Profil</h3>`;
+
+  sorted.forEach(mode => {
+    const sc = scores[mode.key] || 0;
+    const pct = (sc / 5 * 100).toFixed(1);
+    html += `<div class="ypi-result-bar">
+      <div class="ypi-result-label">${mode.emoji} ${mode.name}</div>
+      <div class="ypi-result-track">
+        <div class="ypi-result-fill" style="width:${pct}%;background:${mode.color}">
+          <span class="ypi-result-val">${sc.toFixed(1)}</span>
+        </div>
+      </div>
+      <div class="ypi-result-num">${sc.toFixed(2)}</div>
+    </div>`;
+  });
+
+  const DOMINANT_TIPS = {
+    elkeru: "Az elkerülés rövidtávon véd, de hosszútávon fenntartja a sémát. Próbálj meg fokozatosan szembenézni a kellemetlen érzésekkel. Mindfulness és testi alapú technikák különösen hasznosak.",
+    behod:  "A behódolás a séma 'legegyenesebb' kifejezése. A tudatosítás az első lépés: mikor adod meg magad a sémának? Asszertivitás tréning és az önszánat fejlesztése sokat segíthet.",
+    kompenz:"A kompenzáció energiát igényel és fárasztó. Hasznos lehet megkérdezni: mit próbálok elrejteni magam és mások elől? A sérülékenység megengedése terápiás cél lehet.",
+  };
+
+  if (dominantScore >= 2.5) {
+    html += `<div style="margin-top:14px;padding:12px 14px;background:var(--cream);border-radius:8px;border-left:4px solid ${dominant.color}">
+      <div style="font-size:0.8rem;font-weight:700;margin-bottom:6px" style="color:${dominant.color}">
+        ${dominant.emoji} Domináns módod: <strong>${dominant.name}</strong>
+      </div>
+      <p style="font-size:0.84rem;color:var(--txt2);line-height:1.6">${DOMINANT_TIPS[dominant.key]}</p>
+    </div>`;
+  }
+
+  html += `</div>`;
+  return html;
+}
+
+function setMode(key, val, btn) {
+  modeAnswers[key] = val;
+  const row = btn.closest('.ypi-likert');
+  row.querySelectorAll('.ypi-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  autoSaveLocal();
+}
+
+function modeGoTab(idx) {
+  if (idx < 0) return;
+  if (idx >= MODE_STYLES.length) { renderModes(); return; }
+  modePage = idx;
+  renderModes();
+  window.scrollTo(0, 0);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PDF SUMMARY – CLEAN ONE-PAGE CLIENT EXPORT
+// ═══════════════════════════════════════════════════════════════
+function exportClientPDF() {
+  const n = answeredCount();
+  if (n < 50) { alert('Kérjük, töltse ki előbb a kérdőívet!'); return; }
+
+  // Build print-only summary
+  const scored = SCHEMAS.map(s => ({...s, score: getScore(s)}))
+    .filter(s => s.score !== null)
+    .sort((a,b) => b.score - a.score);
+
+  const high = scored.filter(s => s.score >= 4);
+  const medium = scored.filter(s => s.score >= 3 && s.score < 4);
+  const clientName = activeClient !== null ? clients[activeClient].name : '–';
+  const dateStr = new Date().toLocaleDateString('hu-HU');
+  const timerStr = timerSeconds > 0 ? Math.floor(timerSeconds/60) + ' perc' : '–';
+  const avgAll = (scored.reduce((a,b) => a+b.score, 0) / scored.length).toFixed(2);
+
+  // Inject a print-only div
+  let summaryHtml = `
+  <div style="font-family:'DM Sans',sans-serif;max-width:700px;margin:0 auto;color:#1B2A4A">
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,#1B2A4A,#2E4270);color:white;padding:24px;border-radius:12px;margin-bottom:20px">
+      <div style="font-size:0.8rem;color:#E8C47A;margin-bottom:4px">YOUNG SÉMA KÉRDŐÍV – YSQ-L · ÖSSZEFOGLALÓ</div>
+      <div style="font-size:1.5rem;font-weight:700;margin-bottom:4px">${clientName}</div>
+      <div style="font-size:0.84rem;opacity:0.8">${dateStr} · ${n}/244 kérdés · Kitöltési idő: ${timerStr} · Összesített átlag: ${avgAll}</div>
+    </div>
+
+    <!-- Kiemelt sémák -->
+    <div style="margin-bottom:18px">
+      <div style="font-size:0.76rem;font-weight:700;color:#C9973A;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px">🔴 Kiemelt területek (átlag ≥ 4.0)</div>
+      ${high.length === 0 ? '<p style="color:#888;font-size:0.84rem">Nincs kiemelt séma.</p>' :
+        high.map(s => {
+          const lvl = getLevel(s.score);
+          const color = getBarColor(s.score);
+          const pct = (s.score/6*100).toFixed(0);
+          return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            <div style="width:150px;font-size:0.84rem;font-weight:600;flex-shrink:0;color:${getDomainColor(s.dom)}">${s.nev}</div>
+            <div style="flex:1;height:14px;background:#EEF2F9;border-radius:7px;overflow:hidden">
+              <div style="width:${pct}%;height:100%;background:${color};border-radius:7px"></div>
+            </div>
+            <div style="font-size:0.88rem;font-weight:700;min-width:36px;text-align:right">${s.score.toFixed(2)}</div>
+          </div>`;
+        }).join('')}
+    </div>
+
+    <!-- Mérsékelt sémák -->
+    ${medium.length > 0 ? `
+    <div style="margin-bottom:18px">
+      <div style="font-size:0.76rem;font-weight:700;color:#D4AC0D;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px">🟡 Mérsékelt területek (3.0–3.9)</div>
+      ${medium.map(s => {
+        const pct = (s.score/6*100).toFixed(0);
+        return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+          <div style="width:150px;font-size:0.82rem;flex-shrink:0;color:${getDomainColor(s.dom)}">${s.nev}</div>
+          <div style="flex:1;height:10px;background:#EEF2F9;border-radius:5px;overflow:hidden">
+            <div style="width:${pct}%;height:100%;background:#D4AC0D;border-radius:5px"></div>
+          </div>
+          <div style="font-size:0.82rem;font-weight:600;min-width:36px;text-align:right">${s.score.toFixed(2)}</div>
+        </div>`;
+      }).join('')}
+    </div>` : ''}
+
+    <!-- Tartomány összesítő -->
+    <div style="margin-bottom:18px">
+      <div style="font-size:0.76rem;font-weight:700;color:#1B2A4A;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px">📊 Tartomány összesítők</div>
+      ${DOMAINS.map(dom => {
+        const schemas = SCHEMAS.filter(s => s.dom === dom.key);
+        const sc = schemas.map(s => getScore(s)).filter(s=>s!==null);
+        if (!sc.length) return '';
+        const avg = sc.reduce((a,b)=>a+b,0)/sc.length;
+        const pct = (avg/6*100).toFixed(0);
+        return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+          <div style="width:200px;font-size:0.8rem;font-weight:600;flex-shrink:0;color:${dom.color}">${dom.name}</div>
+          <div style="flex:1;height:12px;background:#EEF2F9;border-radius:6px;overflow:hidden">
+            <div style="width:${pct}%;height:100%;background:${dom.color};border-radius:6px"></div>
+          </div>
+          <div style="font-size:0.84rem;font-weight:700;min-width:36px;text-align:right">${avg.toFixed(2)}</div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <!-- Megjegyzés -->
+    ${Object.keys(memos).some(k => memos[k]) ? `
+    <div style="margin-bottom:18px">
+      <div style="font-size:0.76rem;font-weight:700;color:#1B2A4A;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px">✏️ Személyes megjegyzések</div>
+      ${SCHEMAS.filter(s => memos[s.kod]).map(s => `
+        <div style="margin-bottom:8px;padding:8px 12px;background:#F8FAFD;border-radius:6px;border-left:3px solid ${getDomainColor(s.dom)}">
+          <div style="font-size:0.78rem;font-weight:700;color:${getDomainColor(s.dom)};margin-bottom:3px">${s.nev}</div>
+          <div style="font-size:0.82rem;color:#4A5568">${memos[s.kod]}</div>
+        </div>`).join('')}
+    </div>` : ''}
+
+    <!-- Footer -->
+    <div style="border-top:2px solid #EEF2F9;padding-top:12px;font-size:0.74rem;color:#8898A8">
+      Young Séma Kérdőív (YSQ-L) · Magyar adaptáció: Unoka Zs. és mtsai (2004) ·
+      Ez az összefoglaló önismereti célokat szolgál – diagnosztikai célra kizárólag képzett szakember alkalmazhatja.
+    </div>
+  </div>`;
+
+  // Insert into page, print, remove
+  const printDiv = document.createElement('div');
+  printDiv.id = 'clientPrintSummary';
+  printDiv.style.cssText = 'display:none';
+  printDiv.innerHTML = summaryHtml;
+  document.body.appendChild(printDiv);
+
+  // Add print styles
+  const style = document.createElement('style');
+  style.id = 'printOverrideStyle';
+  style.textContent = `
+    @media print {
+      body > *:not(#clientPrintSummary) { display: none !important; }
+      #clientPrintSummary { display: block !important; }
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    }
+  `;
+  document.head.appendChild(style);
+
+  window.print();
+
+  setTimeout(() => {
+    document.body.removeChild(printDiv);
+    document.head.removeChild(style);
+  }, 2000);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TIMER
+// ═══════════════════════════════════════════════════════════════
+let timerSeconds = 0;
+let timerInterval = null;
+let timerRunning = false;
+let timerStarted = false;
+
+function timerStart() {
+  if (timerRunning) return;
+  timerRunning = true;
+  timerStarted = true;
+  document.getElementById('timerBar').classList.add('visible');
+  document.getElementById('timerToggleBtn').textContent = '⏸ Szünet';
+  timerInterval = setInterval(() => {
+    timerSeconds++;
+    updateTimerDisplay();
+    // Also adjust fab/main padding
+    document.querySelector('.main').style.paddingBottom = '80px';
+  }, 1000);
+  // Save timer state
+  localStorage.setItem('ysq_timer', timerSeconds);
+}
+
+function timerToggle() {
+  if (timerRunning) {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    document.getElementById('timerToggleBtn').textContent = '▶ Folytatás';
+  } else {
+    timerStart();
+  }
+}
+
+function timerReset() {
+  if (!confirm('Nullázza az időmérőt?')) return;
+  clearInterval(timerInterval);
+  timerRunning = false; timerStarted = false; timerSeconds = 0;
+  updateTimerDisplay();
+  document.getElementById('timerBar').classList.remove('visible');
+  document.querySelector('.main').style.paddingBottom = '';
+  localStorage.removeItem('ysq_timer');
+}
+
+function updateTimerDisplay() {
+  const h = Math.floor(timerSeconds / 3600);
+  const m = Math.floor((timerSeconds % 3600) / 60);
+  const s = timerSeconds % 60;
+  const str = h > 0
+    ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+    : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  document.getElementById('timerDisplay').textContent = str;
+  localStorage.setItem('ysq_timer', timerSeconds);
+}
+
+function timerRestore() {
+  const saved = parseInt(localStorage.getItem('ysq_timer') || '0');
+  if (saved > 0) {
+    timerSeconds = saved;
+    timerStarted = true;
+    updateTimerDisplay();
+    document.getElementById('timerBar').classList.add('visible');
+    document.querySelector('.main').style.paddingBottom = '80px';
+    // Don't auto-resume – let user click
+    document.getElementById('timerToggleBtn').textContent = '▶ Folytatás';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// AUTOSAVE (localStorage – anonymous)
+// ═══════════════════════════════════════════════════════════════
+let autosaveTimeout = null;
+
+function autoSaveLocal() {
+  if (activeClient !== null) return; // clients handle their own save
+  clearTimeout(autosaveTimeout);
+  autosaveTimeout = setTimeout(() => {
+    const data = { answers, memos, goals, timerSeconds, ts: Date.now() };
+    localStorage.setItem('ysq_autosave', JSON.stringify(data));
+    const badge = document.getElementById('autosaveBadge');
+    badge.classList.add('show');
+    setTimeout(() => badge.classList.remove('show'), 2000);
+  }, 800);
+}
+
+function autoLoadLocal() {
+  const raw = localStorage.getItem('ysq_autosave');
+  if (!raw) return false;
+  try {
+    const data = JSON.parse(raw);
+    const age = (Date.now() - (data.ts || 0)) / 1000 / 60; // minutes
+    if (age > 60 * 24 * 7) return false; // older than 7 days, ignore
+    const n = Object.keys(data.answers || {}).length;
+    if (n === 0) return false;
+    const mins = Math.floor(age);
+    if (confirm(`Talált egy mentett kitöltést (${n}/244 kérdés, ${mins} perce).
+Folytatja onnan?`)) {
+      answers = data.answers || {};
+      memos   = data.memos   || {};
+      goals   = data.goals   || {};
+      if (data.timerSeconds) timerSeconds = data.timerSeconds;
+      updateProgress();
+      renderQuestionnaire();
+      return true;
+    }
+  } catch(e) {}
+  return false;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RESULTS – HIGH-SCHEMA FILTER
+// ═══════════════════════════════════════════════════════════════
+let resultFilter = 'all'; // 'all' | 'high' | domKey
+
+// Patch filterDom to also handle 'high'
+
+// ═══════════════════════════════════════════════════════════════
+// SNAPSHOT SYSTEM (for comparison)
+// ═══════════════════════════════════════════════════════════════
+let snapshots = JSON.parse(localStorage.getItem('ysq_snapshots') || '[]');
+
+function saveSnapshot(label) {
+  const scores = {};
+  SCHEMAS.forEach(s => { const sc = getScore(s); if (sc !== null) scores[s.kod] = sc; });
+  if (Object.keys(scores).length === 0) { alert('Nincs kitöltve elég kérdés a mentéshez.'); return; }
+  const snap = {
+    id: Date.now(),
+    label: label || new Date().toLocaleDateString('hu-HU'),
+    date: new Date().toISOString(),
+    scores,
+    clientName: activeClient !== null ? clients[activeClient].name : null,
+    totalAnswered: Object.keys(answers).length,
+    timerSeconds,
+  };
+  snapshots.push(snap);
+  localStorage.setItem('ysq_snapshots', JSON.stringify(snapshots));
+  alert(`Snapshot elmentve: "${snap.label}"`);
+  renderCompare();
+}
+
+function deleteSnapshot(idx) {
+  snapshots.splice(idx, 1);
+  localStorage.setItem('ysq_snapshots', JSON.stringify(snapshots));
+  renderCompare();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// COMPARISON VIEW
+// ═══════════════════════════════════════════════════════════════
+let compareA = null, compareB = null;
+
+function renderCompare() {
+  let html = `<div class="section-title">📉 Összehasonlítás & Fejlődéskövetés</div>`;
+
+  // Save current snapshot
+  html += `<div class="compare-card fade-up">
+    <h3>📸 Aktuális állapot mentése</h3>
+    <p style="font-size:0.84rem;color:var(--txt2);margin-bottom:12px">
+      Mentsd el az aktuális pontszámokat pillanatképként, hogy később összehasonlíthasd a fejlődést.
+    </p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <input id="snapLabel" class="client-input" style="flex:1;min-width:160px"
+        placeholder="Pl. 2025. január – első mérés"
+        value="${activeClient !== null ? clients[activeClient].name + ' – ' + new Date().toLocaleDateString('hu-HU') : new Date().toLocaleDateString('hu-HU')}">
+      <button class="snapshot-btn snapshot-btn-save" onclick="saveSnapshot(document.getElementById('snapLabel').value)">
+        💾 Snapshot mentése
+      </button>
+    </div>
+  </div>`;
+
+  if (snapshots.length < 2) {
+    html += `<div class="incomplete-notice">
+      <h3>Még nincs elég snapshot</h3>
+      <p>Legalább 2 mentett snapshot szükséges az összehasonlításhoz.<br>
+      Jelenlegi snapshots: <strong>${snapshots.length}</strong> db</p>`;
+    if (snapshots.length === 1) {
+      html += `<p style="margin-top:8px;font-size:0.84rem">Mentett: <strong>${snapshots[0].label}</strong></p>`;
+    }
+    html += `</div>`;
+  } else {
+    // Selector
+    html += `<div class="compare-card fade-up">
+      <h3>Összehasonlítandó időpontok</h3>
+      <div class="compare-select-row">
+        <select class="compare-select" id="selectA" onchange="updateCompare()">
+          <option value="">-- 1. mérés --</option>
+          ${snapshots.map((s,i) => `<option value="${i}">${s.label}${s.clientName?' ('+s.clientName+')':''}</option>`).join('')}
+        </select>
+        <select class="compare-select" id="selectB" onchange="updateCompare()">
+          <option value="">-- 2. mérés --</option>
+          ${snapshots.map((s,i) => `<option value="${i}">${s.label}${s.clientName?' ('+s.clientName+')':''}</option>`).join('')}
+        </select>
+      </div>
+      <div class="compare-legend">
+        <div class="compare-legend-item"><div class="compare-legend-dot" style="background:var(--navy3)"></div>1. mérés</div>
+        <div class="compare-legend-item"><div class="compare-legend-dot" style="background:var(--gold)"></div>2. mérés</div>
+        <div class="compare-legend-item" style="font-size:0.8rem;color:var(--txt3)">▲ = romlás &nbsp; ▼ = javulás</div>
+      </div>
+      <div id="compareChart"></div>
+    </div>`;
+  }
+
+  // Snapshot list
+  html += `<div class="compare-card fade-up">
+    <h3>Mentett Snapshotok (${snapshots.length} db)</h3>`;
+  if (snapshots.length === 0) {
+    html += `<div class="client-empty">Még nincs mentett snapshot.</div>`;
+  } else {
+    snapshots.forEach((s, i) => {
+      const d = new Date(s.date).toLocaleDateString('hu-HU');
+      const mins = Math.floor((s.timerSeconds||0) / 60);
+      const scores = Object.values(s.scores);
+      const avg = scores.length ? (scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(2) : '–';
+      html += `<div class="client-item" style="margin-bottom:6px">
+        <div>
+          <div class="client-item-name">${s.label}</div>
+          <div class="client-item-date">${d}${s.clientName?' · '+s.clientName:''} · ${s.totalAnswered||'?'}/244 kitöltve${mins>0?' · ⏱'+mins+' perc':''}</div>
+        </div>
+        <div class="client-item-score">Átlag: ${avg}</div>
+        <button class="client-btn client-btn-danger" style="padding:4px 10px;font-size:0.76rem"
+          onclick="deleteSnapshot(${i})">Töröl</button>
+      </div>`;
+    });
+  }
+  html += `</div>`;
+
+  document.getElementById('compareContent').innerHTML = html;
+}
+
+function updateCompare() {
+  const aIdx = document.getElementById('selectA').value;
+  const bIdx = document.getElementById('selectB').value;
+  if (aIdx === '' || bIdx === '' || aIdx === bIdx) {
+    document.getElementById('compareChart').innerHTML =
+      '<p style="color:var(--txt3);font-size:0.84rem;text-align:center;padding:12px">Válassz két különböző snapshottot!</p>';
+    return;
+  }
+  const snapA = snapshots[parseInt(aIdx)];
+  const snapB = snapshots[parseInt(bIdx)];
+
+  let chartHtml = '<div class="bar-chart">';
+  SCHEMAS.forEach(schema => {
+    const a = snapA.scores[schema.kod];
+    const b = snapB.scores[schema.kod];
+    if (a === undefined && b === undefined) return;
+    const aVal = a || 0, bVal = b || 0;
+    const delta = bVal - aVal;
+    const deltaCls = delta > 0.2 ? 'delta-neg' : delta < -0.2 ? 'delta-pos' : 'delta-neu';
+    const deltaStr = delta > 0 ? `▲${delta.toFixed(1)}` : delta < 0 ? `▼${Math.abs(delta).toFixed(1)}` : '–';
+    const color = getDomainColor(schema.dom);
+
+    chartHtml += `<div class="compare-row">
+      <div class="compare-label" style="color:${color};font-weight:600">${schema.nev}</div>
+      <div class="compare-bars">
+        <div class="compare-bar-wrap">
+          <div class="compare-bar-track">
+            <div class="compare-bar-fill" style="width:${(aVal/6*100).toFixed(1)}%;background:var(--navy3)"></div>
+          </div>
+          <div class="compare-bar-val" style="color:var(--navy3)">${aVal.toFixed(1)}</div>
+        </div>
+        <div class="compare-bar-wrap">
+          <div class="compare-bar-track">
+            <div class="compare-bar-fill" style="width:${(bVal/6*100).toFixed(1)}%;background:var(--gold)"></div>
+          </div>
+          <div class="compare-bar-val" style="color:var(--gold)">${bVal.toFixed(1)}</div>
+        </div>
+      </div>
+      <div class="compare-delta ${deltaCls}">${deltaStr}</div>
+    </div>`;
+  });
+  chartHtml += '</div>';
+  document.getElementById('compareChart').innerHTML = chartHtml;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+// Restore autosave
+const restored = autoLoadLocal();
+if (!restored) renderQuestionnaire();
+updateProgress();
+timerRestore();
+</script>
+</body>
+</html>

@@ -14,4 +14,6 @@ A filmadatokat a szerver a TMDB-től kéri. A jelszóellenőrzés és a TMDB-hit
 
 A `maeste-source-encrypted.7z` külön jelszóval titkosított forrásmentés. A forrásmentés jelszava és az alkalmazás belépési jelszava különböző. A jelszavakat külön, privát csatornán adja át a tulajdonos; egyik sem szerepel ebben a repóban. A mellékelt `.sha256` fájl a letöltés sértetlenségét ellenőrzi.
 
+Az **Animációk** választóban látványos, visszafogott vagy kikapcsolt módot kérhetsz. Alapból a visszafogott mód aktív; a készülék csökkentett mozgása elsőbbséget élvez. A következő poszter előre betöltődik a pakliba. A részletes effektek a Látványos módban láthatók.
+
 A repó eredeti, gyökérkönyvtárban található projektje változatlanul megmarad.

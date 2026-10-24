@@ -6,6 +6,20 @@
   const image = (path, size = 'w500') => typeof path === 'string' && /^\/[A-Za-z0-9._/-]+$/.test(path) ? `https://image.tmdb.org/t/p/${size}${path}` : '';
   const read = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } };
   const save = (key, value) => { try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* The app also works with session-only preferences. */ } };
+  const effectsModes = new Set(['full', 'subtle', 'off']);
+  const reducedMotionPreference = matchMedia('(prefers-reduced-motion: reduce)');
+  let effectsPreference = read('maeste.effects', 'subtle');
+  if (!effectsModes.has(effectsPreference)) effectsPreference = 'subtle';
+  function effectiveEffectsMode() { return reducedMotionPreference.matches ? 'off' : effectsPreference; }
+  function renderEffectsPreference() {
+    $('#effects-mode').value = effectsPreference;
+    $('#effects-system-note').hidden = !reducedMotionPreference.matches;
+    document.documentElement.dataset.effects = effectiveEffectsMode();
+  }
+  function effectsPreferenceChanged() {
+    renderEffectsPreference();
+    document.dispatchEvent(new Event('maeste:effects-change'));
+  }
   const configuredApi = $('meta[name="maeste-api-origin"]')?.content.trim();
   const apiOrigin = configuredApi ? new URL(configuredApi).origin : location.origin;
   let accessToken = ''; try { accessToken = sessionStorage.getItem('maeste.access') || ''; } catch { /* Session access also works in memory. */ }
@@ -256,6 +270,7 @@
   }
   function showState(kind, message = '') {
     $('#movie-actions').hidden = true; $('#gesture-hint').hidden = true;
+    $('#card-stage').classList.remove('has-peek');
     if (kind === 'loading') $('#card-stage').innerHTML = '<div class="state-card"><div class="loading-reel" aria-hidden="true">✦</div><h3>Mindjárt kezdődik.</h3><p>Keressük a következő ma esti kedvencet.</p></div>';
     else if (kind === 'error') $('#card-stage').innerHTML = `<div class="state-card"><span class="state-icon" aria-hidden="true">☁</span><h3>Egy kis szünet a vetítésben.</h3><p>${esc(message)}</p><button type="button" class="secondary-button error-retry" data-action="retry">Megpróbálom újra →</button></div>`;
     else if (kind === 'empty' && state.hasMore && !state.room) $('#card-stage').innerHTML = '<div class="state-card"><span class="state-icon" aria-hidden="true">✧</span><h3>Ezek már ismerős történetek.</h3><p>A látott filmjeidet kihagytuk. Nézzünk körül a következő válogatásban!</p><button type="button" class="secondary-button" data-action="next-page">További filmek →</button></div>';
@@ -267,6 +282,10 @@
       $('#card-stage').innerHTML = `<div class="state-card"><span class="state-icon" aria-hidden="true">✦</span><h3>${heading}</h3><p>${esc(note)}</p>${count ? '<button type="button" class="primary-button" data-action="open-list">Megnézem a találatokat →</button>' : ''}${!state.room && state.page < state.totalPages ? '<button type="button" class="secondary-button" data-action="next-page">Jöhet még pár film →</button>' : ''}${!state.room && state.history.length ? '<button type="button" class="text-button" data-action="undo-last">Utolsó döntés visszavonása ↶</button>' : ''}${!state.room && !count ? '<button type="button" class="secondary-button" data-action="edit-filters">Más hangulatra váltok →</button>' : ''}</div>`;
     }
   }
+  function nextDeckMovie() {
+    const seen = new Set(state.seen.map(mediaKey));
+    return state.deck.slice(state.index + 1).find(movie => !seen.has(mediaKey(movie)) && (!state.room || !Object.prototype.hasOwnProperty.call(state.room.myVotes || {}, String(movie.id))));
+  }
   function renderCard() {
     if (state.busy) return;
     const seenIds = new Set(state.seen.map(mediaKey)), heldSeen = activeSeenVoteHold();
@@ -277,13 +296,31 @@
     const voted = state.room ? Object.keys(state.room.myVotes || {}).length : Math.max(0, state.index);
     $('#deck-counter').textContent = `${String(Math.min(voted + (movie ? 1 : 0), state.deck.length)).padStart(2,'0')} / ${String(state.deck.length).padStart(2,'0')}`;
     if (!movie) { showState(state.deck.length || state.room ? 'finished' : 'empty'); if (state.room) $('.state-card', $('#card-stage'))?.insertAdjacentHTML('beforeend', roundControls()); return; }
-    const poster = image(movie.poster_path, 'w780');
+    const stage = $('#card-stage'), next = nextDeckMovie(), poster = image(movie.poster_path, 'w780');
+    // Reuse the decoded poster already visible behind the outgoing card.
+    // Polling can redraw the same card, so preserve its poster too.
+    const reusablePoster = [...stage.querySelectorAll('.movie-card,.deck-peek')]
+      .find(element => Number(element.dataset.movieId) === Number(movie.id) && element.dataset.mediaType === typeOf(movie))
+      ?.querySelector('img');
+    const nextPoster = next ? image(next.poster_path, 'w780') : '';
+    const peek = next ? `<div class="deck-peek" data-movie-id="${Number(next.id)}" data-media-type="${typeOf(next)}" aria-hidden="true" inert>${nextPoster ? `<img class="deck-peek-poster" src="${nextPoster}" alt="" draggable="false" decoding="async" fetchpriority="low">` : `<div class="deck-peek-fallback"><span>✦</span><p>${esc(title(next))}</p></div>`}<div class="deck-peek-shade"></div></div>` : '';
     const metadata = [rating(movie) ? `<span class="rating-tag">★ ${rating(movie)}</span>` : '', year(movie) ? `<span>${esc(year(movie))}</span>` : '', ...genreNames(movie).slice(0, 2).map(name => `<span>${esc(name)}</span>`)].filter(Boolean).join('<span class="meta-dot">·</span>');
-    $('#card-stage').innerHTML = `<article class="movie-card" data-movie-id="${Number(movie.id)}" data-media-type="${typeOf(movie)}" aria-label="${esc(title(movie))}">${poster ? `<img class="poster-image" src="${poster}" alt="${esc(title(movie))} ${noun(typeOf(movie))}poszter" draggable="false" fetchpriority="high">` : '<div class="poster-placeholder" aria-hidden="true">✦</div>'}<div class="card-shade"></div><div class="card-top"><span class="card-kicker"><span aria-hidden="true">✦</span> ${state.recommendation?.personalized && !state.room ? 'AZ ÍZLÉSEDHEZ HANGOLVA' : 'EGY ÚJABB LEHETŐSÉG'}</span><button type="button" class="card-info" data-details="${mediaKey(movie)}" aria-label="${esc(title(movie))} részletei">i</button></div><div class="swipe-stamp yes" aria-hidden="true">JÖHET</div><div class="swipe-stamp no" aria-hidden="true">MOST NEM</div><div class="swipe-stamp seen" aria-hidden="true">MÁR LÁTTAM</div><div class="card-body"><div class="card-availability availability-loading" aria-live="polite">Elérhetőség ellenőrzése…</div><div class="movie-tags">${metadata}</div><h3>${esc(title(movie))}</h3><p class="card-overview">${esc(movie.overview || 'Egy új történet, amit érdemes felfedezni. Nyisd meg a részleteket és az előzetest.')}</p><button class="card-details-link" type="button" data-details="${mediaKey(movie)}">A történet és az előzetes <span aria-hidden="true">→</span></button></div></article>`;
-    $('.poster-image')?.addEventListener('error', event => { event.target.remove(); });
+    stage.innerHTML = `${peek}<article class="movie-card" data-movie-id="${Number(movie.id)}" data-media-type="${typeOf(movie)}" aria-label="${esc(title(movie))}">${poster ? `<img class="poster-image" src="${poster}" alt="${esc(title(movie))} ${noun(typeOf(movie))}poszter" draggable="false" fetchpriority="high">` : '<div class="poster-placeholder" aria-hidden="true">✦</div>'}<div class="card-shade"></div><div class="card-top"><span class="card-kicker"><span aria-hidden="true">✦</span> ${state.recommendation?.personalized && !state.room ? 'AZ ÍZLÉSEDHEZ HANGOLVA' : 'EGY ÚJABB LEHETŐSÉG'}</span><button type="button" class="card-info" data-details="${mediaKey(movie)}" aria-label="${esc(title(movie))} részletei">i</button></div><div class="swipe-stamp yes" aria-hidden="true">JÖHET</div><div class="swipe-stamp no" aria-hidden="true">MOST NEM</div><div class="swipe-stamp seen" aria-hidden="true">MÁR LÁTTAM</div><div class="card-body"><div class="card-availability availability-loading" aria-live="polite">Elérhetőség ellenőrzése…</div><div class="movie-tags">${metadata}</div><h3>${esc(title(movie))}</h3><p class="card-overview">${esc(movie.overview || 'Egy új történet, amit érdemes felfedezni. Nyisd meg a részleteket és az előzetest.')}</p><button class="card-details-link" type="button" data-details="${mediaKey(movie)}">A történet és az előzetes <span aria-hidden="true">→</span></button></div></article>`;
+    stage.classList.toggle('has-peek', Boolean(next));
+    if (poster && reusablePoster && reusablePoster.getAttribute('src') === poster) {
+      reusablePoster.className = 'poster-image'; reusablePoster.alt = `${title(movie)} ${noun(typeOf(movie))}poszter`;
+      reusablePoster.fetchPriority = 'high'; reusablePoster.removeAttribute('aria-hidden');
+      $('.poster-image', stage)?.replaceWith(reusablePoster);
+    }
+    $('.poster-image', stage)?.addEventListener('error', event => { event.target.remove(); }, { once: true });
+    $('.deck-peek-poster', stage)?.addEventListener('error', event => {
+      if (!event.target.classList.contains('deck-peek-poster')) return;
+      const fallback = document.createElement('div'); fallback.className = 'deck-peek-fallback';
+      const name = document.createElement('p'); name.textContent = title(next); fallback.append(name); event.target.replaceWith(fallback);
+    }, { once: true });
     $('#movie-actions').hidden = false; $('#gesture-hint').hidden = false;
     setBusy(false); attachSwipe(); loadCardAvailability(movie);
-    const next = state.deck[state.index + 1]; if (next) prefetchAvailability(next); if (next?.poster_path) { const preload = new Image(); preload.src = image(next.poster_path, 'w780'); }
+    if (next) prefetchAvailability(next);
   }
   function renderSummary() {
     const active = state.room?.filters || filters();
@@ -400,11 +437,11 @@
   }
   function clearVoteCardState(card, preservePose = false) {
     if (!card) return;
-    card.classList.remove('dragging', 'dragging-seen', 'dragging-no', 'dragging-yes', 'is-vote-saving', 'saving-no', 'saving-yes', 'is-seen-saving', 'is-burning', 'is-archiving', 'is-portaling');
+    card.classList.remove('dragging', 'dragging-seen', 'dragging-no', 'dragging-yes', 'is-vote-saving', 'saving-no', 'saving-yes', 'is-seen-saving', 'is-burning', 'is-archiving', 'is-portaling', 'effects-subtle');
     card.style.pointerEvents = ''; card.style.opacity = ''; card.removeAttribute('aria-busy');
     if (!preservePose) {
       card.style.transform = '';
-      for (const property of ['--choice-x', '--choice-y', '--choice-rotation']) card.style.removeProperty(property);
+      for (const property of ['--choice-x', '--choice-y', '--choice-rotation', '--archive-x', '--archive-y', '--archive-scale']) card.style.removeProperty(property);
     }
     $$('.swipe-stamp', card).forEach(stamp => { stamp.style.opacity = '0'; });
   }
@@ -418,27 +455,50 @@
     if (!card?.isConnected || !['no', 'seen', 'yes'].includes(choice)) return;
     const stage = card.parentElement, originDeck = state.deck, originIndex = state.index, originSerial = state.discoverSerial;
     const originRoom = state.room ? { code: state.room.code, memberToken: state.room.memberToken, roundVersion: roomVersion() } : null;
-    const contextCurrent = () => card.isConnected && card.parentElement === stage && $('.movie-card', stage) === card && (originRoom ? state.room?.code === originRoom.code && state.room?.memberToken === originRoom.memberToken && roomVersion() === originRoom.roundVersion : !state.room && state.deck === originDeck && state.index === originIndex && state.discoverSerial === originSerial);
+    const contextCurrent = () => !accessLocked && card.isConnected && card.parentElement === stage && $('.movie-card', stage) === card && (originRoom ? state.room?.code === originRoom.code && state.room?.memberToken === originRoom.memberToken && roomVersion() === originRoom.roundVersion : !state.room && state.deck === originDeck && state.index === originIndex && state.discoverSerial === originSerial);
     clearVoteCardState(card, true); card.style.pointerEvents = 'none';
-    if (!contextCurrent() || document.hidden || motion.matches) return;
+    const mode = effectiveEffectsMode();
+    if (!contextCurrent() || document.hidden || motion.matches || mode === 'off') return;
     const effects = document.createElement('div'); effects.setAttribute('aria-hidden', 'true');
     const append = (className, parent = effects, tag = 'div', text = '') => { const element = document.createElement(tag); element.className = className; if (text) element.textContent = text; parent.append(element); return element; };
     const variants = { no: ['is-burning', 'choice-card-burn'], seen: ['is-archiving', 'card-file-away'], yes: ['is-portaling', 'card-enter-portal'] };
-    const [cardClass, animationName] = variants[choice];
-    if (choice === 'no') {
+    const [cardClass, fullAnimationName] = variants[choice];
+    const animationName = mode === 'subtle' ? 'card-gentle-exit' : fullAnimationName;
+    let libraryTarget = null;
+    if (mode === 'subtle') {
+      effects.className = 'subtle-effects';
+    } else if (choice === 'no') {
       effects.className = 'burn-effects'; append('burn-glow'); const front = append('burn-front');
-      for (let index = 0; index < 24; index++) {
+      for (const property of ['--choice-x', '--choice-y', '--choice-rotation']) effects.style.setProperty(property, card.style.getPropertyValue(property) || (property === '--choice-rotation' ? '0deg' : '0px'));
+      for (let index = 0; index < 9; index++) {
         const spark = append(index % 4 === 0 ? 'burn-spark burn-ash' : 'burn-spark', front, 'i');
         spark.style.setProperty('--spark-x', `${3 + Math.random() * 94}%`);
-        spark.style.setProperty('--spark-drift', `${Math.round((Math.random() - .5) * 90)}px`);
-        spark.style.setProperty('--spark-delay', `${Math.round(Math.random() * 180)}ms`);
-        spark.style.setProperty('--spark-size', `${2 + Math.random() * 3}px`);
+        spark.style.setProperty('--spark-drift', `${Math.round((Math.random() - .5) * 42)}px`);
+        spark.style.setProperty('--spark-delay', `${Math.round(Math.random() * 100)}ms`);
+        spark.style.setProperty('--spark-size', `${1.5 + Math.random() * 1.5}px`);
       }
     } else if (choice === 'seen') {
-      effects.className = 'vote-effects archive-effects'; const cabinet = append('archive-cabinet');
-      for (let index = 0; index < 4; index++) append('archive-book', cabinet, 'i').style.setProperty('--book-index', String(index));
-      append('archive-slot', cabinet); append('archive-label', cabinet, 'span', 'MÁR LÁTTAM');
-      append('effect-caption', effects, 'span', 'A KÖNYVTÁRADBA KERÜLT');
+      effects.className = 'vote-effects archive-effects';
+      const stageRect = stage.getBoundingClientRect(), button = $('#seen-open'), buttonRect = button?.getBoundingClientRect();
+      const width = card.offsetWidth, height = card.offsetHeight;
+      const centerX = stageRect.left + card.offsetLeft + width / 2, centerY = stageRect.top + card.offsetTop + height / 2;
+      const visibleButton = buttonRect && buttonRect.width > 0 && buttonRect.height > 0 && buttonRect.left >= 0 && buttonRect.top >= 0 && buttonRect.right <= innerWidth && buttonRect.bottom <= innerHeight;
+      let targetX, targetY, scale;
+      if (visibleButton) {
+        libraryTarget = button;
+        targetX = buttonRect.left + buttonRect.width / 2; targetY = buttonRect.top + buttonRect.height / 2;
+        scale = Math.min(.14, buttonRect.width * .6 / width, buttonRect.height * .6 / height);
+      } else {
+        // Keep the receipt visible when the actual library button is offscreen.
+        targetX = Math.max(24, Math.min(innerWidth - 24, stageRect.right - 25));
+        targetY = Math.max(24, Math.min(innerHeight - 24, stageRect.top + 25));
+        const receipt = append('archive-target', effects, 'span', '✓');
+        receipt.style.left = `${targetX - stageRect.left}px`; receipt.style.top = `${targetY - stageRect.top}px`;
+        scale = Math.min(28 / width, 28 / height);
+      }
+      card.style.setProperty('--archive-x', `${targetX - centerX}px`);
+      card.style.setProperty('--archive-y', `${targetY - centerY}px`);
+      card.style.setProperty('--archive-scale', String(scale));
     } else {
       effects.className = 'vote-effects portal-effects'; append('portal-halo'); append('portal-ring'); append('portal-core');
       for (let index = 0; index < 6; index++) {
@@ -452,26 +512,38 @@
     }
     await new Promise(resolve => {
       let finished = false, timeout, frame;
-      const finish = () => {
+      const finish = (completed = false) => {
         if (finished) return; finished = true;
         clearTimeout(timeout); cancelAnimationFrame(frame);
         card.removeEventListener('animationend', onEnd); card.removeEventListener('animationcancel', onEnd);
         document.removeEventListener('visibilitychange', onVisibility);
+        document.removeEventListener('maeste:effects-change', onEffectsChange);
         if (motion.removeEventListener) motion.removeEventListener('change', onMotion); else motion.removeListener?.(onMotion);
-        effects.remove(); clearVoteCardState(card); resolve();
+        effects.remove();
+        if (completed && choice === 'seen' && contextCurrent() && !document.hidden && effectiveEffectsMode() !== 'off') {
+          const button = libraryTarget || $('#seen-open');
+          button?.classList.add('library-receipt');
+          setTimeout(() => button?.classList.remove('library-receipt'), 360);
+        }
+        clearVoteCardState(card); resolve();
       };
-      const onEnd = event => { if (event.target === card && event.animationName === animationName) finish(); };
+      const onEnd = event => { if (event.target === card && event.animationName === animationName) finish(event.type === 'animationend'); };
       const onVisibility = () => { if (document.hidden) finish(); };
       const onMotion = () => { if (motion.matches) finish(); };
+      const onEffectsChange = () => { if (effectiveEffectsMode() !== mode) finish(); };
       const checkContext = () => { if (!contextCurrent()) finish(); else frame = requestAnimationFrame(checkContext); };
       try {
         card.addEventListener('animationend', onEnd); card.addEventListener('animationcancel', onEnd);
         document.addEventListener('visibilitychange', onVisibility);
+        document.addEventListener('maeste:effects-change', onEffectsChange);
         if (motion.addEventListener) motion.addEventListener('change', onMotion); else motion.addListener?.(onMotion);
-        timeout = setTimeout(finish, 1100); stage.append(effects);
+        timeout = setTimeout(finish, mode === 'subtle' ? 400 : 850);
+        if (mode === 'full') stage.append(effects);
         // The exit starts at the released pose; replace the inline drag transform
         // and the saving state together before the browser paints another frame.
-        card.style.transform = ''; card.classList.add(cardClass); frame = requestAnimationFrame(checkContext);
+        card.style.transform = '';
+        if (mode === 'subtle') card.classList.add('effects-subtle');
+        card.classList.add(cardClass); frame = requestAnimationFrame(checkContext);
         if (document.hidden || motion.matches || !contextCurrent()) finish();
       } catch { finish(); }
     });
@@ -537,7 +609,7 @@
     let startX = 0, startY = 0, active = false, dx = 0, dy = 0, axis = null, pointerId;
     let pose = { x: 0, y: 0, rotation: 0 };
     const setPose = (x, y, rotation) => {
-      pose = matchMedia('(prefers-reduced-motion: reduce)').matches ? { x: 0, y: 0, rotation: 0 } : { x, y, rotation: Math.max(-6, Math.min(6, rotation)) };
+      pose = effectiveEffectsMode() === 'off' ? { x: 0, y: 0, rotation: 0 } : { x, y, rotation: Math.max(-6, Math.min(6, rotation)) };
       card.style.transform = `translate3d(${pose.x}px,${pose.y}px,0) rotate(${pose.rotation}deg)`;
     };
     const reset = () => {
@@ -883,7 +955,7 @@
     finally { renderMediaType(); renderTaste(); renderLists(); }
   }
   function availabilityPair() {
-    const current = state.deck[state.index], next = state.deck[state.index + 1];
+    const current = state.deck[state.index], next = nextDeckMovie();
     return new Set([current, next].filter(Boolean).map(mediaKey));
   }
   function pruneAvailability() {
@@ -1096,6 +1168,13 @@
   }
   state.dismissed = boundDismissed(state.dismissed); save('maeste.dismissed', state.dismissed);
   renderConnection(); renderMediaType();
+  renderEffectsPreference();
+  $('#effects-mode').addEventListener('change', event => {
+    if (!effectsModes.has(event.target.value)) return;
+    effectsPreference = event.target.value; save('maeste.effects', effectsPreference); effectsPreferenceChanged();
+  });
+  if (reducedMotionPreference.addEventListener) reducedMotionPreference.addEventListener('change', effectsPreferenceChanged);
+  else reducedMotionPreference.addListener?.(effectsPreferenceChanged);
   $('#access-form').addEventListener('submit', unlockAccess);
   $('#access-retry').addEventListener('click', checkAccess);
   $('#access-logout').addEventListener('click', () => { accessBootstrapSerial++; lockAccess('Kiléptél. A listáid megmaradtak ebben a böngészőben.'); });

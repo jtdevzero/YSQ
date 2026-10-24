@@ -4,18 +4,18 @@ Magyar nyelvű, Activity-jellegű, egy közös eszközön játszható partiját�
 
 Játszható változat: https://jtdevzero.github.io/YSQ/activity18/
 
-- 540 egyedi, 2–3 szavas feladvány: 60 bemelegítő, 180 csípős, 180 merész és 120 külön szex témájú kifejezés.
+- 720 egyedi, 2–3 szavas feladvány: 60 bemelegítő, 180 csípős, 180 merész és 300 külön szex témájú kifejezés.
 - „Csak pikáns” pakli: 360 csípős és merész lap, bemelegítő feladványok nélkül. Ez az alapértelmezett pakli.
-- „Szex témájú” pakli: 120 külön kifejezés intimitásról, vágyról, szexualitásról és védekezésről.
+- „Szex témájú” pakli: 300 külön kifejezés intimitásról, vágyról, szexualitásról és védekezésről.
 - „Vegyes” pakli: három erősség; a magasabb szintek a lazább lapokat is tartalmazzák. A külön szex témájú lapok nem kerülnek bele.
 - 2–6 csapat, 30/60/90 másodperces időkeret, csapatonként 3/5/8 kör.
-- Körülírás, mutogatás és rajzolás; kapcsolható feladattípusok.
+- Körülírás, mutogatás és rajzolás; alapból minden megfejtés vagy passz után vált a kijelölt típusok között. A körönkénti váltás külön választható.
 - Érintéses rajzvászon és a feladványt elrejtő csapatnézet.
 - Megfejtésenként 1 pont, büntetés nélküli passz, utolsó lap visszavonása.
 - Automatikus helyi mentés, szünet és visszavágó. Minden csapat ugyanannyi kört kap.
 - Nincs regisztráció, külső betűtípus, követőkód vagy szerveroldali adatkezelés.
 
-Példák: „Eljegyzési hagymakarika”, „Csipkés alibi”, illetve a külön csomagban „Nemi vágy”, „Szexuális előjáték”, „Vízbázisú síkosító”. A mentett játékok megőrzik a korábbi paklijukat; az új csomagokat új játék indításával választhatjátok ki.
+Példák: „Eljegyzési hagymakarika”, „Csipkés alibi”, illetve a külön csomagban „Nemi vágy”, „Szexuális előjáték”, „Vízbázisú síkosító”. A mentett játékok megőrzik a korábbi paklijukat és váltási módjukat; a bővített csomagot és a laponkénti váltást új játék indításával választhatjátok ki.
 
 ## Indítás
 

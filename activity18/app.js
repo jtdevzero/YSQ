@@ -58,6 +58,12 @@ function updateEstimate() {
   $('#game-estimate').textContent = `Kb. ${minutes} perc, plusz a nevetés.`;
 }
 
+function updateModeInfo() {
+  const modes = $$('input[name="modes"]:checked').map(input => MODES[input.value].name);
+  const rotation = $('#mode-rotation').value;
+  $('#mode-order').textContent = !modes.length ? 'Válassz legalább egy feladattípust.' : modes.length === 1 ? `Csak ${modes[0].toLocaleLowerCase('hu')} lesz.` : `${rotation === 'cards' ? 'Lapról lapra' : 'Csapatkörönként'}: ${modes.join(' → ')}.`;
+}
+
 function updateLevel() {
   const level = $('input[name="level"]:checked').value;
   const pack = $('#pack').value;
@@ -91,7 +97,7 @@ function sideBar() {
 
 function liveLog() {
   if (!game.entries.length) return '<p class="empty-note">Az első nagy megfejtésre várunk.</p>';
-  return game.entries.slice(-6).reverse().map(e => `<div class="log-item" data-result="${e.result}"><span>${esc(e.text)}</span><strong>${e.result === 'correct' ? '+1' : 'passz'}</strong></div>`).join('');
+  return game.entries.slice(-6).reverse().map(e => `<div class="log-item" data-result="${e.result}"><span>${esc(e.text)}${e.mode ? `<small class="log-mode">${MODES[e.mode].name}</small>` : ''}</span><strong>${e.result === 'correct' ? '+1' : 'passz'}</strong></div>`).join('');
 }
 
 function render() {
@@ -114,7 +120,9 @@ function render() {
 
 function modeCard() {
   const mode = MODES[currentMode(game)];
-  return `<div class="mode-card" data-mode="${currentMode(game)}"><span class="mode-icon">${icon(mode.icon)}</span><span><strong class="mode-name">${mode.name}</strong><span class="mode-rule">${mode.rule}</span></span></div>`;
+  const next = game.config.modes[(game.config.modes.indexOf(currentMode(game)) + 1) % game.config.modes.length];
+  const note = game.config.modes.length === 1 ? 'Ebben a játékban csak ez a típus szerepel.' : game.config.modeRotation === 'cards' ? `Következő lap: ${MODES[next].name}` : 'Ez a típus marad a csapatkör végéig.';
+  return `<div class="mode-card" data-mode="${currentMode(game)}"><span class="mode-icon">${icon(mode.icon)}</span><span><strong class="mode-name">Most: ${mode.name}</strong><span class="mode-rule">${mode.rule}</span><span class="mode-next">${note}</span></span></div>`;
 }
 
 function promptCard() {
@@ -136,7 +144,8 @@ function renderPhase(team) {
   if (game.phase === 'summary') {
     const pts = roundPoints(game);
     const last = game.turn + 1 >= game.teams.length * game.config.rounds;
-    return `<div class="round-summary"><span class="phase-pill">KÖR LEZÁRVA</span><h1 class="turn-heading">${pts ? 'Ez szép volt!' : 'A következő jobb lesz!'}<span class="brand-dot">.</span></h1><p class="turn-note">${esc(team.name)} · ${MODES[currentMode(game)].name}</p><div class="summary-number">+${pts}<span>pont ebben a körben</span></div><div class="result-list">${game.entries.length ? game.entries.map(e => `<div class="result-item"><span>${esc(e.text)}</span><strong>${e.result === 'correct' ? '+1' : 'passz'}</strong></div>`).join('') : '<p class="helper">Ebben a körben nem született megfejtés.</p>'}</div><button class="button button-primary" data-action="next-turn" data-autofocus>${last ? 'Jöjjön az eredmény' : 'Következő csapat'} <span aria-hidden="true">↗</span></button></div>`;
+    const modeLabel = game.config.modeRotation === 'cards' && game.config.modes.length > 1 ? 'Váltakozó feladattípusok' : MODES[currentMode(game)].name;
+    return `<div class="round-summary"><span class="phase-pill">KÖR LEZÁRVA</span><h1 class="turn-heading">${pts ? 'Ez szép volt!' : 'A következő jobb lesz!'}<span class="brand-dot">.</span></h1><p class="turn-note">${esc(team.name)} · ${modeLabel}</p><div class="summary-number">+${pts}<span>pont ebben a körben</span></div><div class="result-list">${game.entries.length ? game.entries.map(e => `<div class="result-item"><span>${esc(e.text)}${e.mode ? `<small class="log-mode">${MODES[e.mode].name}</small>` : ''}</span><strong>${e.result === 'correct' ? '+1' : 'passz'}</strong></div>`).join('') : '<p class="helper">Ebben a körben nem született megfejtés.</p>'}</div><button class="button button-primary" data-action="next-turn" data-autofocus>${last ? 'Jöjjön az eredmény' : 'Következő csapat'} <span aria-hidden="true">↗</span></button></div>`;
   }
   return `<span class="phase-pill">${esc(team.name)} · ${game.phase === 'ready' ? 'FELKÉSZÜLTÉL?' : 'MEHET A PRODUKCIÓ'}</span>${modeCard()}${promptCard()}${game.phase === 'ready' ? `<p class="helper">Jegyezd meg a feladványt, aztán indulhat!</p><button class="button button-primary" data-action="start" data-autofocus>Induljon az idő! <span aria-hidden="true">↗</span></button>` : `${timerMarkup()}<div class="action-row"><button class="button button-secondary" data-action="pass">Passz <span aria-hidden="true">↪</span></button><button class="button button-primary" data-action="correct" data-autofocus>Megvan! <span>+1</span></button></div><div class="action-row secondary-actions"><button class="button button-quiet" id="undo-button" data-action="undo" ${!game.entries.length ? 'disabled' : ''}>↶ Visszavonás</button><button class="button button-quiet" data-action="pause">Ⅱ Szünet</button><button class="button button-quiet" data-action="sound" aria-pressed="${soundOn}">${soundOn ? 'Hang: be' : 'Hang: ki'}</button></div>`}${drawingMarkup()}`;
 }
@@ -188,14 +197,7 @@ function recordAnswer(result) {
   if (remaining(game) <= 0) { tick(); return; }
   record(game, result);
   drawing = [];
-  $('#prompt-word').textContent = game.current.text;
-  $('.prompt-meta span:last-child').textContent = LEVELS.find(l => l.id === game.current.level)?.label || '';
-  $('#live-points').textContent = roundPoints(game);
-  $('#live-log').innerHTML = liveLog();
-  $('#undo-button').disabled = !game.entries.length;
-  clearCanvas();
-  persist();
-  tick();
+  render();
 }
 
 function resetToLobby() {
@@ -281,7 +283,7 @@ document.addEventListener('click', event => {
 
 $('#setup-form').addEventListener('submit', event => {
   event.preventDefault();
-  const config = { teams: $$('.team-input').map(input => input.value), duration: Number($('#duration').value), rounds: Number($('#rounds').value), level: $('input[name="level"]:checked').value, modes: $$('input[name="modes"]:checked').map(el => el.value), pack: $('#pack').value };
+  const config = { teams: $$('.team-input').map(input => input.value), duration: Number($('#duration').value), rounds: Number($('#rounds').value), level: $('input[name="level"]:checked').value, modes: $$('input[name="modes"]:checked').map(el => el.value), pack: $('#pack').value, modeRotation: $('#mode-rotation').value };
   try { game = createGame(config, PROMPTS); $('#setup-error').hidden = true; drawing = []; goToGame(); }
   catch (error) { $('#setup-error').textContent = error.message; $('#setup-error').hidden = false; }
 });
@@ -289,6 +291,8 @@ $('#add-team').addEventListener('click', () => addTeam());
 $('#duration').addEventListener('change', updateEstimate);
 $('#rounds').addEventListener('change', updateEstimate);
 $('#pack').addEventListener('change', updateLevel);
+$('#mode-rotation').addEventListener('change', updateModeInfo);
+$$('input[name="modes"]').forEach(input => input.addEventListener('change', updateModeInfo));
 $$('input[name="level"]').forEach(input => input.addEventListener('change', updateLevel));
 $('#rules-button').addEventListener('click', () => {
   if (game?.phase === 'playing') { pause(game); render(); }
@@ -306,8 +310,10 @@ $('#canvas-modal').addEventListener('close', restoreCanvas);
 addTeam('Éjjeli baglyok');
 addTeam('Másnapos zsenik');
 updateLevel();
+updateModeInfo();
 try { savedGame = restoreGame(localStorage.getItem(SAVE_KEY)); } catch { /* Start fresh when storage is unavailable. */ }
 if (savedGame) {
   $('#resume-description').textContent = `${savedGame.teams.map(t => t.name).join(' · ')} — ${savedGame.phase === 'finished' ? 'befejezett játék' : `${Math.min(roundNumber(savedGame), savedGame.config.rounds)}. kör / ${savedGame.config.rounds}`}`;
+  if (savedGame.config.modeRotation === 'rounds') $('#resume-description').textContent += '. Ez a mentés csapatkörönként vált típust. Az új, laponkénti váltáshoz indíts új játékot.';
   $('#resume-modal').showModal();
 }

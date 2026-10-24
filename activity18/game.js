@@ -36,13 +36,15 @@ export function createGame(config, prompts, random = Math.random) {
   if (!['warm', 'spicy', 'bold'].includes(config.level)) throw new Error('Válassz nehézségi szintet.');
   const pack = config.pack ?? 'mixed';
   if (!Object.hasOwn(PACKS, pack)) throw new Error('Válassz az elérhető paklikból.');
+  const modeRotation = config.modeRotation ?? 'cards';
+  if (!['cards', 'rounds'].includes(modeRotation)) throw new Error('Válassz váltási módot.');
   const modes = [...new Set(config.modes || [])].filter(m => MODES[m]);
   if (!modes.length) throw new Error('Válassz legalább egy feladattípust.');
   const pool = eligiblePrompts(prompts, config.level, pack);
   if (!pool.length) throw new Error('Nincs elérhető feladvány.');
   return {
     version: 1,
-    config: { teams: names, duration: config.duration, rounds: config.rounds, level: config.level, modes, pack },
+    config: { teams: names, duration: config.duration, rounds: config.rounds, level: config.level, modes, pack, modeRotation },
     teams: names.map((name, i) => ({ name, score: 0, color: COLORS[i] })),
     phase: 'handoff', turn: 0, deck: shuffle(pool, random), cursor: 0,
     current: null, entries: [], history: [], remainingMs: config.duration * 1000, deadline: null
@@ -51,7 +53,7 @@ export function createGame(config, prompts, random = Math.random) {
 
 export const currentTeamIndex = game => game.turn % game.teams.length;
 export const roundNumber = game => Math.floor(game.turn / game.teams.length) + 1;
-export const currentMode = game => game.config.modes[(roundNumber(game) - 1) % game.config.modes.length];
+export const currentMode = game => game.config.modes[(roundNumber(game) - 1 + (game.config.modeRotation === 'cards' ? game.entries.length : 0)) % game.config.modes.length];
 export const roundPoints = game => game.entries.filter(e => e.result === 'correct').length;
 export const remaining = (game, now = Date.now()) => game.phase === 'playing' ? Math.max(0, game.deadline - now) : game.remainingMs;
 
@@ -90,7 +92,7 @@ export function pause(game, now = Date.now()) {
 export function record(game, result, now = Date.now()) {
   if (game.phase !== 'playing' || !['correct', 'pass'].includes(result)) return false;
   if (remaining(game, now) <= 0) { finishRound(game); return false; }
-  game.entries.push({ ...game.current, result });
+  game.entries.push({ ...game.current, result, mode: currentMode(game) });
   nextCard(game);
   return true;
 }
@@ -101,6 +103,7 @@ export function undo(game) {
   game.deck.splice(game.cursor, 0, game.current);
   game.current = game.entries.pop();
   delete game.current.result;
+  delete game.current.mode;
   return true;
 }
 
@@ -144,13 +147,15 @@ export function restoreGame(raw) {
     if (!['warm', 'spicy', 'bold'].includes(g.config.level)) return null;
     g.config.pack ??= 'mixed';
     if (!Object.hasOwn(PACKS, g.config.pack)) return null;
+    g.config.modeRotation ??= 'rounds';
+    if (!['cards', 'rounds'].includes(g.config.modeRotation)) return null;
     if (g.teams.some(t => typeof t.name !== 'string' || !t.name.trim() || t.name.length > 28 || !Number.isInteger(t.score) || t.score < 0)) return null;
     const validPrompt = p => p && typeof p.id === 'string' && typeof p.text === 'string' && p.text.length > 0 && p.text.length <= 180 && ['warm', 'spicy', 'bold', 'intimate'].includes(p.level);
     if (g.deck.some(p => !validPrompt(p))) return null;
     if (g.config.pack === 'intimate' && g.deck.some(p => p.level !== 'intimate')) return null;
     if (g.config.pack === 'spicy' && g.deck.some(p => !['spicy', 'bold'].includes(p.level))) return null;
     if (g.config.pack === 'mixed' && g.deck.some(p => p.level === 'intimate')) return null;
-    if (g.entries.some(e => !validPrompt(e) || !['correct', 'pass'].includes(e.result))) return null;
+    if (g.entries.some(e => !validPrompt(e) || !['correct', 'pass'].includes(e.result) || (e.mode !== undefined && !g.config.modes.includes(e.mode)))) return null;
     if (g.history.some(h => !h || !Number.isInteger(h.team) || h.team < 0 || h.team >= g.teams.length || !Number.isInteger(h.round) || h.round < 1 || h.round > g.config.rounds || !Number.isInteger(h.points) || h.points < 0 || !MODES[h.mode])) return null;
     if (['ready', 'playing', 'paused'].includes(g.phase) && !validPrompt(g.current)) return null;
     if ((g.phase === 'finished') !== (g.turn === g.teams.length * g.config.rounds)) return null;

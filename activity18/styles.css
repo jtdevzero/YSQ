@@ -414,3 +414,8 @@ dialog.canvas-modal { width: min(960px, calc(100% - 24px)); }
 .pack-field { display: block; margin-bottom: 8px; }
 #pack-description { margin: 8px 0 16px; min-height: 36px; }
 #level-help { margin-top: 16px; }
+
+.rotation-field { display: block; margin-top: 18px; }
+.mode-card .mode-name { font-size: 16px; }
+.mode-next { display: block; margin-top: 7px; color: var(--lilac); font-size: 11px; font-weight: 700; }
+.log-mode { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; font-weight: 500; }

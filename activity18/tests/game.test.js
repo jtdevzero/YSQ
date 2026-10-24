@@ -20,9 +20,9 @@ function playing(changes = {}, prompts = PROMPTS) {
 }
 
 test('prompt packs have unique cards and mixed intensity includes milder packs without intimate cards', () => {
-  assert.equal(PROMPTS.length, 540);
-  assert.equal(new Set(PROMPTS.map(p => p.id)).size, 540);
-  assert.equal(new Set(PROMPTS.map(p => p.text)).size, 540);
+  assert.equal(PROMPTS.length, 720);
+  assert.equal(new Set(PROMPTS.map(p => p.id)).size, 720);
+  assert.equal(new Set(PROMPTS.map(p => p.text)).size, 720);
   assert.equal(eligiblePrompts(PROMPTS, 'warm').length, 60);
   assert.equal(eligiblePrompts(PROMPTS, 'spicy').length, 240);
   assert.equal(eligiblePrompts(PROMPTS, 'bold').length, 420);
@@ -36,7 +36,7 @@ test('dedicated spicy and intimate packs contain only their cards regardless of 
     assert.equal(spicy.length, 360);
     assert.ok(spicy.every(p => ['spicy', 'bold'].includes(p.level)));
     const intimate = eligiblePrompts(PROMPTS, level, 'intimate');
-    assert.equal(intimate.length, 120);
+    assert.equal(intimate.length, 300);
     assert.ok(intimate.every(p => p.level === 'intimate'));
     const spicyIds = new Set(spicy.map(p => p.id));
     assert.ok(intimate.every(p => !spicyIds.has(p.id)));
@@ -78,6 +78,102 @@ test('restoration supports intimate current cards and defaults legacy saves to t
   assert.ok(restoredLegacy);
   assert.equal(restoredLegacy.config.pack, 'mixed');
   assert.deepEqual(restoredLegacy.deck, legacy.deck);
+});
+
+test('new games rotate modes after both correct answers and passes, and undo restores the previous mode', () => {
+  const g = playing();
+  assert.equal(g.config.modeRotation, 'cards');
+  assert.equal(currentMode(g), 'describe');
+  record(g, 'correct', 2000);
+  assert.equal(g.entries[0].mode, 'describe');
+  assert.equal(currentMode(g), 'mime');
+  const mimeCard = g.current.id;
+  record(g, 'pass', 3000);
+  assert.equal(g.entries[1].mode, 'mime');
+  assert.equal(currentMode(g), 'draw');
+  assert.equal(undo(g), true);
+  assert.equal(g.current.id, mimeCard);
+  assert.equal(currentMode(g), 'mime');
+  record(g, 'correct', 4000);
+  assert.equal(currentMode(g), 'draw');
+  record(g, 'pass', 5000);
+  assert.equal(currentMode(g), 'describe');
+});
+
+test('card rotation uses only the selected modes, including a one-mode game', () => {
+  const twoModes = playing({ modes: ['mime', 'draw'] });
+  const observed = [];
+  for (let i = 0; i < 6; i++) {
+    observed.push(currentMode(twoModes));
+    record(twoModes, i % 2 ? 'correct' : 'pass', 2000 + i);
+  }
+  assert.deepEqual(observed, ['mime', 'draw', 'mime', 'draw', 'mime', 'draw']);
+  assert.ok(twoModes.entries.every(e => ['mime', 'draw'].includes(e.mode)));
+
+  const oneMode = playing({ modes: ['draw'] });
+  record(oneMode, 'correct', 2000);
+  record(oneMode, 'pass', 3000);
+  assert.equal(currentMode(oneMode), 'draw');
+  assert.ok(oneMode.entries.every(e => e.mode === 'draw'));
+});
+
+test('changing a card mode or undoing an answer never resets the round clock', () => {
+  const g = playing();
+  const deadline = g.deadline;
+  record(g, 'correct', 2000);
+  record(g, 'pass', 3000);
+  undo(g);
+  assert.equal(currentMode(g), 'mime');
+  assert.equal(g.deadline, deadline);
+  assert.equal(remaining(g, 4000), 57000);
+  assert.equal(record(g, 'correct', deadline), false);
+  assert.equal(g.phase, 'summary');
+  assert.equal(g.teams[0].score, 1);
+});
+
+test('explicit round rotation keeps one mode per round and starts every team on the same mode', () => {
+  const g = playing({ modeRotation: 'rounds' });
+  assert.equal(g.config.modeRotation, 'rounds');
+  record(g, 'correct', 2000);
+  record(g, 'pass', 3000);
+  assert.equal(currentMode(g), 'describe');
+  assert.ok(g.entries.every(e => e.mode === 'describe'));
+  finishRound(g);
+  nextTurn(g);
+  assert.equal(currentMode(g), 'describe');
+  reveal(g);
+  start(g, 1000);
+  record(g, 'correct', 2000);
+  finishRound(g);
+  nextTurn(g);
+  assert.equal(roundNumber(g), 2);
+  assert.equal(currentMode(g), 'mime');
+});
+
+test('saved card rotation resumes its current mode while legacy saves keep round rotation', () => {
+  const g = playing();
+  record(g, 'correct', 2000);
+  pause(g, 3000);
+  const restored = restoreGame(JSON.stringify(g));
+  assert.ok(restored);
+  assert.equal(restored.config.modeRotation, 'cards');
+  assert.equal(currentMode(restored), 'mime');
+  assert.equal(restored.entries[0].mode, 'describe');
+  assert.equal(restored.current.id, g.current.id);
+
+  const legacy = playing({ modeRotation: 'rounds' });
+  record(legacy, 'correct', 2000);
+  pause(legacy, 3000);
+  delete legacy.config.modeRotation;
+  for (const entry of legacy.entries) delete entry.mode;
+  const restoredLegacy = restoreGame(JSON.stringify(legacy));
+  assert.ok(restoredLegacy);
+  assert.equal(restoredLegacy.config.modeRotation, 'rounds');
+  assert.equal(currentMode(restoredLegacy), 'describe');
+
+  assert.throws(() => game({ modeRotation: 'unknown' }));
+  g.config.modeRotation = 'unknown';
+  assert.equal(restoreGame(JSON.stringify(g)), null);
 });
 
 test('rejects duplicate, blank, and unsupported team or timing settings', () => {

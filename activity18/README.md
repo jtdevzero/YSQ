@@ -12,6 +12,8 @@ Játszható változat: https://jtdevzero.github.io/YSQ/activity18/
 - Témaszűrők: buli és káosz, randi és flört, hálószobai humor, test és vágy, intim kellékek, védekezés és egészség, abszurd világ. Több kijelölésnél bármelyik választott témába illő lap bekerülhet.
 - Módhoz illő lapok: minden lap külön besorolást kapott körülíráshoz, mutogatáshoz és rajzoláshoz. A játék az aktuális típushoz megfelelő lapot választ; a többi lapot megőrzi későbbre. Ha nincs megfelelő lap egy kijelölt típushoz, a beállításoknál jelzi.
 - 2–6 csapat, 30/60/90 másodperces időkeret, csapatonként 3/5/8 kör.
+- Automatikus előadóváltás: csapatonként megadható 2–12 játékos neve, a sorrend körönként lép. Nevek nélkül az 1. és 2. játékost váltja. Több játékosnál, mint körnél nem mindenki kerül sorra.
+- Nyílt kör: mindenki találgathat az előadón kívül. Alapból az utolsó teljes kör minden csapatfordulója nyílt; minden körre bekapcsolható vagy kikapcsolható. A Megvan gomb megállítja az órát, a házigazda kijelöli a megfejtő csapatot, majd a játék folytatódik. A pontválasztás menthető, megszakítható és visszavonható.
 - Körülírás, mutogatás és rajzolás; alapból minden megfejtés vagy passz után vált a kijelölt típusok között. A körönkénti váltás külön választható.
 - Érintéses rajzvászon és a feladványt elrejtő csapatnézet.
 - Megfejtésenként 1 pont, büntetés nélküli passz, utolsó lap visszavonása.
@@ -44,10 +46,10 @@ Node.js 22 vagy újabb verzióval:
 npm test
 ```
 
-A tesztek a pontozást, a határidőt, a szünetet, a visszavonást, a mentett állást, az azonos körszámot és a döntetlent ellenőrzik.
+A tesztek a pontozást, a határidőt, a szünetet, a visszavonást, a mentett állást, az azonos körszámot, a döntetlent, a nyíltköri pontelosztást és az előadóváltást ellenőrzik.
 
 ## Adatok
 
-A böngésző `localStorage` tárában csak a csapatnevek, a beállítások és a játékállás szerepel. Az „Új játék” véglegesítése törli a mentett állást. Ha a helyi tárolás tiltva van, a játék mentés nélkül használható. A böngésző bezárása nem garantálja a folyamatban lévő kör megállítását: visszatéréskor az eredeti határidő számít. A Szünet gombbal állítsátok meg az órát.
+A böngésző `localStorage` tárában a csapat- és játékosnevek, a beállítások és a játékállás szerepel, beleértve a függőben lévő nyíltköri pontválasztást. Az „Új játék” véglegesítése törli a mentett állást. Ha a helyi tárolás tiltva van, a játék mentés nélkül használható. A böngésző bezárása nem garantálja a folyamatban lévő kör megállítását: visszatéréskor az eredeti határidő számít. A Szünet gombbal állítsátok meg az órát.
 
 A 18+ jelölés önbevallásos korhatárnyilatkozat, nem személyazonosításon alapuló ellenőrzés. A pikáns csomagok felnőttes humorúak és kétértelműek; a külön szex témájú pakli rövid kifejezéseket tartalmaz intimitásról, szexualitásról és védekezésről.

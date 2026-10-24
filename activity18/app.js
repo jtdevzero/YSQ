@@ -1,5 +1,5 @@
 import { PROMPTS, LEVELS } from './prompts.js';
-import { MODES, COLORS, PACKS, THEMES, supportsMode, createGame, eligiblePrompts, currentTeamIndex, roundNumber, currentMode, roundPoints, remaining, reveal, start, pause, record, undo, finishRound, nextTurn, winners, restoreGame } from './game.js';
+import { MODES, COLORS, PACKS, THEMES, supportsMode, createGame, eligiblePrompts, currentTeamIndex, currentPresenter, isOpenRound, roundNumber, currentMode, roundPoints, roundAwards, remaining, reveal, start, pause, record, beginOpenAward, awardOpen, cancelOpenAward, undo, finishRound, nextTurn, winners, restoreGame } from './game.js';
 
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -33,7 +33,7 @@ function addTeam(name = '') {
   if (list.children.length >= 6) return;
   const row = document.createElement('div');
   row.className = 'team-row';
-  row.innerHTML = `<span class="team-number"></span><input class="team-input" type="text" maxlength="28" required autocomplete="off" value="${esc(name)}"><button class="icon-button" type="button" data-action="remove-team" title="Csapat törlése">×</button>`;
+  row.innerHTML = `<span class="team-number"></span><input class="team-input" type="text" maxlength="28" required autocomplete="off" value="${esc(name)}"><button class="icon-button" type="button" data-action="remove-team" title="Csapat törlése">×</button><label class="team-member-field"><span>Játékosok sorrendben, vesszővel elválasztva · nem kötelező</span><input class="team-players" type="text" maxlength="360" autocomplete="off" placeholder="Pl. Anna, Bence, Csilla"></label>`;
   list.append(row);
   updateTeams();
   if (!name) row.querySelector('input').focus();
@@ -46,6 +46,7 @@ function updateTeams() {
     row.style.setProperty('--team-color', COLORS[index]);
     row.querySelector('input').setAttribute('aria-label', `${index + 1}. csapat neve`);
     row.querySelector('input').placeholder = `${index + 1}. csapat neve`;
+    row.querySelector('.team-players').setAttribute('aria-label', `${index + 1}. csapat játékosai, vesszővel elválasztva`);
     row.querySelector('button').disabled = rows.length <= 2;
     row.querySelector('button').setAttribute('aria-label', `${index + 1}. csapat törlése`);
   });
@@ -56,6 +57,12 @@ function updateTeams() {
 function updateEstimate() {
   const minutes = Math.round($$('.team-row').length * Number($('#duration').value) * Number($('#rounds').value) / 60);
   $('#game-estimate').textContent = `Kb. ${minutes} perc, plusz a nevetés.`;
+  updateOpenInfo();
+}
+
+function updateOpenInfo() {
+  const setting = $('#open-rounds').value;
+  $('#open-round-help').textContent = setting === 'off' ? 'Minden csapat csak a saját fordulójában találgat.' : `${setting === 'all' ? 'Minden teljes körben' : `Az utolsó (${$('#rounds').value}.) teljes körben`} az előadón kívül mindenki találgathat. A Megvan gomb után válaszd ki a megfejtő csapatot.`;
 }
 
 function updateModeInfo() {
@@ -115,21 +122,31 @@ function sideBar() {
   const level = LEVELS.find(l => l.id === game.config.level);
   const packName = (game.config.pack ?? 'mixed') === 'mixed' ? level?.label : PACKS[game.config.pack].name;
   const themeNames = game.config.themes?.map(theme => THEMES[theme]).join(' · ') || 'Minden téma';
-  return `<aside class="round-sidebar"><div class="panel"><span class="eyebrow">EBBEN A KÖRBEN</span><div class="round-points"><strong id="live-points">${roundPoints(game)}</strong><span>megszerzett pont</span></div><div class="log-list" id="live-log">${liveLog()}</div><p class="helper">Megfejtés +1 · Passz 0</p></div><div class="panel mini-rules"><span class="field-label">${esc(mode.name)}</span><p class="helper">${esc(mode.rule)}</p><p class="helper">${esc(packName || '')} pakli · ${game.config.duration} mp</p><p class="helper">${esc(themeNames)}</p><p class="helper">A feladványt csak az előadó láthatja.</p></div></aside>`;
+  return `<aside class="round-sidebar"><div class="panel"><span class="eyebrow">${isOpenRound(game) ? 'NYÍLT KÖR PONTJAI' : 'EBBEN A KÖRBEN'}</span><div class="round-points"><strong id="live-points">${roundPoints(game)}</strong><span>${isOpenRound(game) ? 'közös megfejtés' : 'megszerzett pont'}</span></div><div class="log-list" id="live-log">${liveLog()}</div>${isOpenRound(game) ? awardSummary() : ''}<p class="helper">Megfejtés +1 · Passz 0</p></div><div class="panel mini-rules"><span class="field-label">${esc(mode.name)}</span><p class="helper">Előadó: <strong>${esc(currentPresenter(game))}</strong></p><p class="helper">${esc(mode.rule)}</p><p class="helper">${esc(packName || '')} pakli · ${game.config.duration} mp</p><p class="helper">${esc(themeNames)}</p><p class="helper">A feladványt csak az előadó láthatja.</p></div></aside>`;
+}
+
+function entryDetails(entry) {
+  const parts = [entry.mode ? MODES[entry.mode].name : '', isOpenRound(game) && entry.result === 'correct' ? game.teams[entry.awardTeam ?? currentTeamIndex(game)].name : ''].filter(Boolean);
+  return parts.length ? `<small class="log-mode">${esc(parts.join(' · '))}</small>` : '';
+}
+
+function awardSummary() {
+  return `<div class="award-summary">${roundAwards(game).map((points, index) => points ? `<div><span>${esc(game.teams[index].name)}</span><strong>+${points}</strong></div>` : '').join('')}</div>`;
 }
 
 function liveLog() {
   if (!game.entries.length) return '<p class="empty-note">Az első nagy megfejtésre várunk.</p>';
-  return game.entries.slice(-6).reverse().map(e => `<div class="log-item" data-result="${e.result}"><span>${esc(e.text)}${e.mode ? `<small class="log-mode">${MODES[e.mode].name}</small>` : ''}</span><strong>${e.result === 'correct' ? '+1' : 'passz'}</strong></div>`).join('');
+  return game.entries.slice(-6).reverse().map(e => `<div class="log-item" data-result="${e.result}"><span>${esc(e.text)}${entryDetails(e)}</span><strong>${e.result === 'correct' ? '+1' : 'passz'}</strong></div>`).join('');
 }
 
 function render() {
   if ($('#canvas-modal').open) { restoreCanvas(); $('#canvas-modal').close(); }
+  if ($('#award-modal').open) $('#award-modal').close();
   clearInterval(timerId);
   timerId = null;
   const finished = game.phase === 'finished';
   const team = game.teams[currentTeamIndex(game)];
-  const heading = `<div class="game-topline"><span class="round-label">${finished ? 'EZ EGY JÓ ESTE VOLT' : `${roundNumber(game)}. KÖR / ${game.config.rounds} · ${currentTeamIndex(game) + 1}. CSAPAT`}</span><button class="button button-quiet" data-action="reset">Új játék</button></div>${scoreBoard()}`;
+  const heading = `<div class="game-topline"><span class="round-label">${finished ? 'EZ EGY JÓ ESTE VOLT' : `${roundNumber(game)}. KÖR / ${game.config.rounds} · ${currentTeamIndex(game) + 1}. CSAPAT${isOpenRound(game) ? ' · NYÍLT KÖR' : ''}`}</span><button class="button button-quiet" data-action="reset">Új játék</button></div>${scoreBoard()}`;
   $('#game-content').innerHTML = heading + (finished ? renderFinish() : `<div class="game-layout"><section class="panel play-panel" style="--team-color:${COLORS[currentTeamIndex(game)]}">${renderPhase(team)}</section>${sideBar()}</div>`);
   if (['ready', 'playing'].includes(game.phase) && currentMode(game) === 'draw') setupCanvas();
   if (game.phase === 'playing') {
@@ -139,6 +156,10 @@ function render() {
   const focus = $('#game-content [data-autofocus]');
   if (focus) focus.focus({ preventScroll: true });
   persist();
+  if (game.phase === 'award') {
+    $('#award-teams').innerHTML = game.teams.map((entry, index) => `<button class="award-team-button" data-action="award-open" data-team="${index}" style="--team-color:${COLORS[index]}"><span class="team-dot"></span><span>${esc(entry.name)}</span><strong>+1</strong></button>`).join('');
+    $('#award-modal').showModal();
+  }
 }
 
 function modeCard() {
@@ -163,15 +184,19 @@ function drawingMarkup() {
 }
 
 function renderPhase(team) {
-  if (game.phase === 'handoff') return `<span class="phase-pill">MOST TI JÖTTÖK</span><h1 class="turn-heading">${esc(team.name)}<span class="brand-dot">.</span></h1><p class="turn-note">Adjátok a telefont az előadónak.<br>A következő lapot már csak ő nézheti!</p><div class="handoff-graphic" aria-hidden="true">${icon('moon')}<span>pszt.</span></div>${modeCard()}<button class="button button-primary" data-action="reveal" data-autofocus>Én vagyok az előadó <span aria-hidden="true">↗</span></button><p class="helper">A lap felfedése még nem indítja el az órát.</p>`;
-  if (game.phase === 'paused') return `<span class="phase-pill">EGY KIS SZUSSZANÁS</span><h1 class="turn-heading">Tartunk egy<br>szünetet<span class="brand-dot">.</span></h1><p class="turn-note">A lapot elrejtettük. A folytatáshoz az előadó vegye vissza a telefont.</p>${timerMarkup()}<button class="button button-primary" data-action="resume" data-autofocus>Folytatjuk <span aria-hidden="true">↗</span></button><button class="button button-quiet" data-action="end-round">Kör lezárása</button>`;
+  const presenter = currentPresenter(game);
+  const open = isOpenRound(game);
+  const notice = open ? '<p class="open-notice">Nyílt kör: az előadón kívül bárki tippelhet, a saját csapata is. A pontot a megfejtő csapat kapja.</p>' : '';
+  if (game.phase === 'handoff') return `<span class="phase-pill ${open ? 'open-pill' : ''}">${open ? 'NYÍLT KÖR · MINDEN CSAPAT JÁTSZIK' : 'MOST TI JÖTTÖK'}</span><h1 class="turn-heading">${esc(team.name)}<span class="brand-dot">.</span></h1><div class="presenter-card"><span>Most ő ad elő</span><strong>${esc(presenter)}</strong></div><p class="turn-note">${esc(presenter)} vegye kézbe a telefont.<br>A következő lapot már csak ő nézheti!</p>${notice}<div class="handoff-graphic" aria-hidden="true">${icon('moon')}<span>pszt.</span></div>${modeCard()}<button class="button button-primary" data-action="reveal" data-autofocus>Én vagyok az előadó <span aria-hidden="true">↗</span></button><p class="helper">A lap felfedése még nem indítja el az órát.</p>`;
+  if (game.phase === 'award') return `<span class="phase-pill open-pill">NYÍLT KÖR · MEGFEJTÉS JELÖLVE</span><h1 class="turn-heading">Kié a pont?</h1><p class="turn-note">Válaszd ki a megfejtő csapatot. A feladvány rejtve marad, az óra most áll.</p>${timerMarkup()}`;
+  if (game.phase === 'paused') return `<span class="phase-pill">EGY KIS SZUSSZANÁS</span><h1 class="turn-heading">Tartunk egy<br>szünetet<span class="brand-dot">.</span></h1><p class="turn-note">A lapot elrejtettük. A folytatáshoz ${esc(presenter)} vegye vissza a telefont.</p>${timerMarkup()}<button class="button button-primary" data-action="resume" data-autofocus>Folytatjuk <span aria-hidden="true">↗</span></button><button class="button button-quiet" data-action="end-round">Kör lezárása</button>`;
   if (game.phase === 'summary') {
     const pts = roundPoints(game);
     const last = game.turn + 1 >= game.teams.length * game.config.rounds;
     const modeLabel = game.config.modeRotation === 'cards' && game.config.modes.length > 1 ? 'Váltakozó feladattípusok' : MODES[currentMode(game)].name;
-    return `<div class="round-summary"><span class="phase-pill">KÖR LEZÁRVA</span><h1 class="turn-heading">${pts ? 'Ez szép volt!' : 'A következő jobb lesz!'}<span class="brand-dot">.</span></h1><p class="turn-note">${esc(team.name)} · ${modeLabel}</p><div class="summary-number">+${pts}<span>pont ebben a körben</span></div><div class="result-list">${game.entries.length ? game.entries.map(e => `<div class="result-item"><span>${esc(e.text)}${e.mode ? `<small class="log-mode">${MODES[e.mode].name}</small>` : ''}</span><strong>${e.result === 'correct' ? '+1' : 'passz'}</strong></div>`).join('') : '<p class="helper">Ebben a körben nem született megfejtés.</p>'}</div><button class="button button-primary" data-action="next-turn" data-autofocus>${last ? 'Jöjjön az eredmény' : 'Következő csapat'} <span aria-hidden="true">↗</span></button></div>`;
+    return `<div class="round-summary"><span class="phase-pill ${open ? 'open-pill' : ''}">${open ? 'NYÍLT KÖR LEZÁRVA' : 'KÖR LEZÁRVA'}</span><h1 class="turn-heading">${pts ? 'Ez szép volt!' : 'A következő jobb lesz!'}<span class="brand-dot">.</span></h1><p class="turn-note">${esc(team.name)} · Előadó: ${esc(presenter)}<br>${modeLabel}</p><div class="summary-number">+${pts}<span>${open ? 'pont kiosztva a csapatoknak' : 'pont ebben a körben'}</span></div>${open ? awardSummary() : ''}<div class="result-list">${game.entries.length ? game.entries.map(e => `<div class="result-item"><span>${esc(e.text)}${entryDetails(e)}</span><strong>${e.result === 'correct' ? '+1' : 'passz'}</strong></div>`).join('') : '<p class="helper">Ebben a körben nem született megfejtés.</p>'}</div><button class="button button-primary" data-action="next-turn" data-autofocus>${last ? 'Jöjjön az eredmény' : 'Következő csapat'} <span aria-hidden="true">↗</span></button></div>`;
   }
-  return `<span class="phase-pill">${esc(team.name)} · ${game.phase === 'ready' ? 'FELKÉSZÜLTÉL?' : 'MEHET A PRODUKCIÓ'}</span>${modeCard()}${promptCard()}${game.phase === 'ready' ? `<p class="helper">Jegyezd meg a feladványt, aztán indulhat!</p><button class="button button-primary" data-action="start" data-autofocus>Induljon az idő! <span aria-hidden="true">↗</span></button>` : `${timerMarkup()}<div class="action-row"><button class="button button-secondary" data-action="pass">Passz <span aria-hidden="true">↪</span></button><button class="button button-primary" data-action="correct" data-autofocus>Megvan! <span>+1</span></button></div><div class="action-row secondary-actions"><button class="button button-quiet" id="undo-button" data-action="undo" ${!game.entries.length ? 'disabled' : ''}>↶ Visszavonás</button><button class="button button-quiet" data-action="pause">Ⅱ Szünet</button><button class="button button-quiet" data-action="sound" aria-pressed="${soundOn}">${soundOn ? 'Hang: be' : 'Hang: ki'}</button></div>`}${drawingMarkup()}`;
+  return `<span class="phase-pill ${open ? 'open-pill' : ''}">${open ? 'NYÍLT KÖR' : esc(team.name)} · ${esc(presenter)}</span>${notice}${modeCard()}${promptCard()}${game.phase === 'ready' ? `<p class="helper">Jegyezd meg a feladványt, aztán indulhat!</p><button class="button button-primary" data-action="start" data-autofocus>Induljon az idő! <span aria-hidden="true">↗</span></button>` : `${timerMarkup()}<div class="action-row"><button class="button button-secondary" data-action="pass">Passz <span aria-hidden="true">↪</span></button><button class="button button-primary" data-action="correct" data-autofocus>Megvan! <span>+1</span></button></div><div class="action-row secondary-actions"><button class="button button-quiet" id="undo-button" data-action="undo" ${!game.entries.length ? 'disabled' : ''}>↶ Visszavonás</button><button class="button button-quiet" data-action="pause">Ⅱ Szünet</button><button class="button button-quiet" data-action="sound" aria-pressed="${soundOn}">${soundOn ? 'Hang: be' : 'Hang: ki'}</button></div>`}${drawingMarkup()}`;
 }
 
 function renderFinish() {
@@ -219,6 +244,7 @@ function tick() {
 function recordAnswer(result) {
   if (!game || game.phase !== 'playing') return;
   if (remaining(game) <= 0) { tick(); return; }
+  if (result === 'correct' && isOpenRound(game)) { beginOpenAward(game); render(); return; }
   record(game, result);
   drawing = [];
   render();
@@ -229,6 +255,7 @@ function resetToLobby() {
   game = null; savedGame = null; drawing = [];
   removeSave();
   $('#confirm-modal').close();
+  $('#award-modal').close();
   $('#lobby').hidden = false;
   $('#game-page').hidden = true;
   window.scrollTo({ top: $('.section-heading').offsetTop - 20, behavior: 'smooth' });
@@ -285,6 +312,8 @@ document.addEventListener('click', event => {
   if (action === 'reveal') { drawing = []; reveal(game); render(); }
   if (action === 'start' || action === 'resume') { unlockAudio(); lastBeep = 0; start(game); render(); }
   if (action === 'correct' || action === 'pass') recordAnswer(action === 'correct' ? 'correct' : 'pass');
+  if (action === 'award-open') { if (awardOpen(game, Number(button.dataset.team))) { drawing = []; render(); } }
+  if (action === 'cancel-award') { cancelOpenAward(game); render(); }
   if (action === 'pause') { pause(game); render(); }
   if (action === 'undo') { if (undo(game)) { drawing = []; render(); } }
   if (action === 'next-turn') { nextTurn(game); drawing = []; render(); window.scrollTo({ top: 0, behavior: 'instant' }); }
@@ -308,13 +337,14 @@ document.addEventListener('click', event => {
 
 $('#setup-form').addEventListener('submit', event => {
   event.preventDefault();
-  const config = { teams: $$('.team-input').map(input => input.value), duration: Number($('#duration').value), rounds: Number($('#rounds').value), level: $('input[name="level"]:checked').value, modes: $$('input[name="modes"]:checked').map(el => el.value), pack: $('#pack').value, modeRotation: $('#mode-rotation').value, themes: selectedThemes() };
+  const config = { teams: $$('.team-input').map(input => input.value), duration: Number($('#duration').value), rounds: Number($('#rounds').value), level: $('input[name="level"]:checked').value, modes: $$('input[name="modes"]:checked').map(el => el.value), pack: $('#pack').value, modeRotation: $('#mode-rotation').value, themes: selectedThemes(), openRounds: $('#open-rounds').value, players: $$('.team-players').map(input => input.value.split(/[,;\n]+/).map(name => name.trim()).filter(Boolean)) };
   try { game = createGame(config, PROMPTS); $('#setup-error').hidden = true; drawing = []; goToGame(); }
   catch (error) { $('#setup-error').textContent = error.message; $('#setup-error').hidden = false; }
 });
 $('#add-team').addEventListener('click', () => addTeam());
 $('#duration').addEventListener('change', updateEstimate);
 $('#rounds').addEventListener('change', updateEstimate);
+$('#open-rounds').addEventListener('change', updateOpenInfo);
 $('#pack').addEventListener('change', updateLevel);
 $('#theme-options').addEventListener('change', updateSelection);
 $('#mode-rotation').addEventListener('change', updateModeInfo);
@@ -332,6 +362,7 @@ $('#brand-link').addEventListener('click', event => {
 document.addEventListener('visibilitychange', () => { if (!document.hidden && game?.phase === 'playing') tick(); });
 window.addEventListener('pagehide', () => { if (game) persist(); });
 $('#canvas-modal').addEventListener('close', restoreCanvas);
+$('#award-modal').addEventListener('cancel', event => { event.preventDefault(); if (game?.phase === 'award') { cancelOpenAward(game); render(); } });
 
 addTeam('Éjjeli baglyok');
 addTeam('Másnapos zsenik');

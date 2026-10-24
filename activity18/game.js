@@ -19,6 +19,18 @@ export function supportsMode(prompt, mode) {
   return Object.hasOwn(MODES, mode) && (prompt.modes === undefined || (Array.isArray(prompt.modes) && prompt.modes.includes(mode)));
 }
 
+function normalizePlayers(input, count) {
+  if (input == null) return Array.from({ length: count }, () => []);
+  if (!Array.isArray(input) || input.length !== count) throw new Error('Minden csapathoz külön játékoslistát adj meg.');
+  return input.map(list => {
+    if (!Array.isArray(list) || list.some(name => typeof name !== 'string')) throw new Error('A játékosneveket csapatonként add meg.');
+    const names = list.map(name => name.trim());
+    if ((names.length && names.length < 2) || names.length > 12 || names.some(name => !name || name.length > 28)) throw new Error('Csapatonként 2–12 nevet adj meg, vagy hagyd üresen. Egy név legfeljebb 28 karakter lehet.');
+    if (new Set(names.map(name => name.toLocaleLowerCase('hu'))).size !== names.length) throw new Error('Egy csapaton belül minden játékosnak külön neve legyen.');
+    return names;
+  });
+}
+
 export function shuffle(items, random = Math.random) {
   const copy = [...items];
   for (let i = copy.length - 1; i > 0; i--) {
@@ -41,6 +53,9 @@ export function createGame(config, prompts, random = Math.random) {
   const names = (config.teams || []).map(n => String(n).trim());
   if (names.length < 2 || names.length > 6 || names.some(n => !n || n.length > 28)) throw new Error('Adj meg 2–6 csapatnevet, legfeljebb 28 karakterrel.');
   if (new Set(names.map(n => n.toLocaleLowerCase('hu'))).size !== names.length) throw new Error('Minden csapatnak külön neve legyen.');
+  const players = normalizePlayers(config.players, names.length);
+  const openRounds = config.openRounds ?? 'final';
+  if (!['off', 'final', 'all'].includes(openRounds)) throw new Error('Válassz nyíltköri beállítást.');
   if (![30, 60, 90].includes(config.duration) || ![3, 5, 8].includes(config.rounds)) throw new Error('Válassz a megadott időkből és körszámokból.');
   if (!['warm', 'spicy', 'bold'].includes(config.level)) throw new Error('Válassz nehézségi szintet.');
   const pack = config.pack ?? 'mixed';
@@ -59,8 +74,8 @@ export function createGame(config, prompts, random = Math.random) {
   if (unavailable.length) throw new Error(`A kiválasztott témákhoz nincs ilyen lap: ${unavailable.map(mode => MODES[mode].name).join(', ')}. Bővítsd a témákat vagy kapcsold ki ezt a típust.`);
   return {
     version: 1,
-    config: { teams: names, duration: config.duration, rounds: config.rounds, level: config.level, modes, pack, modeRotation, themes, matchModes },
-    teams: names.map((name, i) => ({ name, score: 0, color: COLORS[i] })),
+    config: { teams: names, duration: config.duration, rounds: config.rounds, level: config.level, modes, pack, modeRotation, themes, matchModes, players, openRounds },
+    teams: names.map((name, i) => ({ name, score: 0, color: COLORS[i], players: [...players[i]] })),
     phase: 'handoff', turn: 0, deck: shuffle(pool, random), cursor: 0,
     current: null, entries: [], history: [], remainingMs: config.duration * 1000, deadline: null,
     pool: matchModes ? [...pool] : undefined
@@ -70,7 +85,18 @@ export function createGame(config, prompts, random = Math.random) {
 export const currentTeamIndex = game => game.turn % game.teams.length;
 export const roundNumber = game => Math.floor(game.turn / game.teams.length) + 1;
 export const currentMode = game => game.config.modes[(roundNumber(game) - 1 + (game.config.modeRotation === 'cards' ? game.entries.length : 0)) % game.config.modes.length];
+export const isOpenRound = game => game.config.openRounds === 'all' || (game.config.openRounds === 'final' && roundNumber(game) === game.config.rounds);
+export function currentPresenter(game, turn = game.turn) {
+  const players = game.teams[turn % game.teams.length].players || [];
+  const index = Math.floor(turn / game.teams.length) % (players.length || 2);
+  return players[index] || `${index + 1}. játékos`;
+}
 export const roundPoints = game => game.entries.filter(e => e.result === 'correct').length;
+export function roundAwards(game) {
+  const points = game.teams.map(() => 0);
+  game.entries.filter(entry => entry.result === 'correct').forEach(entry => { points[entry.awardTeam ?? currentTeamIndex(game)]++; });
+  return points;
+}
 export const remaining = (game, now = Date.now()) => game.phase === 'playing' ? Math.max(0, game.deadline - now) : game.remainingMs;
 
 function nextCard(game) {
@@ -125,11 +151,38 @@ export function pause(game, now = Date.now()) {
   return true;
 }
 
-export function record(game, result, now = Date.now()) {
+export function record(game, result, now = Date.now(), winningTeam) {
   if (game.phase !== 'playing' || !['correct', 'pass'].includes(result)) return false;
   if (remaining(game, now) <= 0) { finishRound(game); return false; }
-  game.entries.push({ ...game.current, result, mode: currentMode(game) });
+  if (result === 'correct' && isOpenRound(game) && (!Number.isInteger(winningTeam) || winningTeam < 0 || winningTeam >= game.teams.length)) return false;
+  const entry = { ...game.current, result, mode: currentMode(game) };
+  if (result === 'correct') entry.awardTeam = isOpenRound(game) ? winningTeam : currentTeamIndex(game);
+  game.entries.push(entry);
   nextCard(game);
+  return true;
+}
+
+export function beginOpenAward(game, now = Date.now()) {
+  if (game.phase !== 'playing' || !isOpenRound(game)) return false;
+  const ms = remaining(game, now);
+  if (ms <= 0) { finishRound(game); return false; }
+  game.remainingMs = ms;
+  game.deadline = null;
+  game.phase = 'award';
+  return true;
+}
+
+export function awardOpen(game, winningTeam, now = Date.now()) {
+  if (game.phase !== 'award' || !isOpenRound(game) || !Number.isInteger(winningTeam) || winningTeam < 0 || winningTeam >= game.teams.length) return false;
+  game.phase = 'playing';
+  game.deadline = now + game.remainingMs;
+  return record(game, 'correct', now, winningTeam);
+}
+
+export function cancelOpenAward(game, now = Date.now()) {
+  if (game.phase !== 'award') return false;
+  game.phase = 'playing';
+  game.deadline = now + game.remainingMs;
   return true;
 }
 
@@ -140,14 +193,16 @@ export function undo(game) {
   game.current = game.entries.pop();
   delete game.current.result;
   delete game.current.mode;
+  delete game.current.awardTeam;
   return true;
 }
 
 export function finishRound(game) {
   if (!['playing', 'paused', 'ready'].includes(game.phase)) return false;
   const points = roundPoints(game);
-  game.teams[currentTeamIndex(game)].score += points;
-  game.history.push({ team: currentTeamIndex(game), round: roundNumber(game), points, mode: currentMode(game) });
+  const awards = roundAwards(game);
+  awards.forEach((value, index) => { game.teams[index].score += value; });
+  game.history.push({ team: currentTeamIndex(game), round: roundNumber(game), points, mode: currentMode(game), awards, presenter: currentPresenter(game), open: isOpenRound(game) });
   game.phase = 'summary';
   game.remainingMs = 0;
   game.deadline = null;
@@ -176,7 +231,7 @@ export function winners(game) {
 export function restoreGame(raw) {
   try {
     const g = JSON.parse(raw);
-    if (g.version !== 1 || !['handoff', 'ready', 'playing', 'paused', 'summary', 'finished'].includes(g.phase)) return null;
+    if (g.version !== 1 || !['handoff', 'ready', 'playing', 'paused', 'award', 'summary', 'finished'].includes(g.phase)) return null;
     if (!Array.isArray(g.teams) || g.teams.length < 2 || g.teams.length > 6 || !Array.isArray(g.deck) || !g.deck.length || !Array.isArray(g.entries) || !Array.isArray(g.history)) return null;
     if (!Number.isInteger(g.turn) || g.turn < 0 || g.turn > g.teams.length * g.config.rounds || !Number.isInteger(g.cursor) || g.cursor < 0 || g.cursor > g.deck.length || !Number.isFinite(g.remainingMs) || g.remainingMs < 0 || g.remainingMs > g.config.duration * 1000) return null;
     if (!g.config.modes?.length || g.config.modes.some(m => !MODES[m]) || ![30, 60, 90].includes(g.config.duration) || ![3, 5, 8].includes(g.config.rounds)) return null;
@@ -189,6 +244,15 @@ export function restoreGame(raw) {
     g.config.themes ??= null;
     if (typeof g.config.matchModes !== 'boolean' || (g.config.themes !== null && (!Array.isArray(g.config.themes) || !g.config.themes.length || g.config.themes.some(theme => !Object.hasOwn(THEMES, theme))))) return null;
     if (g.teams.some(t => typeof t.name !== 'string' || !t.name.trim() || t.name.length > 28 || !Number.isInteger(t.score) || t.score < 0)) return null;
+    g.config.openRounds ??= 'off';
+    if (!['off', 'final', 'all'].includes(g.config.openRounds)) return null;
+    const players = normalizePlayers(g.config.players ?? g.teams.map(team => team.players || []), g.teams.length);
+    for (let i = 0; i < g.teams.length; i++) {
+      if (g.teams[i].players !== undefined && JSON.stringify(normalizePlayers([g.teams[i].players], 1)[0]) !== JSON.stringify(players[i])) return null;
+      g.teams[i].players = players[i];
+    }
+    g.config.players = players;
+    if (g.phase === 'award' && (!isOpenRound(g) || g.remainingMs <= 0 || g.deadline !== null)) return null;
     const validPrompt = p => p && typeof p.id === 'string' && typeof p.text === 'string' && p.text.length > 0 && p.text.length <= 180 && ['warm', 'spicy', 'bold', 'intimate', 'creative'].includes(p.level) && (p.modes === undefined || (Array.isArray(p.modes) && p.modes.length > 0 && p.modes.every(mode => Object.hasOwn(MODES, mode)))) && (p.themes === undefined || (Array.isArray(p.themes) && p.themes.length > 0 && p.themes.every(theme => Object.hasOwn(THEMES, theme))));
     if (g.deck.some(p => !validPrompt(p))) return null;
     const inSelection = p => eligiblePrompts([p], g.config.level, g.config.pack, g.config.themes).length === 1;
@@ -197,11 +261,11 @@ export function restoreGame(raw) {
       if (!Array.isArray(g.pool) || !g.pool.length || g.pool.some(p => !validPrompt(p) || !inSelection(p))) return null;
       const poolIds = new Set(g.pool.map(p => p.id));
       if (poolIds.size !== g.pool.length || g.deck.some(p => !poolIds.has(p.id)) || g.config.modes.some(mode => !g.pool.some(p => supportsMode(p, mode)))) return null;
-      if (['ready', 'playing', 'paused'].includes(g.phase) && (!g.current || !poolIds.has(g.current.id) || !supportsMode(g.current, currentMode(g)))) return null;
+      if (['ready', 'playing', 'paused', 'award'].includes(g.phase) && (!g.current || !poolIds.has(g.current.id) || !supportsMode(g.current, currentMode(g)))) return null;
     }
-    if (g.entries.some(e => !validPrompt(e) || !['correct', 'pass'].includes(e.result) || (e.mode !== undefined && !g.config.modes.includes(e.mode)))) return null;
+    if (g.entries.some(e => !validPrompt(e) || !['correct', 'pass'].includes(e.result) || (e.mode !== undefined && !g.config.modes.includes(e.mode)) || (e.awardTeam !== undefined && (e.result !== 'correct' || !Number.isInteger(e.awardTeam) || e.awardTeam < 0 || e.awardTeam >= g.teams.length)))) return null;
     if (g.history.some(h => !h || !Number.isInteger(h.team) || h.team < 0 || h.team >= g.teams.length || !Number.isInteger(h.round) || h.round < 1 || h.round > g.config.rounds || !Number.isInteger(h.points) || h.points < 0 || !MODES[h.mode])) return null;
-    if (['ready', 'playing', 'paused'].includes(g.phase) && !validPrompt(g.current)) return null;
+    if (['ready', 'playing', 'paused', 'award'].includes(g.phase) && !validPrompt(g.current)) return null;
     if ((g.phase === 'finished') !== (g.turn === g.teams.length * g.config.rounds)) return null;
     if (g.phase === 'playing') {
       if (!Number.isFinite(g.deadline)) return null;

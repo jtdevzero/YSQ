@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  createGame, currentMode, currentTeamIndex, eligiblePrompts, finishRound,
+  awardOpen, beginOpenAward, cancelOpenAward, createGame, currentMode,
+  currentPresenter, currentTeamIndex, eligiblePrompts, finishRound, isOpenRound,
   nextTurn, pause, record, remaining, restoreGame, reveal, roundNumber,
   roundPoints, start, supportsMode, THEMES, undo, winners,
 } from '../game.js';
@@ -9,7 +10,7 @@ import { PROMPTS } from '../prompts.js';
 
 const config = {
   teams: ['Éjjeli baglyok', 'Hajnali hősök'], duration: 60, rounds: 3,
-  level: 'spicy', modes: ['describe', 'mime', 'draw'],
+  level: 'spicy', modes: ['describe', 'mime', 'draw'], openRounds: 'off',
 };
 const game = (changes = {}, prompts = PROMPTS) => createGame({ ...config, ...changes }, prompts, () => 0.5);
 function playing(changes = {}, prompts = PROMPTS) {
@@ -517,4 +518,208 @@ test('malformed storage and invalid state fields are rejected safely', () => {
     mutate(g);
     assert.ok(restoreGame(JSON.stringify(g)) === null, mutate.toString());
   }
+});
+
+test('open rounds default to the final round and can be disabled or enabled for every round', () => {
+  const defaultConfig = { ...config };
+  delete defaultConfig.openRounds;
+  const g = createGame(defaultConfig, PROMPTS, () => 0.5);
+  assert.equal(g.config.openRounds, 'final');
+  assert.equal(isOpenRound(g), false);
+  g.turn = 3;
+  assert.equal(isOpenRound(g), false);
+  g.turn = 4;
+  assert.equal(isOpenRound(g), true);
+  g.turn = 5;
+  assert.equal(isOpenRound(g), true);
+  assert.equal(isOpenRound(game({ openRounds: 'all' })), true);
+  const closed = game({ openRounds: 'off' });
+  closed.turn = 4;
+  assert.equal(isOpenRound(closed), false);
+  assert.throws(() => game({ openRounds: 'unknown' }));
+  g.config.openRounds = 'unknown';
+  assert.equal(restoreGame(JSON.stringify(g)), null);
+});
+
+test('the open-round winner chooser freezes time, rejects invalid winners, and awards a card only once', () => {
+  const g = playing({ openRounds: 'all' });
+  const card = g.current.id;
+  assert.equal(beginOpenAward(g, 11000), true);
+  assert.equal(g.phase, 'award');
+  assert.equal(g.deadline, null);
+  assert.equal(remaining(g, 999000), 50000);
+  assert.equal(beginOpenAward(g, 12000), false);
+  for (const winner of [-1, g.teams.length, 0.5, '1', undefined]) {
+    assert.equal(awardOpen(g, winner, 999000), false);
+    assert.equal(g.phase, 'award');
+    assert.equal(g.current.id, card);
+    assert.equal(g.entries.length, 0);
+    assert.equal(g.remainingMs, 50000);
+  }
+  assert.equal(awardOpen(g, 1, 999000), true);
+  assert.equal(g.phase, 'playing');
+  assert.equal(g.deadline, 1049000);
+  assert.equal(g.entries.length, 1);
+  assert.equal(g.entries[0].awardTeam, 1);
+  assert.equal(g.entries[0].id, card);
+  assert.notEqual(g.current.id, card);
+  assert.deepEqual(g.teams.map(t => t.score), [0, 0]);
+  assert.equal(awardOpen(g, 1, 999001), false);
+  assert.equal(g.entries.length, 1);
+  assert.equal(g.deadline, 1049000);
+  assert.equal(finishRound(g), true);
+  assert.equal(finishRound(g), false);
+  assert.deepEqual(g.teams.map(t => t.score), [0, 1]);
+});
+
+test('canceling winner selection resumes the same card and mode with exactly the saved duration', () => {
+  const g = playing({ openRounds: 'all' });
+  const card = g.current.id;
+  const mode = currentMode(g);
+  beginOpenAward(g, 11000);
+  assert.equal(cancelOpenAward(g, 90000), true);
+  assert.equal(g.phase, 'playing');
+  assert.equal(g.deadline, 140000);
+  assert.equal(g.current.id, card);
+  assert.equal(currentMode(g), mode);
+  assert.equal(g.entries.length, 0);
+  assert.equal(cancelOpenAward(g, 90001), false);
+  assert.equal(beginOpenAward(playing(), 11000), false);
+});
+
+test('opening the chooser at the exact deadline settles earlier awards without granting another point', () => {
+  const g = playing({ openRounds: 'all' });
+  assert.equal(record(g, 'correct', 2000, 1), true);
+  assert.equal(beginOpenAward(g, 61000), false);
+  assert.equal(g.phase, 'summary');
+  assert.equal(g.entries.length, 1);
+  assert.deepEqual(g.teams.map(t => t.score), [0, 1]);
+  assert.equal(awardOpen(g, 0, 62000), false);
+  assert.equal(cancelOpenAward(g, 62000), false);
+  assert.equal(finishRound(g), false);
+  assert.deepEqual(g.teams.map(t => t.score), [0, 1]);
+});
+
+test('open-round correct answers require an explicit valid winner while passing remains available', () => {
+  const g = playing({ openRounds: 'all' });
+  const card = g.current.id;
+  for (const winner of [undefined, -1, 2, 1.5, '1']) {
+    assert.equal(record(g, 'correct', 2000, winner), false);
+    assert.equal(g.entries.length, 0);
+    assert.equal(g.current.id, card);
+  }
+  assert.equal(record(g, 'pass', 3000), true);
+  assert.equal(roundPoints(g), 0);
+  assert.equal(record(g, 'correct', 4000, 1), true);
+  assert.equal(g.entries[1].awardTeam, 1);
+  assert.equal(roundPoints(g), 1);
+  const normal = playing();
+  record(normal, 'correct', 2000);
+  assert.equal(normal.entries[0].awardTeam, 0);
+});
+
+test('round settlement distributes open answers among all winning teams exactly once', () => {
+  const g = playing({ openRounds: 'all', teams: ['Egy', 'Kettő', 'Három'] });
+  for (const [i, winner] of [2, 1, 2, 0].entries()) {
+    assert.equal(record(g, 'correct', 2000 + i, winner), true);
+  }
+  record(g, 'pass', 3000);
+  assert.equal(roundPoints(g), 4);
+  assert.deepEqual(g.teams.map(t => t.score), [0, 0, 0]);
+  finishRound(g);
+  assert.deepEqual(g.teams.map(t => t.score), [1, 1, 2]);
+  assert.deepEqual(g.history[0].awards, [1, 1, 2]);
+  finishRound(g);
+  assert.deepEqual(g.teams.map(t => t.score), [1, 1, 2]);
+});
+
+test('undo removes a pending open-round award and restores the card without resetting time', () => {
+  const g = playing({ openRounds: 'all' });
+  const card = g.current.id;
+  const mode = currentMode(g);
+  beginOpenAward(g, 11000);
+  awardOpen(g, 1, 50000);
+  const deadline = g.deadline;
+  assert.equal(roundPoints(g), 1);
+  assert.equal(undo(g), true);
+  assert.equal(g.current.id, card);
+  assert.equal(currentMode(g), mode);
+  assert.equal(g.deadline, deadline);
+  assert.equal(roundPoints(g), 0);
+  finishRound(g);
+  assert.deepEqual(g.teams.map(t => t.score), [0, 0]);
+});
+
+test('a saved winner chooser stays frozen and can be canceled or awarded after restoration', t => {
+  t.mock.method(Date, 'now', () => 999000);
+  const g = playing({ openRounds: 'all' });
+  beginOpenAward(g, 11000);
+  const raw = JSON.stringify(g);
+  const restored = restoreGame(raw);
+  assert.ok(restored);
+  assert.equal(restored.phase, 'award');
+  assert.equal(restored.remainingMs, 50000);
+  assert.equal(restored.deadline, null);
+  assert.equal(restored.current.id, g.current.id);
+  assert.deepEqual(restored.teams.map(t => t.score), [0, 0]);
+  assert.equal(cancelOpenAward(restored, 999000), true);
+  assert.equal(restored.current.id, g.current.id);
+  assert.equal(restored.deadline, 1049000);
+  assert.equal(restored.entries.length, 0);
+
+  const awarded = restoreGame(raw);
+  assert.equal(awardOpen(awarded, 1, 999000), true);
+  finishRound(awarded);
+  assert.deepEqual(awarded.teams.map(t => t.score), [0, 1]);
+
+  const invalid = JSON.parse(raw);
+  invalid.config.openRounds = 'off';
+  assert.equal(restoreGame(JSON.stringify(invalid)), null);
+});
+
+test('presenters rotate independently for three teams with different player counts', () => {
+  const players = [[' Anna ', 'Béla'], ['Cili', 'Dani', 'Eszter'], ['Feri', 'Gabi', 'Hédi', 'Imre']];
+  const g = game({ teams: ['Egy', 'Kettő', 'Három'], rounds: 5, players });
+  assert.deepEqual(g.teams.map(team => team.players), [['Anna', 'Béla'], players[1], players[2]]);
+  const actual = Array.from({ length: 15 }, (_, turn) => currentPresenter(g, turn));
+  assert.deepEqual(actual, ['Anna', 'Cili', 'Feri', 'Béla', 'Dani', 'Gabi', 'Anna', 'Eszter', 'Hédi', 'Béla', 'Cili', 'Imre', 'Anna', 'Dani', 'Feri']);
+  g.turn = 4;
+  assert.equal(currentPresenter(g), 'Dani');
+  const unnamed = game();
+  assert.equal(currentPresenter(unnamed, 0), '1. játékos');
+  assert.equal(currentPresenter(unnamed, 1), '1. játékos');
+  assert.equal(currentPresenter(unnamed, 2), '2. játékos');
+  assert.equal(currentPresenter(unnamed, 4), '1. játékos');
+});
+
+test('player lists accept unnamed teams or 2–12 unique names and reject invalid lists', () => {
+  assert.doesNotThrow(() => game({ players: [[], []] }));
+  assert.doesNotThrow(() => game({ players: [Array.from({ length: 12 }, (_, i) => `Játékos ${i}`), []] }));
+  const invalidLists = [
+    [['Anna'], []],
+    [Array.from({ length: 13 }, (_, i) => `Játékos ${i}`), []],
+    [['Anna', ' Anna '], []],
+    [['Anna', ' '], []],
+    [['Anna', 'H'.repeat(29)], []],
+  ];
+  for (const players of invalidLists) assert.throws(() => game({ players }));
+});
+
+test('legacy saves default to closed rounds and unnamed alternating presenters', () => {
+  const legacy = playing();
+  record(legacy, 'correct', 2000);
+  pause(legacy, 3000);
+  delete legacy.config.openRounds;
+  delete legacy.config.players;
+  for (const team of legacy.teams) delete team.players;
+  for (const entry of legacy.entries) delete entry.awardTeam;
+  const restored = restoreGame(JSON.stringify(legacy));
+  assert.ok(restored);
+  assert.equal(restored.config.openRounds, 'off');
+  assert.deepEqual(restored.teams.map(team => team.players), [[], []]);
+  assert.equal(currentPresenter(restored, 0), '1. játékos');
+  assert.equal(currentPresenter(restored, 2), '2. játékos');
+  assert.equal(isOpenRound(restored), false);
+  finishRound(restored);
+  assert.deepEqual(restored.teams.map(team => team.score), [1, 0]);
 });

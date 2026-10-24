@@ -7,8 +7,17 @@ export const COLORS = ['#dbff7a', '#bb99ff', '#ffb79c', '#8be0df', '#ff93bc', '#
 export const PACKS = {
   mixed: { name: 'Vegyes', description: 'Bemelegítő, csípős és merész lapok a választott erősség szerint.' },
   spicy: { name: 'Csak pikáns', description: 'Flört, csábítás, kétértelmű helyzetek és hálószobai humor. Bemelegítő lapok nélkül.' },
-  intimate: { name: 'Szex témájú', description: 'Külön szókincspakli: vágy, intimitás, szexualitás és védekezés.' }
+  intimate: { name: 'Szex témájú', description: 'Külön szókincspakli: vágy, intimitás, szexualitás és védekezés.' },
+  creative: { name: 'Abszurd éjszaka', description: 'Képtelen figurák, váratlan tárgyak és filmszerű helyzetek. Engedjétek szabadon a fantáziátokat!' }
 };
+export const THEMES = {
+  party: 'Buli és káosz', dating: 'Randi és flört', bedroom: 'Hálószobai humor',
+  desire: 'Test és vágy', accessories: 'Intim kellékek', health: 'Védekezés és egészség', absurd: 'Abszurd világ'
+};
+
+export function supportsMode(prompt, mode) {
+  return Object.hasOwn(MODES, mode) && (prompt.modes === undefined || (Array.isArray(prompt.modes) && prompt.modes.includes(mode)));
+}
 
 export function shuffle(items, random = Math.random) {
   const copy = [...items];
@@ -19,13 +28,13 @@ export function shuffle(items, random = Math.random) {
   return copy;
 }
 
-export function eligiblePrompts(prompts, level, pack = 'mixed') {
-  if (pack === 'spicy') return prompts.filter(p => ['spicy', 'bold'].includes(p.level));
-  if (pack === 'intimate') return prompts.filter(p => p.level === 'intimate');
-  if (pack !== 'mixed') return [];
+export function eligiblePrompts(prompts, level, pack = 'mixed', themes = null) {
   const levels = ['warm', 'spicy', 'bold'];
   const ceiling = levels.indexOf(level);
-  return prompts.filter(p => levels.indexOf(p.level) >= 0 && levels.indexOf(p.level) <= ceiling);
+  return prompts.filter(p => {
+    const inPack = pack === 'spicy' ? ['spicy', 'bold'].includes(p.level) : pack === 'intimate' ? p.level === 'intimate' : pack === 'creative' ? p.level === 'creative' : pack === 'mixed' && levels.indexOf(p.level) >= 0 && levels.indexOf(p.level) <= ceiling;
+    return inPack && (themes == null || (Array.isArray(themes) && themes.some(theme => p.themes?.includes(theme))));
+  });
 }
 
 export function createGame(config, prompts, random = Math.random) {
@@ -38,16 +47,23 @@ export function createGame(config, prompts, random = Math.random) {
   if (!Object.hasOwn(PACKS, pack)) throw new Error('Válassz az elérhető paklikból.');
   const modeRotation = config.modeRotation ?? 'cards';
   if (!['cards', 'rounds'].includes(modeRotation)) throw new Error('Válassz váltási módot.');
+  if (config.themes != null && (!Array.isArray(config.themes) || !config.themes.length || config.themes.some(theme => !Object.hasOwn(THEMES, theme)))) throw new Error('Válassz legalább egy elérhető témát.');
+  const themes = config.themes == null ? null : [...new Set(config.themes)];
+  const matchModes = config.matchModes ?? true;
+  if (typeof matchModes !== 'boolean') throw new Error('Hibás feladattípus-beállítás.');
   const modes = [...new Set(config.modes || [])].filter(m => MODES[m]);
   if (!modes.length) throw new Error('Válassz legalább egy feladattípust.');
-  const pool = eligiblePrompts(prompts, config.level, pack);
-  if (!pool.length) throw new Error('Nincs elérhető feladvány.');
+  const pool = eligiblePrompts(prompts, config.level, pack, themes);
+  if (!pool.length) throw new Error('Ezekkel a témákkal nincs elérhető feladvány. Válassz másik témát vagy paklit.');
+  const unavailable = matchModes ? modes.filter(mode => !pool.some(prompt => supportsMode(prompt, mode))) : [];
+  if (unavailable.length) throw new Error(`A kiválasztott témákhoz nincs ilyen lap: ${unavailable.map(mode => MODES[mode].name).join(', ')}. Bővítsd a témákat vagy kapcsold ki ezt a típust.`);
   return {
     version: 1,
-    config: { teams: names, duration: config.duration, rounds: config.rounds, level: config.level, modes, pack, modeRotation },
+    config: { teams: names, duration: config.duration, rounds: config.rounds, level: config.level, modes, pack, modeRotation, themes, matchModes },
     teams: names.map((name, i) => ({ name, score: 0, color: COLORS[i] })),
     phase: 'handoff', turn: 0, deck: shuffle(pool, random), cursor: 0,
-    current: null, entries: [], history: [], remainingMs: config.duration * 1000, deadline: null
+    current: null, entries: [], history: [], remainingMs: config.duration * 1000, deadline: null,
+    pool: matchModes ? [...pool] : undefined
   };
 }
 
@@ -58,6 +74,26 @@ export const roundPoints = game => game.entries.filter(e => e.result === 'correc
 export const remaining = (game, now = Date.now()) => game.phase === 'playing' ? Math.max(0, game.deadline - now) : game.remainingMs;
 
 function nextCard(game) {
+  if (game.config.matchModes) {
+    const mode = currentMode(game);
+    const findCompatible = () => {
+      const candidates = game.deck.map((prompt, index) => ({ prompt, index })).filter(item => item.index >= game.cursor && supportsMode(item.prompt, mode));
+      return (candidates.find(item => item.prompt.id !== game.current?.id) ?? candidates[0])?.index ?? -1;
+    };
+    let index = findCompatible();
+    if (index < 0) {
+      const waiting = game.deck.slice(game.cursor);
+      const waitingIds = new Set(waiting.map(prompt => prompt.id));
+      const recycled = shuffle(game.pool.filter(prompt => supportsMode(prompt, mode) && !waitingIds.has(prompt.id)));
+      game.deck = [...waiting, ...recycled];
+      game.cursor = 0;
+      index = findCompatible();
+    }
+    if (index < 0) throw new Error('Ehhez a feladattípushoz nincs elérhető lap.');
+    [game.deck[game.cursor], game.deck[index]] = [game.deck[index], game.deck[game.cursor]];
+    game.current = game.deck[game.cursor++];
+    return;
+  }
   if (game.cursor >= game.deck.length) {
     const last = game.current?.id;
     game.deck = shuffle(game.deck);
@@ -149,12 +185,20 @@ export function restoreGame(raw) {
     if (!Object.hasOwn(PACKS, g.config.pack)) return null;
     g.config.modeRotation ??= 'rounds';
     if (!['cards', 'rounds'].includes(g.config.modeRotation)) return null;
+    g.config.matchModes ??= false;
+    g.config.themes ??= null;
+    if (typeof g.config.matchModes !== 'boolean' || (g.config.themes !== null && (!Array.isArray(g.config.themes) || !g.config.themes.length || g.config.themes.some(theme => !Object.hasOwn(THEMES, theme))))) return null;
     if (g.teams.some(t => typeof t.name !== 'string' || !t.name.trim() || t.name.length > 28 || !Number.isInteger(t.score) || t.score < 0)) return null;
-    const validPrompt = p => p && typeof p.id === 'string' && typeof p.text === 'string' && p.text.length > 0 && p.text.length <= 180 && ['warm', 'spicy', 'bold', 'intimate'].includes(p.level);
+    const validPrompt = p => p && typeof p.id === 'string' && typeof p.text === 'string' && p.text.length > 0 && p.text.length <= 180 && ['warm', 'spicy', 'bold', 'intimate', 'creative'].includes(p.level) && (p.modes === undefined || (Array.isArray(p.modes) && p.modes.length > 0 && p.modes.every(mode => Object.hasOwn(MODES, mode)))) && (p.themes === undefined || (Array.isArray(p.themes) && p.themes.length > 0 && p.themes.every(theme => Object.hasOwn(THEMES, theme))));
     if (g.deck.some(p => !validPrompt(p))) return null;
-    if (g.config.pack === 'intimate' && g.deck.some(p => p.level !== 'intimate')) return null;
-    if (g.config.pack === 'spicy' && g.deck.some(p => !['spicy', 'bold'].includes(p.level))) return null;
-    if (g.config.pack === 'mixed' && g.deck.some(p => p.level === 'intimate')) return null;
+    const inSelection = p => eligiblePrompts([p], g.config.level, g.config.pack, g.config.themes).length === 1;
+    if (g.deck.some(p => !inSelection(p))) return null;
+    if (g.config.matchModes) {
+      if (!Array.isArray(g.pool) || !g.pool.length || g.pool.some(p => !validPrompt(p) || !inSelection(p))) return null;
+      const poolIds = new Set(g.pool.map(p => p.id));
+      if (poolIds.size !== g.pool.length || g.deck.some(p => !poolIds.has(p.id)) || g.config.modes.some(mode => !g.pool.some(p => supportsMode(p, mode)))) return null;
+      if (['ready', 'playing', 'paused'].includes(g.phase) && (!g.current || !poolIds.has(g.current.id) || !supportsMode(g.current, currentMode(g)))) return null;
+    }
     if (g.entries.some(e => !validPrompt(e) || !['correct', 'pass'].includes(e.result) || (e.mode !== undefined && !g.config.modes.includes(e.mode)))) return null;
     if (g.history.some(h => !h || !Number.isInteger(h.team) || h.team < 0 || h.team >= g.teams.length || !Number.isInteger(h.round) || h.round < 1 || h.round > g.config.rounds || !Number.isInteger(h.points) || h.points < 0 || !MODES[h.mode])) return null;
     if (['ready', 'playing', 'paused'].includes(g.phase) && !validPrompt(g.current)) return null;

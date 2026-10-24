@@ -4,10 +4,13 @@ Magyar nyelvű, Activity-jellegű, egy közös eszközön játszható partiját�
 
 Játszható változat: https://jtdevzero.github.io/YSQ/activity18/
 
-- 720 egyedi, 2–3 szavas feladvány: 60 bemelegítő, 180 csípős, 180 merész és 300 külön szex témájú kifejezés.
+- 840 egyedi, 2–3 szavas feladvány: 60 bemelegítő, 180 csípős, 180 merész, 300 külön szex témájú kifejezés és 120 kreatív, abszurd lap.
 - „Csak pikáns” pakli: 360 csípős és merész lap, bemelegítő feladványok nélkül. Ez az alapértelmezett pakli.
 - „Szex témájú” pakli: 300 külön kifejezés intimitásról, vágyról, szexualitásról és védekezésről.
 - „Vegyes” pakli: három erősség; a magasabb szintek a lazább lapokat is tartalmazzák. A külön szex témájú lapok nem kerülnek bele.
+- „Abszurd éjszaka” pakli: 120 új lap képtelen szereplőkkel és helyzetekkel, például „Vámpír a véradáson”, „Adóellenőr a Holdon”.
+- Témaszűrők: buli és káosz, randi és flört, hálószobai humor, test és vágy, intim kellékek, védekezés és egészség, abszurd világ. Több kijelölésnél bármelyik választott témába illő lap bekerülhet.
+- Módhoz illő lapok: minden lap külön besorolást kapott körülíráshoz, mutogatáshoz és rajzoláshoz. A játék az aktuális típushoz megfelelő lapot választ; a többi lapot megőrzi későbbre. Ha nincs megfelelő lap egy kijelölt típushoz, a beállításoknál jelzi.
 - 2–6 csapat, 30/60/90 másodperces időkeret, csapatonként 3/5/8 kör.
 - Körülírás, mutogatás és rajzolás; alapból minden megfejtés vagy passz után vált a kijelölt típusok között. A körönkénti váltás külön választható.
 - Érintéses rajzvászon és a feladványt elrejtő csapatnézet.
@@ -15,7 +18,7 @@ Játszható változat: https://jtdevzero.github.io/YSQ/activity18/
 - Automatikus helyi mentés, szünet és visszavágó. Minden csapat ugyanannyi kört kap.
 - Nincs regisztráció, külső betűtípus, követőkód vagy szerveroldali adatkezelés.
 
-Példák: „Eljegyzési hagymakarika”, „Csipkés alibi”, illetve a külön csomagban „Nemi vágy”, „Szexuális előjáték”, „Vízbázisú síkosító”. A mentett játékok megőrzik a korábbi paklijukat és váltási módjukat; a bővített csomagot és a laponkénti váltást új játék indításával választhatjátok ki.
+Példák: „Eljegyzési hagymakarika”, „Csipkés alibi”, illetve a külön csomagban „Nemi vágy”, „Szexuális előjáték”, „Vízbázisú síkosító”. A mentett játékok megőrzik a korábbi paklijukat és váltási módjukat; az új paklit, témaszűrést és módhoz igazított lapválasztást új játék indításával kapjátok meg.
 
 ## Indítás
 

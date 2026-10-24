@@ -419,3 +419,16 @@ dialog.canvas-modal { width: min(960px, calc(100% - 24px)); }
 .mode-card .mode-name { font-size: 16px; }
 .mode-next { display: block; margin-top: 7px; color: var(--lilac); font-size: 11px; font-weight: 700; }
 .log-mode { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; font-weight: 500; }
+
+.theme-filter { border: 0; padding: 0; margin: 20px 0 0; min-width: 0; }
+.theme-options { display: flex; flex-wrap: wrap; gap: 8px; }
+.theme-chip { display: inline-flex; align-items: center; gap: 7px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 10px; color: var(--muted); font-size: 11px; cursor: pointer; }
+.theme-chip:has(input:checked) { border-color: #bb99ff88; color: var(--text); background: #bb99ff10; }
+.theme-chip input { width: 14px; height: 14px; margin: 0; accent-color: var(--lilac); }
+.theme-chip small { color: var(--lilac); font-size: 10px; }
+.theme-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.theme-actions .button { min-height: 32px; padding: 7px 10px; font-size: 10px; }
+.mode-options label small { margin-left: 2px; color: var(--lilac); white-space: nowrap; font-size: 10px; }
+#mode-order.is-warning { color: var(--danger); }
+.prompt-theme { display: block; margin-top: 16px; color: #405020; font-size: 10px; font-weight: 650; }
+@media (max-width: 720px) { .info-panel { order: -1; } }

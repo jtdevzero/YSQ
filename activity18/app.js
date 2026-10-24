@@ -1,5 +1,5 @@
 import { PROMPTS, LEVELS } from './prompts.js';
-import { MODES, COLORS, PACKS, createGame, eligiblePrompts, currentTeamIndex, roundNumber, currentMode, roundPoints, remaining, reveal, start, pause, record, undo, finishRound, nextTurn, winners, restoreGame } from './game.js';
+import { MODES, COLORS, PACKS, THEMES, supportsMode, createGame, eligiblePrompts, currentTeamIndex, roundNumber, currentMode, roundPoints, remaining, reveal, start, pause, record, undo, finishRound, nextTurn, winners, restoreGame } from './game.js';
 
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -59,9 +59,27 @@ function updateEstimate() {
 }
 
 function updateModeInfo() {
-  const modes = $$('input[name="modes"]:checked').map(input => MODES[input.value].name);
+  const selected = $$('input[name="modes"]:checked').map(input => input.value);
+  const modes = selected.map(mode => MODES[mode].name);
   const rotation = $('#mode-rotation').value;
-  $('#mode-order').textContent = !modes.length ? 'Válassz legalább egy feladattípust.' : modes.length === 1 ? `Csak ${modes[0].toLocaleLowerCase('hu')} lesz.` : `${rotation === 'cards' ? 'Lapról lapra' : 'Csapatkörönként'}: ${modes.join(' → ')}.`;
+  const pool = selectionPool();
+  const counts = Object.fromEntries(Object.keys(MODES).map(mode => [mode, pool.filter(prompt => supportsMode(prompt, mode)).length]));
+  $$('[data-mode-count]').forEach(label => { label.textContent = `${counts[label.dataset.modeCount]} lap`; });
+  const unavailable = selected.filter(mode => !counts[mode]);
+  const warning = !pool.length ? 'Válassz legalább egy olyan témát, amelyben van feladvány.' : !modes.length ? 'Válassz legalább egy feladattípust.' : unavailable.length ? `Nincs megfelelő lap: ${unavailable.map(mode => MODES[mode].name).join(', ')}. Jelölj több témát vagy kapcsold ki ezt a típust.` : '';
+  $('#mode-order').textContent = warning || (modes.length === 1 ? `Csak ${modes[0].toLocaleLowerCase('hu')} lesz.` : `${rotation === 'cards' ? 'Lapról lapra' : 'Csapatkörönként'}: ${modes.join(' → ')}.`);
+  $('#mode-order').classList.toggle('is-warning', Boolean(warning));
+  $('#start-game').disabled = Boolean(warning);
+}
+
+function selectedThemes() { return $$('input[name="themes"]:checked').map(input => input.value); }
+function selectionPool() { return eligiblePrompts(PROMPTS, $('input[name="level"]:checked').value, $('#pack').value, selectedThemes()); }
+
+function updateSelection() {
+  const themes = selectedThemes();
+  const pool = selectionPool();
+  $('#deck-info').textContent = `${pool.length} feladvány · ${themes.length} téma kiválasztva`;
+  updateModeInfo();
 }
 
 function updateLevel() {
@@ -72,9 +90,13 @@ function updateLevel() {
   $('#level-help').hidden = pack !== 'mixed';
   $('#pack-description').textContent = PACKS[pack].description;
   $$('#pack option').forEach(option => { option.textContent = `${PACKS[option.value].name} · ${eligiblePrompts(PROMPTS, level, option.value).length} lap`; });
-  const note = pack === 'mixed' ? (level === 'warm' ? 'csak bemelegítő lapok' : 'a lazább lapokkal együtt') : 'önálló pakli';
-  $('#deck-info').textContent = `${eligiblePrompts(PROMPTS, level, pack).length} feladvány · ${note}`;
+  const pool = eligiblePrompts(PROMPTS, level, pack);
+  $('#theme-options').innerHTML = Object.entries(THEMES).map(([id, name]) => {
+    const count = pool.filter(prompt => prompt.themes.includes(id)).length;
+    return count ? `<label class="theme-chip"><input type="checkbox" name="themes" value="${id}" form="setup-form" checked><span>${name}</span><small>${count}</small></label>` : '';
+  }).join('');
   $('#prompt-count').textContent = PROMPTS.length;
+  updateSelection();
 }
 
 function goToGame() {
@@ -92,7 +114,8 @@ function sideBar() {
   const mode = MODES[currentMode(game)];
   const level = LEVELS.find(l => l.id === game.config.level);
   const packName = (game.config.pack ?? 'mixed') === 'mixed' ? level?.label : PACKS[game.config.pack].name;
-  return `<aside class="round-sidebar"><div class="panel"><span class="eyebrow">EBBEN A KÖRBEN</span><div class="round-points"><strong id="live-points">${roundPoints(game)}</strong><span>megszerzett pont</span></div><div class="log-list" id="live-log">${liveLog()}</div><p class="helper">Megfejtés +1 · Passz 0</p></div><div class="panel mini-rules"><span class="field-label">${esc(mode.name)}</span><p class="helper">${esc(mode.rule)}</p><p class="helper">${esc(packName || '')} pakli · ${game.config.duration} mp</p><p class="helper">A feladványt csak az előadó láthatja.</p></div></aside>`;
+  const themeNames = game.config.themes?.map(theme => THEMES[theme]).join(' · ') || 'Minden téma';
+  return `<aside class="round-sidebar"><div class="panel"><span class="eyebrow">EBBEN A KÖRBEN</span><div class="round-points"><strong id="live-points">${roundPoints(game)}</strong><span>megszerzett pont</span></div><div class="log-list" id="live-log">${liveLog()}</div><p class="helper">Megfejtés +1 · Passz 0</p></div><div class="panel mini-rules"><span class="field-label">${esc(mode.name)}</span><p class="helper">${esc(mode.rule)}</p><p class="helper">${esc(packName || '')} pakli · ${game.config.duration} mp</p><p class="helper">${esc(themeNames)}</p><p class="helper">A feladványt csak az előadó láthatja.</p></div></aside>`;
 }
 
 function liveLog() {
@@ -126,7 +149,8 @@ function modeCard() {
 }
 
 function promptCard() {
-  return `<div class="prompt-card"><div class="prompt-meta"><span>CSAK AZ ELŐADÓNAK</span><span>${esc(LEVELS.find(l => l.id === game.current.level)?.label || '')}</span></div><h2 class="prompt-word" id="prompt-word" aria-live="polite" aria-atomic="true">${esc(game.current.text)}</h2></div>`;
+  const themes = game.current.themes?.map(theme => THEMES[theme]).join(' · ');
+  return `<div class="prompt-card"><div class="prompt-meta"><span>CSAK AZ ELŐADÓNAK</span><span>${esc(LEVELS.find(l => l.id === game.current.level)?.label || '')}</span></div><h2 class="prompt-word" id="prompt-word" aria-live="polite" aria-atomic="true">${esc(game.current.text)}</h2>${themes ? `<span class="prompt-theme">${esc(themes)}</span>` : ''}</div>`;
 }
 
 function timerMarkup() {
@@ -256,6 +280,7 @@ document.addEventListener('click', event => {
   const button = event.target.closest('[data-action]');
   if (!button || button.disabled) return;
   const action = button.dataset.action;
+  if (action === 'themes-all' || action === 'themes-none') { $$('input[name="themes"]').forEach(input => { input.checked = action === 'themes-all'; }); updateSelection(); }
   if (action === 'remove-team') { button.closest('.team-row').remove(); updateTeams(); }
   if (action === 'reveal') { drawing = []; reveal(game); render(); }
   if (action === 'start' || action === 'resume') { unlockAudio(); lastBeep = 0; start(game); render(); }
@@ -283,7 +308,7 @@ document.addEventListener('click', event => {
 
 $('#setup-form').addEventListener('submit', event => {
   event.preventDefault();
-  const config = { teams: $$('.team-input').map(input => input.value), duration: Number($('#duration').value), rounds: Number($('#rounds').value), level: $('input[name="level"]:checked').value, modes: $$('input[name="modes"]:checked').map(el => el.value), pack: $('#pack').value, modeRotation: $('#mode-rotation').value };
+  const config = { teams: $$('.team-input').map(input => input.value), duration: Number($('#duration').value), rounds: Number($('#rounds').value), level: $('input[name="level"]:checked').value, modes: $$('input[name="modes"]:checked').map(el => el.value), pack: $('#pack').value, modeRotation: $('#mode-rotation').value, themes: selectedThemes() };
   try { game = createGame(config, PROMPTS); $('#setup-error').hidden = true; drawing = []; goToGame(); }
   catch (error) { $('#setup-error').textContent = error.message; $('#setup-error').hidden = false; }
 });
@@ -291,6 +316,7 @@ $('#add-team').addEventListener('click', () => addTeam());
 $('#duration').addEventListener('change', updateEstimate);
 $('#rounds').addEventListener('change', updateEstimate);
 $('#pack').addEventListener('change', updateLevel);
+$('#theme-options').addEventListener('change', updateSelection);
 $('#mode-rotation').addEventListener('change', updateModeInfo);
 $$('input[name="modes"]').forEach(input => input.addEventListener('change', updateModeInfo));
 $$('input[name="level"]').forEach(input => input.addEventListener('change', updateLevel));
@@ -315,5 +341,6 @@ try { savedGame = restoreGame(localStorage.getItem(SAVE_KEY)); } catch { /* Star
 if (savedGame) {
   $('#resume-description').textContent = `${savedGame.teams.map(t => t.name).join(' · ')} — ${savedGame.phase === 'finished' ? 'befejezett játék' : `${Math.min(roundNumber(savedGame), savedGame.config.rounds)}. kör / ${savedGame.config.rounds}`}`;
   if (savedGame.config.modeRotation === 'rounds') $('#resume-description').textContent += '. Ez a mentés csapatkörönként vált típust. Az új, laponkénti váltáshoz indíts új játékot.';
+  if (!savedGame.config.matchModes) $('#resume-description').textContent += ' A témaszűrőkhöz és a módhoz illő lapokhoz indíts új játékot.';
   $('#resume-modal').showModal();
 }

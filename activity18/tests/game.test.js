@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   createGame, currentMode, currentTeamIndex, eligiblePrompts, finishRound,
   nextTurn, pause, record, remaining, restoreGame, reveal, roundNumber,
-  roundPoints, start, undo, winners,
+  roundPoints, start, supportsMode, THEMES, undo, winners,
 } from '../game.js';
 import { PROMPTS } from '../prompts.js';
 
@@ -20,17 +20,17 @@ function playing(changes = {}, prompts = PROMPTS) {
 }
 
 test('prompt packs have unique cards and mixed intensity includes milder packs without intimate cards', () => {
-  assert.equal(PROMPTS.length, 720);
-  assert.equal(new Set(PROMPTS.map(p => p.id)).size, 720);
-  assert.equal(new Set(PROMPTS.map(p => p.text)).size, 720);
+  assert.equal(PROMPTS.length, 840);
+  assert.equal(new Set(PROMPTS.map(p => p.id)).size, 840);
+  assert.equal(new Set(PROMPTS.map(p => p.text)).size, 840);
   assert.equal(eligiblePrompts(PROMPTS, 'warm').length, 60);
   assert.equal(eligiblePrompts(PROMPTS, 'spicy').length, 240);
   assert.equal(eligiblePrompts(PROMPTS, 'bold').length, 420);
-  assert.ok(eligiblePrompts(PROMPTS, 'bold', 'mixed').every(p => p.level !== 'intimate'));
+  assert.ok(eligiblePrompts(PROMPTS, 'bold', 'mixed').every(p => ['warm', 'spicy', 'bold'].includes(p.level)));
   assert.ok(game({ level: 'warm' }).deck.every(p => p.level === 'warm'));
 });
 
-test('dedicated spicy and intimate packs contain only their cards regardless of mixed intensity', () => {
+test('dedicated spicy, intimate, and creative packs contain only their cards regardless of mixed intensity', () => {
   for (const level of ['warm', 'spicy', 'bold']) {
     const spicy = eligiblePrompts(PROMPTS, level, 'spicy');
     assert.equal(spicy.length, 360);
@@ -40,11 +40,15 @@ test('dedicated spicy and intimate packs contain only their cards regardless of 
     assert.ok(intimate.every(p => p.level === 'intimate'));
     const spicyIds = new Set(spicy.map(p => p.id));
     assert.ok(intimate.every(p => !spicyIds.has(p.id)));
+    const creative = eligiblePrompts(PROMPTS, level, 'creative');
+    assert.equal(creative.length, 120);
+    assert.ok(creative.every(p => p.level === 'creative'));
+    assert.ok(creative.every(p => !spicyIds.has(p.id)));
   }
 });
 
 test('new games preserve the requested pack and shuffle only that pack into their deck', () => {
-  for (const pack of ['mixed', 'spicy', 'intimate']) {
+  for (const pack of ['mixed', 'spicy', 'intimate', 'creative']) {
     const g = game({ pack, level: 'warm' });
     assert.equal(g.config.pack, pack);
     const eligibleIds = eligiblePrompts(PROMPTS, 'warm', pack).map(p => p.id).sort();
@@ -74,6 +78,9 @@ test('restoration supports intimate current cards and defaults legacy saves to t
 
   const legacy = game();
   delete legacy.config.pack;
+  delete legacy.config.matchModes;
+  delete legacy.config.themes;
+  delete legacy.pool;
   const restoredLegacy = restoreGame(JSON.stringify(legacy));
   assert.ok(restoredLegacy);
   assert.equal(restoredLegacy.config.pack, 'mixed');
@@ -165,6 +172,9 @@ test('saved card rotation resumes its current mode while legacy saves keep round
   record(legacy, 'correct', 2000);
   pause(legacy, 3000);
   delete legacy.config.modeRotation;
+  delete legacy.config.matchModes;
+  delete legacy.config.themes;
+  delete legacy.pool;
   for (const entry of legacy.entries) delete entry.mode;
   const restoredLegacy = restoreGame(JSON.stringify(legacy));
   assert.ok(restoredLegacy);
@@ -174,6 +184,172 @@ test('saved card rotation resumes its current mode while legacy saves keep round
   assert.throws(() => game({ modeRotation: 'unknown' }));
   g.config.modeRotation = 'unknown';
   assert.equal(restoreGame(JSON.stringify(g)), null);
+});
+
+test('every catalog card has valid themes and suitable modes, including semantic exceptions', () => {
+  const themeIds = ['party', 'dating', 'bedroom', 'desire', 'accessories', 'health', 'absurd'];
+  assert.deepEqual(Object.keys(THEMES).sort(), [...themeIds].sort());
+  for (const prompt of PROMPTS) {
+    assert.ok(Array.isArray(prompt.themes) && prompt.themes.length > 0, `Missing themes: ${prompt.id}`);
+    assert.ok(prompt.themes.every(theme => themeIds.includes(theme)), `Unknown theme: ${prompt.id}`);
+    assert.ok(Array.isArray(prompt.modes) && prompt.modes.length > 0, `Missing modes: ${prompt.id}`);
+    assert.ok(prompt.modes.every(mode => ['describe', 'mime', 'draw'].includes(mode)), `Unknown mode: ${prompt.id}`);
+    assert.ok(prompt.modes.includes('describe'), `Description unavailable: ${prompt.id}`);
+  }
+  const abstract = PROMPTS.find(p => p.text === 'Nemi vágy');
+  assert.ok(abstract);
+  assert.deepEqual(abstract.modes, ['describe']);
+  const concrete = PROMPTS.find(p => p.text === 'Óvszeres kulcstartó');
+  assert.ok(concrete);
+  assert.ok(supportsMode(concrete, 'draw'));
+});
+
+test('theme filtering uses OR membership after pack filtering and an empty selection gives no cards', () => {
+  const catalog = [
+    { id: 'party', text: 'Buli', level: 'warm', themes: ['party'] },
+    { id: 'date', text: 'Randi', level: 'spicy', themes: ['dating'] },
+    { id: 'both', text: 'Flört', level: 'bold', themes: ['dating', 'desire'] },
+    { id: 'health', text: 'Egészség', level: 'intimate', themes: ['health'] },
+    { id: 'creative', text: 'Képzelet', level: 'creative', themes: ['party', 'absurd'] },
+  ];
+  assert.deepEqual(eligiblePrompts(catalog, 'bold', 'mixed', ['party', 'dating']).map(p => p.id), ['party', 'date', 'both']);
+  assert.deepEqual(eligiblePrompts(catalog, 'bold', 'mixed', ['dating', 'desire']).map(p => p.id), ['date', 'both']);
+  assert.deepEqual(eligiblePrompts(catalog, 'bold', 'creative', ['party']).map(p => p.id), ['creative']);
+  assert.deepEqual(eligiblePrompts(catalog, 'bold', 'intimate', ['party']), []);
+  assert.deepEqual(eligiblePrompts(catalog, 'bold', 'mixed', []), []);
+  assert.equal(eligiblePrompts(catalog, 'bold', 'mixed', null).length, 3);
+});
+
+test('game creation preserves the selected themes and refuses empty or unknown selections', () => {
+  const g = game({ themes: ['party', 'dating'], modes: ['describe'] });
+  assert.deepEqual(g.config.themes, ['party', 'dating']);
+  assert.equal(g.config.matchModes, true);
+  assert.deepEqual(g.pool.map(p => p.id).sort(), eligiblePrompts(PROMPTS, 'spicy', 'mixed', ['party', 'dating']).map(p => p.id).sort());
+  assert.ok(g.deck.every(p => p.themes.some(theme => ['party', 'dating'].includes(theme))));
+  assert.equal(game().config.themes, null);
+  assert.throws(() => game({ themes: [] }));
+  assert.throws(() => game({ themes: ['unknown-theme'] }));
+});
+
+test('mode coverage is checked at setup while legacy cards without metadata support every mode', () => {
+  const abstractOnly = [
+    { id: 'abstract', text: 'Fogalom', level: 'warm', themes: ['desire'], modes: ['describe'] },
+  ];
+  assert.throws(() => game({ modes: ['describe', 'mime'] }, abstractOnly));
+  assert.throws(() => game({ modes: ['draw'] }, abstractOnly));
+  assert.doesNotThrow(() => game({ modes: ['describe'] }, abstractOnly));
+  assert.doesNotThrow(() => game({ modes: ['mime'], matchModes: false }, abstractOnly));
+  const legacyPrompt = { id: 'legacy', text: 'Régi kártya', level: 'warm' };
+  for (const mode of ['describe', 'mime', 'draw']) assert.equal(supportsMode(legacyPrompt, mode), true);
+  assert.equal(supportsMode(abstractOnly[0], 'describe'), true);
+  assert.equal(supportsMode(abstractOnly[0], 'mime'), false);
+  assert.equal(supportsMode(abstractOnly[0], 'draw'), false);
+});
+
+test('dealt catalog cards remain compatible across mode changes and repeated recycling without changing the pool', () => {
+  for (const pack of ['mixed', 'spicy', 'intimate', 'creative']) {
+    const g = playing({ pack, level: 'bold' });
+    const poolSnapshot = JSON.stringify(g.pool);
+    for (let i = 0; i < 500; i++) {
+      assert.ok(supportsMode(g.current, currentMode(g)), `${pack}: ${g.current.text} cannot be ${currentMode(g)}`);
+      assert.equal(record(g, i % 2 ? 'correct' : 'pass', 2000 + i), true);
+    }
+    assert.equal(JSON.stringify(g.pool), poolSnapshot);
+    assert.ok(g.entries.every(entry => supportsMode(entry, entry.mode)));
+  }
+});
+
+test('recycling a scarce mode preserves incompatible unconsumed cards for later modes', () => {
+  const catalog = [
+    { id: 'd1', text: 'Első fogalom', level: 'warm', themes: ['desire'], modes: ['describe'] },
+    { id: 'm1', text: 'Mutogatható', level: 'warm', themes: ['party'], modes: ['describe', 'mime'] },
+    { id: 'd2', text: 'Második fogalom', level: 'warm', themes: ['desire'], modes: ['describe'] },
+    { id: 'd3', text: 'Harmadik fogalom', level: 'warm', themes: ['desire'], modes: ['describe'] },
+  ];
+  const g = game({ modes: ['describe', 'mime'] }, catalog);
+  g.deck = [...catalog];
+  const poolSnapshot = JSON.stringify(g.pool);
+  reveal(g);
+  start(g, 1000);
+  const sequence = [g.current.id];
+  for (let i = 0; i < 4; i++) {
+    record(g, 'pass', 2000 + i);
+    sequence.push(g.current.id);
+    assert.ok(supportsMode(g.current, currentMode(g)));
+  }
+  assert.deepEqual(sequence, ['d1', 'm1', 'd2', 'm1', 'd3']);
+  assert.equal(JSON.stringify(g.pool), poolSnapshot);
+});
+
+test('a one-mode queue skips incompatible cards without dropping them or repeating when alternatives exist', () => {
+  const catalog = [
+    { id: 'a', text: 'Első mozdulat', level: 'warm', themes: ['party'], modes: ['describe', 'mime'] },
+    { id: 'd', text: 'Csak beszéd', level: 'warm', themes: ['desire'], modes: ['describe'] },
+    { id: 'b', text: 'Második mozdulat', level: 'warm', themes: ['party'], modes: ['describe', 'mime'] },
+  ];
+  const g = game({ modes: ['mime'] }, catalog);
+  g.deck = [...catalog];
+  reveal(g);
+  start(g, 1000);
+  for (let i = 0; i < 20; i++) {
+    const previous = g.current.id;
+    assert.notEqual(previous, 'd');
+    record(g, 'pass', 2000 + i);
+    assert.notEqual(g.current.id, previous);
+    assert.ok(g.deck.slice(g.cursor).some(p => p.id === 'd'));
+  }
+  assert.equal(g.pool.length, 3);
+});
+
+test('undo across mode-aware recycling restores the card, mode, score, and deadline', () => {
+  const catalog = ['a', 'b'].map(id => ({ id, text: id, level: 'warm', themes: ['party'], modes: ['describe', 'mime', 'draw'] }));
+  const g = game({}, catalog);
+  g.deck = [...catalog];
+  reveal(g);
+  start(g, 1000);
+  const deadline = g.deadline;
+  record(g, 'correct', 2000);
+  record(g, 'pass', 3000);
+  assert.equal(g.current.id, 'a');
+  assert.equal(currentMode(g), 'draw');
+  undo(g);
+  assert.equal(g.current.id, 'b');
+  assert.equal(currentMode(g), 'mime');
+  assert.equal(roundPoints(g), 1);
+  assert.equal(g.deadline, deadline);
+  record(g, 'correct', 4000);
+  assert.equal(g.current.id, 'a');
+  assert.equal(currentMode(g), 'draw');
+  assert.ok(supportsMode(g.current, currentMode(g)));
+});
+
+test('matched saves preserve their filtered pool and reject incompatible cards while old saves remain usable', () => {
+  const g = playing({ pack: 'intimate', themes: ['desire', 'accessories'] });
+  record(g, 'correct', 2000);
+  pause(g, 3000);
+  const restored = restoreGame(JSON.stringify(g));
+  assert.ok(restored);
+  assert.equal(restored.config.matchModes, true);
+  assert.deepEqual(restored.config.themes, ['desire', 'accessories']);
+  assert.deepEqual(restored.pool, g.pool);
+  assert.ok(supportsMode(restored.current, currentMode(restored)));
+
+  const incompatible = structuredClone(g);
+  incompatible.current = { ...incompatible.current, modes: ['describe'] };
+  assert.equal(restoreGame(JSON.stringify(incompatible)), null);
+  const missingPool = structuredClone(g);
+  delete missingPool.pool;
+  assert.equal(restoreGame(JSON.stringify(missingPool)), null);
+
+  const legacy = playing({ modeRotation: 'rounds' });
+  pause(legacy, 3000);
+  delete legacy.config.matchModes;
+  delete legacy.config.themes;
+  delete legacy.pool;
+  const old = restoreGame(JSON.stringify(legacy));
+  assert.ok(old);
+  assert.equal(old.config.matchModes, false);
+  assert.equal(old.config.themes, null);
 });
 
 test('rejects duplicate, blank, and unsupported team or timing settings', () => {

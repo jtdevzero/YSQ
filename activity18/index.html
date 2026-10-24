@@ -37,7 +37,7 @@
           <span class="eyebrow"><span class="status-dot"></span> Jó társaság. Rossz szóviccek.</span>
           <h1 class="hero-title">Ma este<br>mindent <span>bele.</span></h1>
           <p class="hero-lead">Mutasd, rajzold, magyarázd! Rövid, 2–3 szavas feladványok, kreatív csavarokkal és felnőttes humorral. Csak felnőtteknek.</p>
-          <div class="hero-facts"><span><strong id="prompt-count">720</strong> feladvány</span><span><strong>2–6</strong> csapat</span><span><strong>1</strong> közös telefon</span></div>
+          <div class="hero-facts"><span><strong id="prompt-count">840</strong> feladvány</span><span><strong>2–6</strong> csapat</span><span><strong>1</strong> közös telefon</span></div>
         </div>
         <div class="hero-art" aria-hidden="true">
           <div class="orbit"></div><span class="art-spark art-spark-one">✳</span><span class="art-spark art-spark-two">✧</span>
@@ -57,16 +57,17 @@
             <label class="field"><span class="field-label">Idő csapatonként</span><select name="duration" id="duration"><option value="30">30 másodperc · pörgős</option><option value="60" selected>60 másodperc · klasszikus</option><option value="90">90 másodperc · ráérős</option></select></label>
             <label class="field"><span class="field-label">Körök csapatonként</span><select name="rounds" id="rounds"><option value="3">3 kör · villámjáték</option><option value="5" selected>5 kör · még egyet!</option><option value="8">8 kör · hosszú este</option></select></label>
           </div>
-          <fieldset class="mode-options"><legend class="field-label">Melyik feladattípus legyen?</legend><label><input type="checkbox" name="modes" value="describe" checked> Körülírás</label><label><input type="checkbox" name="modes" value="mime" checked> Mutogatás</label><label><input type="checkbox" name="modes" value="draw" checked> Rajzolás</label></fieldset>
+          <fieldset class="mode-options"><legend class="field-label">Melyik feladattípus legyen?</legend><label><input type="checkbox" name="modes" value="describe" checked> Körülírás <small data-mode-count="describe"></small></label><label><input type="checkbox" name="modes" value="mime" checked> Mutogatás <small data-mode-count="mime"></small></label><label><input type="checkbox" name="modes" value="draw" checked> Rajzolás <small data-mode-count="draw"></small></label></fieldset>
+          <p class="helper">Minden típushoz csak a hozzá illő lapokat adjuk. A darabszámok a témaszűrőket is figyelembe veszik.</p>
           <label class="field rotation-field"><span class="field-label">Mikor váltson feladattípust?</span><select id="mode-rotation" name="modeRotation"><option value="cards" selected>Minden lapnál · változatos</option><option value="rounds">Csapatkörönként · klasszikus</option></select></label>
           <p class="helper" id="mode-order">Lapról lapra: Körülírás → Mutogatás → Rajzolás.</p>
           <label class="consent-check"><input type="checkbox" id="age-consent" required><span>Mindannyian elmúltunk 18 évesek.</span></label>
           <p id="setup-error" class="inline-error" role="alert" hidden></p>
-          <div class="start-row"><button class="button button-primary" type="submit">Kezdődjön az este <svg aria-hidden="true"><use href="#i-arrow"/></svg></button><span class="helper" id="game-estimate">Kb. 10 perc, plusz a nevetés.</span></div>
+          <div class="start-row"><button class="button button-primary" id="start-game" type="submit">Kezdődjön az este <svg aria-hidden="true"><use href="#i-arrow"/></svg></button><span class="helper" id="game-estimate">Kb. 10 perc, plusz a nevetés.</span></div>
         </form>
         <aside class="panel info-panel">
           <div class="panel-heading"><h3>Válasszatok paklit.</h3><span class="tiny-star" aria-hidden="true">✳</span></div>
-          <label class="field pack-field"><span class="field-label">Milyen témák jöhetnek?</span><select id="pack" name="pack" form="setup-form"><option value="mixed">Vegyes · erősség szerint</option><option value="spicy" selected>Csak pikáns · 360 lap</option><option value="intimate">Szex témájú · 300 lap</option></select></label>
+          <label class="field pack-field"><span class="field-label">Pakli</span><select id="pack" name="pack" form="setup-form"><option value="mixed">Vegyes · erősség szerint</option><option value="spicy" selected>Csak pikáns · 360 lap</option><option value="intimate">Szex témájú · 300 lap</option><option value="creative">Abszurd éjszaka · 120 lap</option></select></label>
           <p class="helper" id="pack-description">Flört, csábítás, kétértelmű helyzetek és hálószobai humor.</p>
           <p class="field-label" id="level-help" hidden>A vegyes pakli erőssége</p>
           <fieldset class="level-options" id="level-options" hidden><legend class="sr-only">A feladványok erőssége</legend>
@@ -74,7 +75,8 @@
             <label class="level-option"><input type="radio" name="level" value="spicy" form="setup-form" checked><span class="level-emoji" aria-hidden="true">♨</span><span><span class="level-label">Csípős <span class="mini-badge">KEDVENC</span></span><span class="level-description">Randik, flörtök és félreérthető helyzetek.</span></span></label>
             <label class="level-option"><input type="radio" name="level" value="bold" form="setup-form"><span class="level-emoji" aria-hidden="true">⚡</span><span><span class="level-label">Merész</span><span class="level-description">Pajzán célzások. Ennek már fele sem tréfa.</span></span></label>
           </fieldset>
-          <p class="helper deck-info" id="deck-info">360 feladvány · önálló pakli</p>
+          <fieldset class="theme-filter"><legend class="field-label">Milyen témák jöhetnek?</legend><div class="theme-options" id="theme-options"></div><div class="theme-actions"><button class="button button-quiet" type="button" data-action="themes-all">Összes kijelölése</button><button class="button button-quiet" type="button" data-action="themes-none">Kijelölés törlése</button></div></fieldset>
+          <p class="helper deck-info" id="deck-info" role="status" aria-live="polite">360 feladvány · minden téma</p>
           <div class="comfort-note"><span aria-hidden="true">♡</span><p>Az a jó játék, amiben mindenki jól érzi magát. Bármelyik lapot passzolhatjátok, pontlevonás nélkül.</p></div>
         </aside>
       </div>

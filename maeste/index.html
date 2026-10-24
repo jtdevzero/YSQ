@@ -9,9 +9,9 @@
   <title>MaEste — Egy jó film. Együtt.</title>
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="stylesheet" href="./styles.css?v=20261024-motion2">
+  <link rel="stylesheet" href="./styles.css?v=20261024-polish1">
   <script src="./backup.js" defer></script>
-  <script src="./app.js?v=20261024-motion2" defer></script>
+  <script src="./app.js?v=20261024-polish1" defer></script>
 </head>
 <body>
   <section id="access-gate" class="access-gate" aria-labelledby="access-title">
@@ -79,6 +79,11 @@
             <div id="card-stage" class="card-stage"><div class="state-card"><div class="loading-reel" aria-hidden="true">✦</div><h3>Előkészítjük a moziestet…</h3><p>Már érkeznek a filmek.</p></div></div>
             <div id="movie-actions" class="movie-actions" hidden><button type="button" id="undo-vote" class="action-small" title="Előző döntés visszavonása" aria-label="Előző döntés visszavonása" disabled><span aria-hidden="true">↶</span></button><button type="button" id="vote-no" class="vote-button vote-no" aria-label="Film kihagyása"><span aria-hidden="true">×</span><small>Kihagyom</small></button><button type="button" id="vote-seen" class="vote-button vote-seen" aria-label="Már láttam ezt a filmet"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg><small>Már láttam</small></button><button type="button" id="vote-yes" class="vote-button vote-yes" aria-label="Tetszik ez a film"><span aria-hidden="true">♡</span><small>Jöhet!</small></button><span class="action-spacer" aria-hidden="true"></span></div>
             <div id="action-error" class="inline-error action-error" role="alert" hidden><span id="action-error-text"></span><button type="button" class="error-inline-retry" data-action="retry-seen">Újrapróbálom →</button></div><p id="gesture-hint" class="gesture-hint" hidden>Balra: kihagyom · Jobbra: jöhet · Lefelé: már láttam.<span>Billentyűzeten a nyilakkal is választhatsz.</span></p>
+            <div class="effects-setting">
+              <label for="effects-mode">Animációk</label>
+              <select id="effects-mode" aria-describedby="effects-system-note"><option value="full">Látványos</option><option value="subtle" selected>Visszafogott</option><option value="off">Kikapcsolva</option></select>
+              <p id="effects-system-note" role="status" hidden>A készülék csökkentett mozgása miatt az animációk most kikapcsolva.</p>
+            </div>
           </section>
           <aside class="night-notes" aria-label="A moziested összefoglalója"><div class="note-heading"><span class="tiny-star">✦</span><span>A TE MOZIESTED</span></div><div id="night-description" class="night-description">Egy jó filmhez<br><em>csak egy igen kell.</em></div><div class="ticket-rule"></div><dl class="night-facts"><div><dt>Helyszín</dt><dd>Otthon, a kanapén</dd></div><div><dt>Válogatás</dt><dd id="summary-type">Filmek</dd></div><div><dt>Szolgáltatók</dt><dd id="summary-providers">Bármelyik</dd></div><div><dt>Hangulat</dt><dd id="summary-genre">Bármi jöhet</dd></div><div><dt>Kizárt műfajok</dt><dd id="summary-excluded">Nincs</dd></div><div><dt>Évjárat</dt><dd id="summary-years">Bármelyik</dd></div><div><dt>Játékidő</dt><dd id="summary-runtime">Ráérünk</dd></div></dl><div class="ticket-rule"></div><div class="mini-list-heading"><span id="shortlist-title">EDDIG TETSZIK</span><strong id="shortlist-count">0</strong></div><div id="shortlist" class="shortlist"><p class="empty-mini">A neked tetsző filmek itt gyűlnek. Jöhet az első?</p></div><button id="random-choice" class="text-button" type="button" disabled>Válassz helyettem <span aria-hidden="true">→</span></button><span class="ticket-cut ticket-cut-left"></span><span class="ticket-cut ticket-cut-right"></span></aside>
         </div>

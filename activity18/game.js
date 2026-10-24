@@ -4,6 +4,11 @@ export const MODES = {
   draw: { name: 'Rajzolás', icon: 'draw', rule: 'Rajzold le! Betűk, számok, beszéd és mutogatás nélkül.' }
 };
 export const COLORS = ['#dbff7a', '#bb99ff', '#ffb79c', '#8be0df', '#ff93bc', '#f4d477'];
+export const PACKS = {
+  mixed: { name: 'Vegyes', description: 'Bemelegítő, csípős és merész lapok a választott erősség szerint.' },
+  spicy: { name: 'Csak pikáns', description: 'Flört, csábítás, kétértelmű helyzetek és hálószobai humor. Bemelegítő lapok nélkül.' },
+  intimate: { name: 'Szex témájú', description: 'Külön szókincspakli: vágy, intimitás, szexualitás és védekezés.' }
+};
 
 export function shuffle(items, random = Math.random) {
   const copy = [...items];
@@ -14,7 +19,10 @@ export function shuffle(items, random = Math.random) {
   return copy;
 }
 
-export function eligiblePrompts(prompts, level) {
+export function eligiblePrompts(prompts, level, pack = 'mixed') {
+  if (pack === 'spicy') return prompts.filter(p => ['spicy', 'bold'].includes(p.level));
+  if (pack === 'intimate') return prompts.filter(p => p.level === 'intimate');
+  if (pack !== 'mixed') return [];
   const levels = ['warm', 'spicy', 'bold'];
   const ceiling = levels.indexOf(level);
   return prompts.filter(p => levels.indexOf(p.level) >= 0 && levels.indexOf(p.level) <= ceiling);
@@ -26,13 +34,15 @@ export function createGame(config, prompts, random = Math.random) {
   if (new Set(names.map(n => n.toLocaleLowerCase('hu'))).size !== names.length) throw new Error('Minden csapatnak külön neve legyen.');
   if (![30, 60, 90].includes(config.duration) || ![3, 5, 8].includes(config.rounds)) throw new Error('Válassz a megadott időkből és körszámokból.');
   if (!['warm', 'spicy', 'bold'].includes(config.level)) throw new Error('Válassz nehézségi szintet.');
+  const pack = config.pack ?? 'mixed';
+  if (!Object.hasOwn(PACKS, pack)) throw new Error('Válassz az elérhető paklikból.');
   const modes = [...new Set(config.modes || [])].filter(m => MODES[m]);
   if (!modes.length) throw new Error('Válassz legalább egy feladattípust.');
-  const pool = eligiblePrompts(prompts, config.level);
+  const pool = eligiblePrompts(prompts, config.level, pack);
   if (!pool.length) throw new Error('Nincs elérhető feladvány.');
   return {
     version: 1,
-    config: { teams: names, duration: config.duration, rounds: config.rounds, level: config.level, modes },
+    config: { teams: names, duration: config.duration, rounds: config.rounds, level: config.level, modes, pack },
     teams: names.map((name, i) => ({ name, score: 0, color: COLORS[i] })),
     phase: 'handoff', turn: 0, deck: shuffle(pool, random), cursor: 0,
     current: null, entries: [], history: [], remainingMs: config.duration * 1000, deadline: null
@@ -132,9 +142,14 @@ export function restoreGame(raw) {
     if (!Number.isInteger(g.turn) || g.turn < 0 || g.turn > g.teams.length * g.config.rounds || !Number.isInteger(g.cursor) || g.cursor < 0 || g.cursor > g.deck.length || !Number.isFinite(g.remainingMs) || g.remainingMs < 0 || g.remainingMs > g.config.duration * 1000) return null;
     if (!g.config.modes?.length || g.config.modes.some(m => !MODES[m]) || ![30, 60, 90].includes(g.config.duration) || ![3, 5, 8].includes(g.config.rounds)) return null;
     if (!['warm', 'spicy', 'bold'].includes(g.config.level)) return null;
+    g.config.pack ??= 'mixed';
+    if (!Object.hasOwn(PACKS, g.config.pack)) return null;
     if (g.teams.some(t => typeof t.name !== 'string' || !t.name.trim() || t.name.length > 28 || !Number.isInteger(t.score) || t.score < 0)) return null;
-    const validPrompt = p => p && typeof p.id === 'string' && typeof p.text === 'string' && p.text.length > 0 && p.text.length <= 180 && ['warm', 'spicy', 'bold'].includes(p.level);
+    const validPrompt = p => p && typeof p.id === 'string' && typeof p.text === 'string' && p.text.length > 0 && p.text.length <= 180 && ['warm', 'spicy', 'bold', 'intimate'].includes(p.level);
     if (g.deck.some(p => !validPrompt(p))) return null;
+    if (g.config.pack === 'intimate' && g.deck.some(p => p.level !== 'intimate')) return null;
+    if (g.config.pack === 'spicy' && g.deck.some(p => !['spicy', 'bold'].includes(p.level))) return null;
+    if (g.config.pack === 'mixed' && g.deck.some(p => p.level === 'intimate')) return null;
     if (g.entries.some(e => !validPrompt(e) || !['correct', 'pass'].includes(e.result))) return null;
     if (g.history.some(h => !h || !Number.isInteger(h.team) || h.team < 0 || h.team >= g.teams.length || !Number.isInteger(h.round) || h.round < 1 || h.round > g.config.rounds || !Number.isInteger(h.points) || h.points < 0 || !MODES[h.mode])) return null;
     if (['ready', 'playing', 'paused'].includes(g.phase) && !validPrompt(g.current)) return null;

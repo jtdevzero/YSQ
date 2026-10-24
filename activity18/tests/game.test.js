@@ -19,14 +19,65 @@ function playing(changes = {}, prompts = PROMPTS) {
   return g;
 }
 
-test('prompt packs have unique cards and the selected intensity includes milder packs', () => {
-  assert.equal(PROMPTS.length, 180);
-  assert.equal(new Set(PROMPTS.map(p => p.id)).size, 180);
-  assert.equal(new Set(PROMPTS.map(p => p.text)).size, 180);
+test('prompt packs have unique cards and mixed intensity includes milder packs without intimate cards', () => {
+  assert.equal(PROMPTS.length, 540);
+  assert.equal(new Set(PROMPTS.map(p => p.id)).size, 540);
+  assert.equal(new Set(PROMPTS.map(p => p.text)).size, 540);
   assert.equal(eligiblePrompts(PROMPTS, 'warm').length, 60);
-  assert.equal(eligiblePrompts(PROMPTS, 'spicy').length, 120);
-  assert.equal(eligiblePrompts(PROMPTS, 'bold').length, 180);
+  assert.equal(eligiblePrompts(PROMPTS, 'spicy').length, 240);
+  assert.equal(eligiblePrompts(PROMPTS, 'bold').length, 420);
+  assert.ok(eligiblePrompts(PROMPTS, 'bold', 'mixed').every(p => p.level !== 'intimate'));
   assert.ok(game({ level: 'warm' }).deck.every(p => p.level === 'warm'));
+});
+
+test('dedicated spicy and intimate packs contain only their cards regardless of mixed intensity', () => {
+  for (const level of ['warm', 'spicy', 'bold']) {
+    const spicy = eligiblePrompts(PROMPTS, level, 'spicy');
+    assert.equal(spicy.length, 360);
+    assert.ok(spicy.every(p => ['spicy', 'bold'].includes(p.level)));
+    const intimate = eligiblePrompts(PROMPTS, level, 'intimate');
+    assert.equal(intimate.length, 120);
+    assert.ok(intimate.every(p => p.level === 'intimate'));
+    const spicyIds = new Set(spicy.map(p => p.id));
+    assert.ok(intimate.every(p => !spicyIds.has(p.id)));
+  }
+});
+
+test('new games preserve the requested pack and shuffle only that pack into their deck', () => {
+  for (const pack of ['mixed', 'spicy', 'intimate']) {
+    const g = game({ pack, level: 'warm' });
+    assert.equal(g.config.pack, pack);
+    const eligibleIds = eligiblePrompts(PROMPTS, 'warm', pack).map(p => p.id).sort();
+    assert.deepEqual(g.deck.map(p => p.id).sort(), eligibleIds);
+  }
+  const legacy = game();
+  assert.equal(legacy.config.pack, 'mixed');
+  assert.equal(legacy.deck.length, 240);
+});
+
+test('unknown packs are rejected during creation and saved-game restoration', () => {
+  assert.throws(() => game({ pack: 'unknown' }));
+  const g = game();
+  g.config.pack = 'unknown';
+  assert.equal(restoreGame(JSON.stringify(g)), null);
+});
+
+test('restoration supports intimate current cards and defaults legacy saves to the mixed pack', () => {
+  const intimate = game({ pack: 'intimate', level: 'warm' });
+  reveal(intimate);
+  const restoredIntimate = restoreGame(JSON.stringify(intimate));
+  assert.ok(restoredIntimate);
+  assert.equal(restoredIntimate.config.pack, 'intimate');
+  assert.equal(restoredIntimate.current.level, 'intimate');
+  assert.equal(restoredIntimate.current.id, intimate.current.id);
+  assert.deepEqual(restoredIntimate.deck, intimate.deck);
+
+  const legacy = game();
+  delete legacy.config.pack;
+  const restoredLegacy = restoreGame(JSON.stringify(legacy));
+  assert.ok(restoredLegacy);
+  assert.equal(restoredLegacy.config.pack, 'mixed');
+  assert.deepEqual(restoredLegacy.deck, legacy.deck);
 });
 
 test('rejects duplicate, blank, and unsupported team or timing settings', () => {

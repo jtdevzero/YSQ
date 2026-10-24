@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#17131f">
-  <meta name="description" content="Éjfél után – magyar Activity-jellegű partijáték felnőtteknek. 180 feladvány, körülírás, mutogatás és rajzolás, egy közös telefonon.">
+  <meta name="description" content="Éjfél után – magyar Activity-jellegű partijáték felnőtteknek. Több száz rövid feladvány, külön pikáns és szex témájú paklival, egy közös telefonon.">
   <title>Éjfél után · Activity 18+</title>
   <link rel="icon" type="image/svg+xml" href="./favicon.svg">
   <link rel="stylesheet" href="./styles.css">
@@ -37,7 +37,7 @@
           <span class="eyebrow"><span class="status-dot"></span> Jó társaság. Rossz szóviccek.</span>
           <h1 class="hero-title">Ma este<br>mindent <span>bele.</span></h1>
           <p class="hero-lead">Mutasd, rajzold, magyarázd! Rövid, 2–3 szavas feladványok, kreatív csavarokkal és felnőttes humorral. Csak felnőtteknek.</p>
-          <div class="hero-facts"><span><strong>180</strong> feladvány</span><span><strong>2–6</strong> csapat</span><span><strong>1</strong> közös telefon</span></div>
+          <div class="hero-facts"><span><strong id="prompt-count">540</strong> feladvány</span><span><strong>2–6</strong> csapat</span><span><strong>1</strong> közös telefon</span></div>
         </div>
         <div class="hero-art" aria-hidden="true">
           <div class="orbit"></div><span class="art-spark art-spark-one">✳</span><span class="art-spark art-spark-two">✧</span>
@@ -63,14 +63,16 @@
           <div class="start-row"><button class="button button-primary" type="submit">Kezdődjön az este <svg aria-hidden="true"><use href="#i-arrow"/></svg></button><span class="helper" id="game-estimate">Kb. 10 perc, plusz a nevetés.</span></div>
         </form>
         <aside class="panel info-panel">
-          <div class="panel-heading"><h3>Mennyire legyen csípős?</h3><span class="tiny-star" aria-hidden="true">✳</span></div>
-          <p class="helper">Válasszatok a társaság hangulatához.</p>
-          <fieldset class="level-options" id="level-options"><legend class="sr-only">A feladványok erőssége</legend>
+          <div class="panel-heading"><h3>Válasszatok paklit.</h3><span class="tiny-star" aria-hidden="true">✳</span></div>
+          <label class="field pack-field"><span class="field-label">Milyen témák jöhetnek?</span><select id="pack" name="pack" form="setup-form"><option value="mixed">Vegyes · erősség szerint</option><option value="spicy" selected>Csak pikáns · 360 lap</option><option value="intimate">Szex témájú · 120 lap</option></select></label>
+          <p class="helper" id="pack-description">Flört, csábítás, kétértelmű helyzetek és hálószobai humor.</p>
+          <p class="field-label" id="level-help" hidden>A vegyes pakli erőssége</p>
+          <fieldset class="level-options" id="level-options" hidden><legend class="sr-only">A feladványok erőssége</legend>
             <label class="level-option"><input type="radio" name="level" value="warm" form="setup-form"><span class="level-emoji" aria-hidden="true">☀</span><span><span class="level-label">Bemelegítés</span><span class="level-description">Képtelen figurák, bulis helyzetek, nagy nevetések.</span></span></label>
             <label class="level-option"><input type="radio" name="level" value="spicy" form="setup-form" checked><span class="level-emoji" aria-hidden="true">♨</span><span><span class="level-label">Csípős <span class="mini-badge">KEDVENC</span></span><span class="level-description">Randik, flörtök és félreérthető helyzetek.</span></span></label>
             <label class="level-option"><input type="radio" name="level" value="bold" form="setup-form"><span class="level-emoji" aria-hidden="true">⚡</span><span><span class="level-label">Merész</span><span class="level-description">Pajzán célzások. Ennek már fele sem tréfa.</span></span></label>
           </fieldset>
-          <p class="helper deck-info" id="deck-info">120 feladvány · a lazább lapokkal együtt</p>
+          <p class="helper deck-info" id="deck-info">360 feladvány · önálló pakli</p>
           <div class="comfort-note"><span aria-hidden="true">♡</span><p>Az a jó játék, amiben mindenki jól érzi magát. Bármelyik lapot passzolhatjátok, pontlevonás nélkül.</p></div>
         </aside>
       </div>

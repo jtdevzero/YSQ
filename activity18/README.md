@@ -4,7 +4,10 @@ Magyar nyelvű, Activity-jellegű, egy közös eszközön játszható partiját�
 
 Játszható változat: https://jtdevzero.github.io/YSQ/activity18/
 
-- 180 egyedi, 2–3 szavas feladvány, három erősségi szint; a magasabb szintek a lazább lapokat is tartalmazzák.
+- 540 egyedi, 2–3 szavas feladvány: 60 bemelegítő, 180 csípős, 180 merész és 120 külön szex témájú kifejezés.
+- „Csak pikáns” pakli: 360 csípős és merész lap, bemelegítő feladványok nélkül. Ez az alapértelmezett pakli.
+- „Szex témájú” pakli: 120 külön kifejezés intimitásról, vágyról, szexualitásról és védekezésről.
+- „Vegyes” pakli: három erősség; a magasabb szintek a lazább lapokat is tartalmazzák. A külön szex témájú lapok nem kerülnek bele.
 - 2–6 csapat, 30/60/90 másodperces időkeret, csapatonként 3/5/8 kör.
 - Körülírás, mutogatás és rajzolás; kapcsolható feladattípusok.
 - Érintéses rajzvászon és a feladványt elrejtő csapatnézet.
@@ -12,7 +15,7 @@ Játszható változat: https://jtdevzero.github.io/YSQ/activity18/
 - Automatikus helyi mentés, szünet és visszavágó. Minden csapat ugyanannyi kört kap.
 - Nincs regisztráció, külső betűtípus, követőkód vagy szerveroldali adatkezelés.
 
-Példák az új pakliból: „Másnapos szuperhős”, „Eljegyzési hagymakarika”, „Csipkés alibi”. A mentett játékok megőrzik a korábbi paklijukat; az új feladványokat új játék indításával kapjátok meg.
+Példák: „Eljegyzési hagymakarika”, „Csipkés alibi”, illetve a külön csomagban „Nemi vágy”, „Szexuális előjáték”, „Vízbázisú síkosító”. A mentett játékok megőrzik a korábbi paklijukat; az új csomagokat új játék indításával választhatjátok ki.
 
 ## Indítás
 
@@ -44,4 +47,4 @@ A tesztek a pontozást, a határidőt, a szünetet, a visszavonást, a mentett �
 
 A böngésző `localStorage` tárában csak a csapatnevek, a beállítások és a játékállás szerepel. Az „Új játék” véglegesítése törli a mentett állást. Ha a helyi tárolás tiltva van, a játék mentés nélkül használható. A böngésző bezárása nem garantálja a folyamatban lévő kör megállítását: visszatéréskor az eredeti határidő számít. A Szünet gombbal állítsátok meg az órát.
 
-A 18+ jelölés önbevallásos korhatárnyilatkozat, nem személyazonosításon alapuló ellenőrzés. A feladványok felnőttes humorúak és kétértelműek, részletező szexuális leírások nélkül.
+A 18+ jelölés önbevallásos korhatárnyilatkozat, nem személyazonosításon alapuló ellenőrzés. A pikáns csomagok felnőttes humorúak és kétértelműek; a külön szex témájú pakli rövid kifejezéseket tartalmaz intimitásról, szexualitásról és védekezésről.

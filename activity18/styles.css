@@ -410,3 +410,7 @@ dialog.canvas-modal { width: min(960px, calc(100% - 24px)); }
 .canvas-modal .drawing-canvas { height: auto; aspect-ratio: 900 / 440; border-radius: 12px; }
 .canvas-modal .modal-actions { margin: 18px 0; }
 .canvas-modal .modal-content > .helper { margin-bottom: 0; }
+
+.pack-field { display: block; margin-bottom: 8px; }
+#pack-description { margin: 8px 0 16px; min-height: 36px; }
+#level-help { margin-top: 16px; }

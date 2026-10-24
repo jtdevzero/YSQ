@@ -1,5 +1,5 @@
 import { PROMPTS, LEVELS } from './prompts.js';
-import { MODES, COLORS, createGame, eligiblePrompts, currentTeamIndex, roundNumber, currentMode, roundPoints, remaining, reveal, start, pause, record, undo, finishRound, nextTurn, winners, restoreGame } from './game.js';
+import { MODES, COLORS, PACKS, createGame, eligiblePrompts, currentTeamIndex, roundNumber, currentMode, roundPoints, remaining, reveal, start, pause, record, undo, finishRound, nextTurn, winners, restoreGame } from './game.js';
 
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -60,8 +60,15 @@ function updateEstimate() {
 
 function updateLevel() {
   const level = $('input[name="level"]:checked').value;
+  const pack = $('#pack').value;
   $$('.level-option').forEach(el => el.classList.toggle('is-selected', el.querySelector('input').checked));
-  $('#deck-info').textContent = `${eligiblePrompts(PROMPTS, level).length} feladvány${level === 'warm' ? ' · jöhet a bemelegítés' : ' · a lazább lapokkal együtt'}`;
+  $('#level-options').hidden = pack !== 'mixed';
+  $('#level-help').hidden = pack !== 'mixed';
+  $('#pack-description').textContent = PACKS[pack].description;
+  $$('#pack option').forEach(option => { option.textContent = `${PACKS[option.value].name} · ${eligiblePrompts(PROMPTS, level, option.value).length} lap`; });
+  const note = pack === 'mixed' ? (level === 'warm' ? 'csak bemelegítő lapok' : 'a lazább lapokkal együtt') : 'önálló pakli';
+  $('#deck-info').textContent = `${eligiblePrompts(PROMPTS, level, pack).length} feladvány · ${note}`;
+  $('#prompt-count').textContent = PROMPTS.length;
 }
 
 function goToGame() {
@@ -78,7 +85,8 @@ function scoreBoard() {
 function sideBar() {
   const mode = MODES[currentMode(game)];
   const level = LEVELS.find(l => l.id === game.config.level);
-  return `<aside class="round-sidebar"><div class="panel"><span class="eyebrow">EBBEN A KÖRBEN</span><div class="round-points"><strong id="live-points">${roundPoints(game)}</strong><span>megszerzett pont</span></div><div class="log-list" id="live-log">${liveLog()}</div><p class="helper">Megfejtés +1 · Passz 0</p></div><div class="panel mini-rules"><span class="field-label">${esc(mode.name)}</span><p class="helper">${esc(mode.rule)}</p><p class="helper">${esc(level?.label || '')} pakli · ${game.config.duration} mp</p><p class="helper">A feladványt csak az előadó láthatja.</p></div></aside>`;
+  const packName = (game.config.pack ?? 'mixed') === 'mixed' ? level?.label : PACKS[game.config.pack].name;
+  return `<aside class="round-sidebar"><div class="panel"><span class="eyebrow">EBBEN A KÖRBEN</span><div class="round-points"><strong id="live-points">${roundPoints(game)}</strong><span>megszerzett pont</span></div><div class="log-list" id="live-log">${liveLog()}</div><p class="helper">Megfejtés +1 · Passz 0</p></div><div class="panel mini-rules"><span class="field-label">${esc(mode.name)}</span><p class="helper">${esc(mode.rule)}</p><p class="helper">${esc(packName || '')} pakli · ${game.config.duration} mp</p><p class="helper">A feladványt csak az előadó láthatja.</p></div></aside>`;
 }
 
 function liveLog() {
@@ -273,13 +281,14 @@ document.addEventListener('click', event => {
 
 $('#setup-form').addEventListener('submit', event => {
   event.preventDefault();
-  const config = { teams: $$('.team-input').map(input => input.value), duration: Number($('#duration').value), rounds: Number($('#rounds').value), level: $('input[name="level"]:checked').value, modes: $$('input[name="modes"]:checked').map(el => el.value) };
+  const config = { teams: $$('.team-input').map(input => input.value), duration: Number($('#duration').value), rounds: Number($('#rounds').value), level: $('input[name="level"]:checked').value, modes: $$('input[name="modes"]:checked').map(el => el.value), pack: $('#pack').value };
   try { game = createGame(config, PROMPTS); $('#setup-error').hidden = true; drawing = []; goToGame(); }
   catch (error) { $('#setup-error').textContent = error.message; $('#setup-error').hidden = false; }
 });
 $('#add-team').addEventListener('click', () => addTeam());
 $('#duration').addEventListener('change', updateEstimate);
 $('#rounds').addEventListener('change', updateEstimate);
+$('#pack').addEventListener('change', updateLevel);
 $$('input[name="level"]').forEach(input => input.addEventListener('change', updateLevel));
 $('#rules-button').addEventListener('click', () => {
   if (game?.phase === 'playing') { pause(game); render(); }

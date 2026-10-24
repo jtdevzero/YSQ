@@ -1,21 +1,25 @@
-# MaEste — titkosított forráscsomag
+# APP HASZNÁLATA
 
-Magyar film- és sorozatválasztó egyéni és páros estékhez.
+## [MaEste megnyitása →](https://jtdevzero.github.io/YSQ/maeste/)
 
-**[Az élő alkalmazás megnyitása →](https://maeste-filmrandi.turcsi.chatgpt.site)**
+Magyar film- és sorozatválasztó, amit a fenti linken közvetlenül használhatsz telefonon vagy számítógépen. Lapozz egyedül, vagy indíts páros estét, és oszd meg a meghívókódot a másik résztvevővel.
 
-A teljes forráskód a [maeste-source-encrypted.7z](maeste-source-encrypted.7z) jelszóval védett archívumban érhető el. A csomag tartalmazza az alkalmazást, a teszteket, az adatbázis-migrációkat és a dokumentációt. Az AES-256 titkosítás a tartalmat és a belső fájlneveket is védi.
+Az `index.html` indítóoldal automatikusan a működő alkalmazáshoz irányít át. Az oldalon látható **MaEste megnyitása** gomb ugyanezt a linket nyitja meg.
 
-## Megnyitás
+<details>
+<summary>Forráskód és ellenőrzőösszeg</summary>
 
-1. Töltsd le a `.7z` fájlt a GitHub fájloldalán a **Download raw** lehetőséggel.
-2. Nyisd meg **7-Zip** vagy **Keka** segítségével, és add meg a külön átadott jelszót.
-3. Kibontás után a csomag `maeste/README.md` fájljában találod az indítási és tesztelési útmutatót.
+A fejlesztéshez és saját telepítéshez a teljes forrás külön, titkosított csomagban érhető el. A csomag az alkalmazást, a teszteket, az adatbázis-migrációkat és a dokumentációt tartalmazza; AES-256 titkosítás védi a tartalmát és a belső fájlneveket.
 
-A jelszó külön kerül átadásra; nem szerepel ebben a repóban. A mellékelt `.sha256` fájl a letöltött archívum ellenőrzőösszegét tartalmazza.
+- [Titkosított forráscsomag — maeste-source-encrypted.7z](maeste-source-encrypted.7z)
+- [SHA-256 ellenőrzőösszeg](maeste-source-encrypted.7z.sha256)
 
-Telefonon a kibontáshoz titkosított 7z-archívumot támogató alkalmazás szükséges. A MaEste használatához elég megnyitni a fenti élő linket.
+A kibontási kulcsot a tulajdonos külön adja át. A csomag 7-Zip vagy Keka segítségével nyitható meg. Kibontás után a benne lévő `maeste/README.md` tartalmazza az indítási útmutatót.
 
-## GitHub és telepítés
+SHA-256:
 
-A GitHub a titkosított forrást nem tudja közvetlenül megjeleníteni, futtatni vagy CI-ben ellenőrizni. A nyilvános mappában az archívum, ez az útmutató és az ellenőrzőösszeg található. Az élő alkalmazás címe és működése változatlan; a telepítése továbbra is a Sites-on történik.
+```text
+8db438ed512c40d2c988139b2b66e73610991752695aead1d7da389268542408
+```
+
+</details>

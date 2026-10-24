@@ -398,15 +398,19 @@
     const index = state.deck.findIndex(movie => mediaKey(movie) === hold.key);
     return index < 0 ? null : { ...hold, index };
   }
-  function clearVoteCardState(card) {
+  function clearVoteCardState(card, preservePose = false) {
     if (!card) return;
     card.classList.remove('dragging', 'dragging-seen', 'dragging-no', 'dragging-yes', 'is-vote-saving', 'saving-no', 'saving-yes', 'is-seen-saving', 'is-burning', 'is-archiving', 'is-portaling');
-    card.style.pointerEvents = ''; card.style.transform = ''; card.style.opacity = ''; card.removeAttribute('aria-busy');
+    card.style.pointerEvents = ''; card.style.opacity = ''; card.removeAttribute('aria-busy');
+    if (!preservePose) {
+      card.style.transform = '';
+      for (const property of ['--choice-x', '--choice-y', '--choice-rotation']) card.style.removeProperty(property);
+    }
     $$('.swipe-stamp', card).forEach(stamp => { stamp.style.opacity = '0'; });
   }
   function markVoteSaving(card, choice) {
     if (!card?.isConnected) return;
-    clearVoteCardState(card); card.style.pointerEvents = 'none'; card.setAttribute('aria-busy', 'true');
+    clearVoteCardState(card, true); card.style.pointerEvents = 'none'; card.setAttribute('aria-busy', 'true');
     card.classList.add('is-vote-saving', choice === 'seen' ? 'is-seen-saving' : `saving-${choice}`);
   }
   async function playVoteAnimation(card, choice) {
@@ -415,7 +419,7 @@
     const stage = card.parentElement, originDeck = state.deck, originIndex = state.index, originSerial = state.discoverSerial;
     const originRoom = state.room ? { code: state.room.code, memberToken: state.room.memberToken, roundVersion: roomVersion() } : null;
     const contextCurrent = () => card.isConnected && card.parentElement === stage && $('.movie-card', stage) === card && (originRoom ? state.room?.code === originRoom.code && state.room?.memberToken === originRoom.memberToken && roomVersion() === originRoom.roundVersion : !state.room && state.deck === originDeck && state.index === originIndex && state.discoverSerial === originSerial);
-    clearVoteCardState(card); card.style.pointerEvents = 'none';
+    clearVoteCardState(card, true); card.style.pointerEvents = 'none';
     if (!contextCurrent() || document.hidden || motion.matches) return;
     const effects = document.createElement('div'); effects.setAttribute('aria-hidden', 'true');
     const append = (className, parent = effects, tag = 'div', text = '') => { const element = document.createElement(tag); element.className = className; if (text) element.textContent = text; parent.append(element); return element; };
@@ -437,10 +441,10 @@
       append('effect-caption', effects, 'span', 'A KÖNYVTÁRADBA KERÜLT');
     } else {
       effects.className = 'vote-effects portal-effects'; append('portal-halo'); append('portal-ring'); append('portal-core');
-      for (let index = 0; index < 14; index++) {
+      for (let index = 0; index < 6; index++) {
         const spark = append('portal-spark', effects, 'i');
-        spark.style.setProperty('--spark-x', `${Math.round(Math.random() * 100)}%`);
-        spark.style.setProperty('--spark-y', `${Math.round(Math.random() * 100)}%`);
+        spark.style.setProperty('--spark-x', `${72 + Math.round(Math.random() * 20)}%`);
+        spark.style.setProperty('--spark-y', `${30 + Math.round(Math.random() * 40)}%`);
         spark.style.setProperty('--spark-delay', `${Math.round(Math.random() * 120)}ms`);
         spark.style.setProperty('--spark-drift', `${Math.round((Math.random() - .5) * 60)}px`);
       }
@@ -464,7 +468,10 @@
         card.addEventListener('animationend', onEnd); card.addEventListener('animationcancel', onEnd);
         document.addEventListener('visibilitychange', onVisibility);
         if (motion.addEventListener) motion.addEventListener('change', onMotion); else motion.addListener?.(onMotion);
-        timeout = setTimeout(finish, 1100); stage.append(effects); card.classList.add(cardClass); frame = requestAnimationFrame(checkContext);
+        timeout = setTimeout(finish, 1100); stage.append(effects);
+        // The exit starts at the released pose; replace the inline drag transform
+        // and the saving state together before the browser paints another frame.
+        card.style.transform = ''; card.classList.add(cardClass); frame = requestAnimationFrame(checkContext);
         if (document.hidden || motion.matches || !contextCurrent()) finish();
       } catch { finish(); }
     });
@@ -528,13 +535,19 @@
   function attachSwipe() {
     const card = $('.movie-card'); if (!card) return;
     let startX = 0, startY = 0, active = false, dx = 0, dy = 0, axis = null, pointerId;
+    let pose = { x: 0, y: 0, rotation: 0 };
+    const setPose = (x, y, rotation) => {
+      pose = matchMedia('(prefers-reduced-motion: reduce)').matches ? { x: 0, y: 0, rotation: 0 } : { x, y, rotation: Math.max(-6, Math.min(6, rotation)) };
+      card.style.transform = `translate3d(${pose.x}px,${pose.y}px,0) rotate(${pose.rotation}deg)`;
+    };
     const reset = () => {
       card.classList.remove('dragging', 'dragging-seen', 'dragging-no', 'dragging-yes'); card.style.transform = '';
+      for (const property of ['--choice-x', '--choice-y', '--choice-rotation']) card.style.removeProperty(property);
       $$('.swipe-stamp', card).forEach(stamp => { stamp.style.opacity = '0'; });
     };
     card.addEventListener('pointerdown', event => {
       if (event.target.closest('button,a,input,select,textarea') || state.voting || state.busy || state.libraryBusy || state.autoSeenBusy || event.button !== 0 || !event.isPrimary) return;
-      startX = event.clientX; startY = event.clientY; dx = 0; dy = 0; axis = null; active = true; pointerId = event.pointerId;
+      startX = event.clientX; startY = event.clientY; dx = 0; dy = 0; axis = null; pose = { x: 0, y: 0, rotation: 0 }; active = true; pointerId = event.pointerId;
       try { card.setPointerCapture(pointerId); } catch { active = false; }
     });
     card.addEventListener('pointermove', event => {
@@ -549,12 +562,12 @@
       if (axis === 'y') {
         const down = Math.max(0, dy);
         card.classList.toggle('dragging-seen', down > 12); card.classList.remove('dragging-no', 'dragging-yes');
-        card.style.transform = `translate3d(${dx * .12}px,${Math.max(-30, Math.min(card.clientHeight * .35, dy * .5))}px,0) rotate(${dx / 70}deg)`;
+        setPose(Math.max(-20, Math.min(20, dx * .12)), Math.max(-30, Math.min(card.clientHeight * .35, dy * .5)), dx / 70);
         $('.swipe-stamp.seen', card).style.opacity = String(Math.min(1, down / 100));
         $('.swipe-stamp.yes', card).style.opacity = '0'; $('.swipe-stamp.no', card).style.opacity = '0';
       } else {
         card.classList.remove('dragging-seen'); card.classList.toggle('dragging-no', dx < -12); card.classList.toggle('dragging-yes', dx > 12);
-        card.style.transform = `translateX(${dx}px) rotate(${dx / 22}deg)`;
+        setPose(Math.max(-card.clientWidth * .6, Math.min(card.clientWidth * .6, dx)), Math.max(-12, Math.min(12, dy * .08)), dx / 28);
         $('.swipe-stamp.yes', card).style.opacity = String(Math.min(1, Math.max(0, dx / 90)));
         $('.swipe-stamp.no', card).style.opacity = String(Math.min(1, Math.max(0, -dx / 90)));
         $('.swipe-stamp.seen', card).style.opacity = '0';
@@ -565,9 +578,14 @@
       active = false;
       const choice = !cancelled && axis === 'y' && dy > Math.min(110, card.clientHeight * .2) ? 'seen'
         : !cancelled && axis === 'x' && Math.abs(dx) > Math.min(85, card.clientWidth * .23) ? (dx > 0 ? 'yes' : 'no') : null;
-      reset();
+      if (choice) {
+        card.style.setProperty('--choice-x', `${pose.x}px`);
+        card.style.setProperty('--choice-y', `${pose.y}px`);
+        card.style.setProperty('--choice-rotation', `${pose.rotation}deg`);
+        card.classList.remove('dragging', 'dragging-seen', 'dragging-no', 'dragging-yes');
+      } else reset();
       try { if (card.hasPointerCapture(pointerId)) card.releasePointerCapture(pointerId); } catch { /* Capture may already be released by the browser. */ }
-      if (choice) vote(choice);
+      if (choice) vote(choice).finally(() => { if (card.isConnected && !state.voting) reset(); });
     };
     card.addEventListener('pointerup', event => release(event));
     card.addEventListener('pointercancel', event => release(event, true));

@@ -1,25 +1,17 @@
-# APP HASZNÁLATA
+# MaEste — filmek és sorozatok egyedül vagy ketten
 
-## [MaEste megnyitása →](https://jtdevzero.github.io/YSQ/maeste/)
+**[Alkalmazás megnyitása](https://jtdevzero.github.io/YSQ/maeste/)**
 
-Magyar film- és sorozatválasztó, amit a fenti linken közvetlenül használhatsz telefonon vagy számítógépen. Lapozz egyedül, vagy indíts páros estét, és oszd meg a meghívókódot a másik résztvevővel.
+Nyisd meg a linket, és add meg a tulajdonostól kapott közös alkalmazásjelszót. ChatGPT- vagy GitHub-fiók nem szükséges. A webapp közvetlenül a GitHub Pages címén fut.
 
-Az `index.html` indítóoldal automatikusan a működő alkalmazáshoz irányít át. Az oldalon látható **MaEste megnyitása** gomb ugyanezt a linket nyitja meg.
+Választhatsz filmeket vagy sorozatokat, streaming szolgáltatókat vagy a Bármelyik lehetőséget. Egyedül listát készíthetsz; páros módban a meghívólinkkel csatlakozhattok ugyanahhoz a szobához. A másik résztvevőnek is szüksége van az alkalmazásjelszóra.
 
-<details>
-<summary>Forráskód és ellenőrzőösszeg</summary>
+Balra: kihagyás és égés; lefelé: már láttam és könyvtár; jobbra: jöhet és zöld kapu. A Kilépés gomb lezárja az adott böngészőlap hozzáférését. A listák megmaradnak az eszközön. A hozzáférés legfeljebb 12 óráig él, utána új belépés szükséges.
 
-A fejlesztéshez és saját telepítéshez a teljes forrás külön, titkosított csomagban érhető el. A csomag az alkalmazást, a teszteket, az adatbázis-migrációkat és a dokumentációt tartalmazza; AES-256 titkosítás védi a tartalmát és a belső fájlneveket.
+A filmadatokat a szerver a TMDB-től kéri. A jelszóellenőrzés és a TMDB-hitelesítés szerveroldalon történik. A nyilvános böngészős fájlok nem tartalmaznak szerveres titkokat. A közös jelszó belépési védelem; a helyi listákat és a letöltött JSON-mentéseket nem titkosítja.
 
-- [Titkosított forráscsomag — maeste-source-encrypted.7z](maeste-source-encrypted.7z)
-- [SHA-256 ellenőrzőösszeg](maeste-source-encrypted.7z.sha256)
+## Titkosított forrásmentés
 
-A kibontási kulcsot a tulajdonos külön adja át. A csomag 7-Zip vagy Keka segítségével nyitható meg. Kibontás után a benne lévő `maeste/README.md` tartalmazza az indítási útmutatót.
+A `maeste-source-encrypted.7z` külön jelszóval titkosított forrásmentés. A forrásmentés jelszava és az alkalmazás belépési jelszava különböző. A jelszavakat külön, privát csatornán adja át a tulajdonos; egyik sem szerepel ebben a repóban. A mellékelt `.sha256` fájl a letöltés sértetlenségét ellenőrzi.
 
-SHA-256:
-
-```text
-8db438ed512c40d2c988139b2b66e73610991752695aead1d7da389268542408
-```
-
-</details>
+A repó eredeti, gyökérkönyvtárban található projektje változatlanul megmarad.

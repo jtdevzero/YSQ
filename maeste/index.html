@@ -2,39 +2,101 @@
 <html lang="hu">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#151716">
-  <meta name="description" content="Nyisd meg a MaEste film- és sorozatválasztó alkalmazást, egyedül vagy párosan.">
-  <meta http-equiv="refresh" content="0; url=https://maeste-filmrandi.turcsi.chatgpt.site">
-  <title>MaEste – App megnyitása</title>
-  <style>
-    :root { color-scheme: dark; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #f3efe3; background: #151716; }
-    * { box-sizing: border-box; }
-    body { margin: 0; min-height: 100vh; min-height: 100svh; display: grid; place-items: center; padding: 30px 20px; }
-    main { width: 100%; max-width: 560px; padding: clamp(26px, 6vw, 48px); border: 1px solid #42483d; border-radius: 18px; background: #1b1e1c; }
-    .brand { display: flex; align-items: center; gap: 12px; font-size: 26px; font-weight: 750; letter-spacing: -1px; }
-    .symbol { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 10px; background: #e6b875; color: #151716; font-family: Georgia, serif; font-size: 29px; font-weight: bold; }
-    .dot { color: #e6b875; }
-    .eyebrow { margin: 38px 0 13px; color: #bdc8a5; font-size: 11px; font-weight: 650; letter-spacing: 1.6px; }
-    h1 { margin: 0 0 19px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(35px, 8vw, 48px); font-weight: 400; letter-spacing: -1.3px; line-height: 1.12; }
-    p { margin: 0; color: #c4c9ba; font-size: 15px; line-height: 1.8; }
-    .launch { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-top: 29px; padding: 16px 19px; border: 2px solid #e6b875; border-radius: 8px; background: #e6b875; color: #151716; font-size: 15px; font-weight: 750; text-decoration: none; }
-    .launch:hover { background: #f0c98f; border-color: #f0c98f; }
-    .launch:focus-visible { outline: 3px solid #f3efe3; outline-offset: 5px; }
-    .launch span { font-size: 21px; }
-    .fallback { margin-top: 16px; color: #aeb7a1; font-size: 12px; }
-    .closing { margin-top: 31px; padding-top: 20px; border-top: 1px solid #42483d; color: #bdc8a5; font-family: Georgia, "Times New Roman", serif; font-size: 15px; font-style: italic; }
-  </style>
+  <meta name="maeste-api-origin" content="https://maeste-filmrandi.turcsi.chatgpt.site">
+  <meta name="description" content="Találjátok meg a ma esti filmet vagy sorozatot. Lapozzatok egyedül vagy ketten, válasszatok streaming szolgáltatót, és jöhet a közös este.">
+  <title>MaEste — Egy jó film. Együtt.</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./backup.js" defer></script>
+  <script src="./app.js" defer></script>
 </head>
 <body>
-  <main aria-labelledby="launch-title">
-    <div class="brand"><span class="symbol" aria-hidden="true">m</span><span>MaEste<span class="dot">.</span></span></div>
-    <p class="eyebrow">FILMEK ÉS SOROZATOK · EGYÜTT VAGY EGYEDÜL</p>
-    <h1 id="launch-title">Mindjárt kezdődik.</h1>
-    <p>Ez az oldal automatikusan átirányít a működő MaEste alkalmazáshoz.</p>
-    <a class="launch" href="https://maeste-filmrandi.turcsi.chatgpt.site">MaEste megnyitása <span aria-hidden="true">↗</span></a>
-    <p class="fallback">Ha az átirányítás nem indul el, a fenti gombbal megnyithatod az appot.</p>
-    <p class="closing">Egy jó történet. Együtt.</p>
-  </main>
+  <section id="access-gate" class="access-gate" aria-labelledby="access-title">
+    <div class="access-card">
+      <a class="brand" href="./" aria-label="MaEste kezdőlap"><span class="brand-symbol" aria-hidden="true">m<span>✦</span></span><span>MaEste<span class="brand-dot">.</span></span></a>
+      <div class="eyebrow">A TI MOZIESTÉTEK</div>
+      <h1 id="access-title">Egy jó film.<br><em>Egy jelszónyira.</em></h1>
+      <p class="access-description">Add meg a MaEste közös jelszavát, és kezdődhet a válogatás.</p>
+      <p id="access-status" class="access-status" role="status" aria-live="polite">Belépés ellenőrzése…</p>
+      <form id="access-form" hidden>
+        <label class="field-label" for="access-password">Alkalmazásjelszó</label>
+        <input id="access-password" name="password" type="password" autocomplete="current-password" maxlength="256" required aria-describedby="access-error" placeholder="A közös jelszavatok">
+        <button id="access-submit" class="primary-button" type="submit">Belépés <span aria-hidden="true">→</span></button>
+      </form>
+      <p id="access-error" class="inline-error" role="alert" hidden></p>
+      <button id="access-retry" class="secondary-button" type="button" hidden>Újrapróbálom →</button>
+      <p class="access-note">A jelszót a meghívót küldő személytől kérheted el.</p>
+      <noscript><p class="inline-error">A MaEste használatához engedélyezd a JavaScriptet a böngésződben.</p></noscript>
+    </div>
+  </section>
+  <div class="app-shell" hidden>
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="MaEste kezdőlap"><span class="brand-symbol" aria-hidden="true">m<span>✦</span></span><span>MaEste<span class="brand-dot">.</span></span></a>
+      <span class="top-tagline">EGY JÓ FILM. EGYÜTT.</span>
+      <div class="top-actions"><button id="seen-open" class="icon-text seen-header-button" type="button" aria-label="Már látott filmjeim megnyitása"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg><span class="seen-header-label">Már láttam</span><span class="count-badge" id="seen-count">0</span></button><button id="filters-toggle" class="icon-text mobile-only" type="button"><span aria-hidden="true">☷</span> <span class="mobile-action-label">Szűrők</span></button><button id="favorites-open" class="icon-text" type="button"><span aria-hidden="true">♡</span> <span id="list-label">Listám</span> <span class="count-badge" id="favorites-count">0</span></button></div>
+    </header>
+
+    <div class="access-session"><button id="access-logout" type="button" class="text-button" hidden>Kilépés az alkalmazásból →</button></div>
+    <div class="workspace">
+      <aside id="filters-panel" class="filters-panel" aria-label="A moziest beállításai">
+        <div class="mobile-panel-head"><strong>A moziested</strong><button type="button" id="filters-close" class="close-button" aria-label="Szűrők bezárása">×</button></div>
+        <div class="intro"><div class="eyebrow"><span class="tiny-star">✦</span> MA ESTE RÁÉRTEK</div><h1>Kevesebb keresés.<br><em>Több mozi.</em></h1><p>A film megvan. Már csak meg kell találnotok egymást.</p></div>
+
+        <div class="section-label">01 <span>EGYEDÜL VAGY EGYÜTT?</span></div>
+        <div class="mode-tabs" role="group" aria-label="Játékmód"><button type="button" id="solo-mode" class="mode-tab active" aria-pressed="true"><span aria-hidden="true">◉</span> Egyedül</button><button type="button" id="pair-mode" class="mode-tab" aria-pressed="false"><span aria-hidden="true">♡</span> Párosan</button></div>
+        <div id="room-summary" class="room-summary" hidden><span class="live-dot"></span><span>Szoba: <strong id="room-code-small"></strong></span><button type="button" id="room-info">Megnyitás →</button></div>
+
+        <form id="filters-form">
+          <fieldset id="filter-fields">
+            <legend class="sr-only">Filmek és sorozatok szűrői</legend><div class="taste-heading">MIBŐL VÁLOGASSUNK?</div><div class="taste-tabs" role="group" aria-label="Ajánlás típusa"><button type="button" id="taste-recommended" class="taste-tab" aria-pressed="false">✦ Nekem ajánlott</button><button type="button" id="taste-popular" class="taste-tab active" aria-pressed="true">Népszerű</button></div><p id="taste-hint" class="field-hint">Népszerű filmek az általad választott szűrőkkel.</p>
+            <div class="section-label">02 <span>HOL NÉZNÉTEK?</span><span class="region-tag">HU</span></div>
+            <div id="provider-options" class="provider-options" aria-label="Streaming szolgáltatók"><button type="button" class="provider-chip selected" data-provider="any" aria-pressed="true">✦ Bármelyik</button><span class="subtle loading-providers">Szolgáltatók betöltése…</span></div>
+            <p class="field-hint">Több szolgáltatót is választhatsz. Előfizetéses kínálatra szűrünk, Magyarországon.</p>
+            <div class="section-label">03 <span>MILYEN ESTÉTEK VAN?</span></div>
+            <div class="mood-options" role="group" aria-label="Hangulat"><button type="button" data-mood="" class="mood-chip selected" aria-pressed="true">Bármi jöhet</button><button type="button" data-mood="35" class="mood-chip" aria-pressed="false">☀ Könnyed</button><button type="button" data-mood="53" class="mood-chip" aria-pressed="false">ϟ Izgalmas</button><button type="button" data-mood="10749" class="mood-chip" aria-pressed="false">♡ Romantikus</button><button type="button" data-mood="878" class="mood-chip" aria-pressed="false">✧ Más világ</button></div>
+            <label class="field-label" for="genre-select">Vagy válassz műfajt</label><select id="genre-select"><option value="">Minden műfaj</option></select>
+            <details class="exclusion-filter"><summary>Műfajok, amiket most kihagynék</summary><p id="exclusion-note" class="field-hint">A kizárt műfajok nem kerülnek a válogatásba. Többet is választhatsz.</p><div id="excluded-genres" class="excluded-genres" role="group" aria-label="Kizárt műfajok"></div></details>
+            <div class="field-row"><div><label id="runtime-label" class="field-label" for="runtime-select">Ennyi időnk van</label><select id="runtime-select"><option value="">Bármennyi</option><option value="90">Legfeljebb 90 perc</option><option value="120">Legfeljebb 2 óra</option><option value="150">Legfeljebb 2,5 óra</option></select></div><div><label class="field-label" for="rating-select">Értékelés</label><select id="rating-select"><option value="0">Bármilyen</option><option value="6">6+ / 10</option><option value="7">7+ / 10</option><option value="8">8+ / 10</option></select></div></div>
+            <div class="year-fields field-row"><div><label id="year-from-label" class="field-label" for="year-from">Évjárat ettől</label><input id="year-from" type="number" inputmode="numeric" min="1870" max="2031" step="1" placeholder="Pl. 2000" aria-describedby="year-hint"></div><div><label id="year-to-label" class="field-label" for="year-to">Évjárat eddig</label><input id="year-to" type="number" inputmode="numeric" min="1870" max="2031" step="1" placeholder="Pl. 2026" aria-describedby="year-hint"></div></div><p id="year-hint" class="field-hint">Üresen nincs évkorlát. Sorozatnál az első bemutató évét vesszük figyelembe.</p><p id="filter-validation" class="inline-error" role="alert" hidden></p>
+          </fieldset>
+          <button id="apply-filters" type="submit" class="primary-button"><span>Mutasd a filmeket</span><span aria-hidden="true">→</span></button>
+          <p id="filter-lock-note" class="field-hint" hidden>A közös válogatás szűrői rögzítve vannak. Ha nincs közös találat, a kör végén együtt folytathatjátok egy új válogatással.</p>
+        </form>
+        <div class="sidebar-footer"><span aria-hidden="true">✷</span><p>Egy húzás közelebb<br>a ma esti filmhez.</p></div>
+      </aside>
+      <div id="filters-backdrop" class="sheet-backdrop" hidden></div>
+
+      <main id="main-content" class="discovery">
+        <div class="discovery-header"><div><div class="eyebrow">A MA ESTI VÁLOGATÁS</div><h2>Na, ehhez mit szólsz?</h2></div><span id="deck-counter" class="deck-counter">— / —</span></div>
+        <section class="quick-start" aria-label="Moziest indítása"><div class="quick-start-controls"><div class="quick-mode-buttons" role="group" aria-label="Játék módja"><button id="quick-solo" type="button" aria-pressed="true"><span aria-hidden="true">◉</span> Egyedül</button><button id="quick-pair" type="button" aria-pressed="false"><span aria-hidden="true">♡</span> Párosan</button></div><div class="media-tabs" role="group" aria-label="Mit néznétek?"><button id="media-movie" type="button" data-media-type="movie" aria-pressed="true">Filmek</button><button id="media-tv" type="button" data-media-type="tv" aria-pressed="false">Sorozatok</button></div></div><form id="title-search-form" class="title-search-form" role="search"><label class="sr-only" for="title-search-input">Film vagy sorozat keresése cím szerint</label><input id="title-search-input" type="search" minlength="2" maxlength="100" placeholder="Keress egy film címére…" autocomplete="off" aria-describedby="title-search-validation"><button id="title-search-submit" type="submit" class="secondary-button">Keresés <span aria-hidden="true">⌕</span></button></form><p id="title-search-validation" class="search-validation" role="alert" hidden></p><p class="quick-start-note">Válasszatok filmet vagy sorozatot, egyedül vagy ketten.</p></section>
+        <p id="recommendation-status" class="recommendation-status" hidden></p><div id="pair-banner" class="pair-banner" hidden><div><span class="live-dot"></span><strong id="pair-status">Várjuk a párodat…</strong><span id="pair-progress"></span></div><button id="share-room" type="button">Kód másolása <span aria-hidden="true">→</span></button></div>
+        <div id="connection-banner" class="connection-banner" hidden><p id="connection-status" class="connection-copy" role="status" data-state="connected"></p><button id="connection-retry" type="button" class="secondary-button" hidden>Újracsatlakozás</button></div>
+        <section id="decision-banner" class="decision-banner" aria-label="Közös filmválasztás" hidden><div><span class="decision-banner-star" aria-hidden="true">✦</span><div><strong id="decision-banner-title">Három közös igen. Egy ma esti film.</strong><p id="decision-banner-note"></p></div></div><button id="decision-open" type="button" class="secondary-button">Döntőkör →</button></section><div class="screen-layout">
+          <section class="swipe-area" aria-label="Filmajánló">
+            <div id="card-stage" class="card-stage"><div class="state-card"><div class="loading-reel" aria-hidden="true">✦</div><h3>Előkészítjük a moziestet…</h3><p>Már érkeznek a filmek.</p></div></div>
+            <div id="movie-actions" class="movie-actions" hidden><button type="button" id="undo-vote" class="action-small" title="Előző döntés visszavonása" aria-label="Előző döntés visszavonása" disabled><span aria-hidden="true">↶</span></button><button type="button" id="vote-no" class="vote-button vote-no" aria-label="Film kihagyása"><span aria-hidden="true">×</span><small>Kihagyom</small></button><button type="button" id="vote-seen" class="vote-button vote-seen" aria-label="Már láttam ezt a filmet"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg><small>Már láttam</small></button><button type="button" id="vote-yes" class="vote-button vote-yes" aria-label="Tetszik ez a film"><span aria-hidden="true">♡</span><small>Jöhet!</small></button><span class="action-spacer" aria-hidden="true"></span></div>
+            <div id="action-error" class="inline-error action-error" role="alert" hidden><span id="action-error-text"></span><button type="button" class="error-inline-retry" data-action="retry-seen">Újrapróbálom →</button></div><p id="gesture-hint" class="gesture-hint" hidden>Balra: kihagyom · Jobbra: jöhet · Lefelé: már láttam.<span>Billentyűzeten a nyilakkal is választhatsz.</span></p>
+          </section>
+          <aside class="night-notes" aria-label="A moziested összefoglalója"><div class="note-heading"><span class="tiny-star">✦</span><span>A TE MOZIESTED</span></div><div id="night-description" class="night-description">Egy jó filmhez<br><em>csak egy igen kell.</em></div><div class="ticket-rule"></div><dl class="night-facts"><div><dt>Helyszín</dt><dd>Otthon, a kanapén</dd></div><div><dt>Válogatás</dt><dd id="summary-type">Filmek</dd></div><div><dt>Szolgáltatók</dt><dd id="summary-providers">Bármelyik</dd></div><div><dt>Hangulat</dt><dd id="summary-genre">Bármi jöhet</dd></div><div><dt>Kizárt műfajok</dt><dd id="summary-excluded">Nincs</dd></div><div><dt>Évjárat</dt><dd id="summary-years">Bármelyik</dd></div><div><dt>Játékidő</dt><dd id="summary-runtime">Ráérünk</dd></div></dl><div class="ticket-rule"></div><div class="mini-list-heading"><span id="shortlist-title">EDDIG TETSZIK</span><strong id="shortlist-count">0</strong></div><div id="shortlist" class="shortlist"><p class="empty-mini">A neked tetsző filmek itt gyűlnek. Jöhet az első?</p></div><button id="random-choice" class="text-button" type="button" disabled>Válassz helyettem <span aria-hidden="true">→</span></button><span class="ticket-cut ticket-cut-left"></span><span class="ticket-cut ticket-cut-right"></span></aside>
+        </div>
+        <footer class="main-footer"><div class="footer-brand">A jó film közös ügy.</div><p>Filmadatok: <a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer">TMDB</a> · Elérhetőség: <a href="https://www.justwatch.com/hu" target="_blank" rel="noopener noreferrer">JustWatch</a></p><p class="attribution">This product uses the TMDB API but is not endorsed or certified by TMDB.</p></footer>
+      </main>
+    </div>
+  </div>
+
+  <dialog id="room-dialog" class="modal room-dialog"><div class="dialog-top"><span class="eyebrow">KETTEN MÉG JOBB</span><button type="button" class="close-button" data-close-dialog aria-label="Ablak bezárása">×</button></div><div id="room-create-content"><h2>Közös este.<br><em>Közös kedvencek.</em></h2><p class="dialog-description">Külön lapoztok. Ha mindketten igent mondtok, megvan a közös találat.</p><label class="field-label" for="player-name">Hogy szólíthatunk?</label><input id="player-name" maxlength="30" autocomplete="given-name" placeholder="A keresztneved" value=""><button type="button" id="create-room" class="primary-button">Új moziest indítása <span aria-hidden="true">→</span></button><p class="field-hint">Az új szobában az aktuális filmszűrőid érvényesek.</p><div class="or-divider"><span>vagy csatlakozz</span></div><label class="field-label" for="join-code">Meghívókód</label><div class="join-row"><input id="join-code" maxlength="8" placeholder="Pl. A7B9C2D4" autocomplete="off" autocapitalize="characters" spellcheck="false"><button id="join-room" type="button" class="secondary-button">Csatlakozom →</button></div></div><div id="room-active-content" hidden><h2>A ti<br><em>moziestétek.</em></h2><p class="dialog-description">Küldd el a kódot vagy a meghívólinket a párodnak.</p><div id="room-code-large" class="room-code-large"></div><button id="copy-invite" class="primary-button" type="button">Meghívólink másolása <span aria-hidden="true">→</span></button><div id="room-members" class="room-members"></div><button id="leave-room" type="button" class="text-button danger-text">Kilépés a szobából</button></div><p id="room-error" class="inline-error" role="alert" hidden></p></dialog>
+
+  <dialog id="search-dialog" class="modal list-dialog search-dialog" aria-labelledby="search-title"><div class="dialog-top"><span id="search-type-label" class="eyebrow">CÍM SZERINTI KERESÉS</span><button type="button" class="close-button" data-close-dialog aria-label="Keresés bezárása">×</button></div><h2 id="search-title">Találatok</h2><p class="search-catalog-note">Itt a teljes katalógusban keresel. A válogatás szolgáltató-, évjárat- és műfajszűrői nem szűkítik a találatokat.</p><p id="search-status" class="search-status" role="status" aria-live="polite"></p><div id="search-results" class="search-results"></div><button id="search-more" type="button" class="secondary-button search-pagination" hidden>További találatok →</button></dialog>
+
+  <dialog id="favorites-dialog" class="modal list-dialog"><div class="dialog-top"><span class="eyebrow" id="favorites-eyebrow">A TE VÁLOGATÁSOD</span><button type="button" class="close-button" data-close-dialog aria-label="Lista bezárása">×</button></div><h2 id="favorites-title">Ezt még megnézném.</h2><div class="list-tools"><p id="favorites-description">A kedvenceid ezen az eszközön maradnak meg.</p><button id="favorites-random" type="button" class="secondary-button">Sorsolj egyet ✦</button></div><div class="backup-controls"><div><strong>Vidd magaddal a listáidat</strong><p>Mentsd le a kedvenceidet és a már látott filmeket, sorozatokat. A fájlból másik eszközön is visszaállíthatod őket.</p></div><button id="backup-export" type="button" class="secondary-button">Listák mentése ↓</button><button id="backup-import" type="button" class="secondary-button">Visszaállítás ↑</button><input id="backup-file" type="file" accept="application/json,.json" aria-label="MaEste listamentés kiválasztása" hidden></div><p id="backup-status" class="backup-status" role="status" aria-live="polite" hidden></p><div id="favorites-list" class="favorites-list"></div></dialog>
+
+  <dialog id="seen-dialog" class="modal list-dialog"><div class="dialog-top"><span class="eyebrow">A MÁR LÁTOTT TÖRTÉNETEID</span><button type="button" class="close-button" data-close-dialog aria-label="Látott filmek bezárása">×</button></div><h2>Ezek már megvoltak.</h2><p id="seen-storage-note" class="library-storage-note"></p><div id="seen-library-error" class="inline-error" role="alert" hidden></div><button type="button" id="seen-sync" class="text-button" hidden>Lista frissítése →</button><div id="seen-list" class="favorites-list"></div></dialog>
+  <dialog id="decision-dialog" class="modal decision-dialog"><div class="dialog-top"><span class="eyebrow">A MA ESTI DÖNTŐKÖR</span><button type="button" class="close-button" data-close-dialog aria-label="Döntőkör bezárása">×</button></div><div id="decision-content"></div><p id="decision-error" class="inline-error" role="alert" hidden></p></dialog>
+  <dialog id="details-dialog" class="modal details-dialog"><button type="button" class="close-button detail-close" data-close-dialog aria-label="Filmrészletek bezárása">×</button><div id="details-content"></div></dialog>
+  <dialog id="match-dialog" class="modal match-dialog"><div class="dialog-top"><span class="eyebrow">EZ BIZONY KÖZÖS IGEN</span><button type="button" class="close-button" data-close-dialog aria-label="Találat bezárása">×</button></div><div class="match-star" aria-hidden="true">✦</div><h2>Megvan a<br><em>közös nevező.</em></h2><div id="match-content"></div><button type="button" id="match-continue" class="primary-button">Nézzünk még párat <span aria-hidden="true">→</span></button></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 </body>
 </html>

@@ -4,13 +4,15 @@ Magyar nyelvű, Activity-jellegű, egy közös eszközön játszható partiját�
 
 Játszható változat: https://jtdevzero.github.io/YSQ/activity18/
 
-- 180 egyedi feladvány, három erősségi szint; a magasabb szintek a lazább lapokat is tartalmazzák.
+- 180 egyedi, 2–3 szavas feladvány, három erősségi szint; a magasabb szintek a lazább lapokat is tartalmazzák.
 - 2–6 csapat, 30/60/90 másodperces időkeret, csapatonként 3/5/8 kör.
 - Körülírás, mutogatás és rajzolás; kapcsolható feladattípusok.
 - Érintéses rajzvászon és a feladványt elrejtő csapatnézet.
 - Megfejtésenként 1 pont, büntetés nélküli passz, utolsó lap visszavonása.
 - Automatikus helyi mentés, szünet és visszavágó. Minden csapat ugyanannyi kört kap.
 - Nincs regisztráció, külső betűtípus, követőkód vagy szerveroldali adatkezelés.
+
+Példák az új pakliból: „Másnapos szuperhős”, „Eljegyzési hagymakarika”, „Csipkés alibi”. A mentett játékok megőrzik a korábbi paklijukat; az új feladványokat új játék indításával kapjátok meg.
 
 ## Indítás
 

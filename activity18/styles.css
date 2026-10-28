@@ -455,3 +455,34 @@ dialog.canvas-modal { width: min(960px, calc(100% - 24px)); }
 .award-summary > div { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); padding: 6px 0; }
 .award-summary strong { color: var(--lime); }
 @media (max-width: 430px) { .team-row { grid-template-columns: 29px minmax(0, 1fr) 27px; } .team-member-field > span { font-size: 9px; } }
+
+.difficulty-field { display: block; margin-top: 18px; }
+.twist-options { border: 0; padding: 0; margin: 23px 0; min-width: 0; }
+.twist-option { display: flex; align-items: flex-start; gap: 11px; padding: 14px; margin-top: 9px; border: 1px solid var(--line); border-radius: 12px; cursor: pointer; }
+.twist-option:has(input:checked) { background: #bb99ff0c; border-color: #bb99ff88; }
+.twist-option input { flex-shrink: 0; accent-color: var(--lilac); margin-top: 4px; }
+.twist-option strong { display: block; font-size: 13px; }
+.twist-option small { display: block; color: var(--muted); font-size: 11px; line-height: 1.6; margin-top: 4px; }
+.custom-editor { padding: 17px; margin: 18px 0; border: 1px solid #bb99ff55; border-radius: 14px; background: #bb99ff06; }
+.custom-editor h4 { margin: 0 0 14px; font-size: 15px; }
+.custom-editor textarea { display: block; width: 100%; min-height: 160px; resize: vertical; padding: 12px; margin-top: 7px; font: inherit; font-size: 13px; line-height: 1.7; border: 1px solid var(--line); border-radius: 10px; color: var(--text); background: var(--bg); }
+.custom-editor .settings-grid { margin-top: 13px; }
+.custom-editor .mode-options { margin: 17px 0; }
+.import-label { position: relative; cursor: pointer; }
+.import-label:focus-within { outline: 3px solid var(--lilac); outline-offset: 3px; }
+.challenge-card { margin: 16px 0; padding: 14px 17px; border: 1px solid #ffb79c77; border-radius: 12px; background: #ffb79c0b; text-align: left; }
+.challenge-card strong { color: var(--peach); font-size: 10px; letter-spacing: 1px; }
+.challenge-card p { margin: 6px 0 0; font-size: 13px; line-height: 1.6; }
+.prompt-part { display: block; }
+.difficulty-badge { display: block; width: fit-content; margin: 10px auto 0; padding: 3px 8px; border: 1px solid #40502055; border-radius: 100px; color: #405020; font-size: 10px; font-weight: 650; letter-spacing: 0; line-height: 1.4; }
+.pair-plus { display: block; margin: 13px 0; font-size: 24px; font-weight: 500; color: #405020; }
+.paired-card .prompt-word { font-size: clamp(23px, 3vw, 33px); }
+.pair-rule { max-width: 400px; margin: 18px auto 0; font-size: 11px; line-height: 1.6; color: #405020; }
+.mode-card[data-mode="reverse"] { border-color: #ffb79c66; background: #ffb79c0a; }
+#offline-status { max-width: 360px; margin: 4px 0 0; font-size: 10px; }
+@media (max-width: 430px) {
+  .custom-editor { padding: 14px; }
+  .custom-editor textarea, .team-input, .team-players, select { font-size: 16px; }
+  .paired-card .prompt-word { font-size: 25px; }
+  .prompt-meta { flex-wrap: wrap; gap: 6px; }
+}

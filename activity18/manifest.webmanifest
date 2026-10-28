@@ -1,0 +1,15 @@
+{
+  "id": "./",
+  "name": "Éjfél után · Activity 18+",
+  "short_name": "Éjfél után",
+  "description": "Magyar Activity-partijáték felnőtteknek, egy közös eszközön.",
+  "lang": "hu",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#17131f",
+  "theme_color": "#17131f",
+  "icons": [
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

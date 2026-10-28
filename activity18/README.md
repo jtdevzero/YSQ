@@ -14,10 +14,16 @@ Játszható változat: https://jtdevzero.github.io/YSQ/activity18/
 - 2–6 csapat, 30/60/90 másodperces időkeret, csapatonként 3/5/8 kör.
 - Automatikus előadóváltás: csapatonként megadható 2–12 játékos neve, a sorrend körönként lép. Nevek nélkül az 1. és 2. játékost váltja. Több játékosnál, mint körnél nem mindenki kerül sorra.
 - Nyílt kör: mindenki találgathat az előadón kívül. Alapból az utolsó teljes kör minden csapatfordulója nyílt; minden körre bekapcsolható vagy kikapcsolható. A Megvan gomb megállítja az órát, a házigazda kijelöli a megfejtő csapatot, majd a játék folytatódik. A pontválasztás menthető, megszakítható és visszavonható.
+- Fordított Activity: a kijelölt játékos találgat, a saját csapat többi tagja együtt mutogat. A mutogatáshoz alkalmas lapokat használja; ezeken a lapokon a nyílt pontozás kikapcsol. Szerepcserekor külön felfedés védi a lapot a találgatók elől. A szerepátadás alatt az idő tovább telik.
+- Káoszkör: kapcsolható, módhoz illő extra szabály minden lapnál, például legfeljebb öt szó, ülve mutogatás vagy rajzolás ügyetlenebb kézzel. A szabály visszavonáskor és újratöltéskor is megmarad.
+- Kétlapos kihívás: két különböző, az aktuális módhoz illő lapot kell egy közös jelenetben vagy rajzban előadni. A teljes pár megfejtése 1 pont, passz 0; visszavonás és mentés mindkét lapot megőrzi. Legalább két megfelelő lap szükséges minden kijelölt módhoz.
+- Külön nehézségszűrés: mind a 840 lap önálló könnyű/közepes/nehéz besorolást kapott, a pikánsságtól függetlenül. A témaszűréssel együtt működik.
+- Saját pakli: 1–200 saját, soronként 2–8 szavas feladvány, választható módbesorolással és nehézséggel. Soronkénti felülírás: `Titkos randi | könnyű`. Helyi szerkesztőmentés, JSON-export/import és egyszerű szövegfájl-import. A folyamatban lévő játék és a visszavágó megőrzi az induláskori paklit.
 - Körülírás, mutogatás és rajzolás; alapból minden megfejtés vagy passz után vált a kijelölt típusok között. A körönkénti váltás külön választható.
 - Érintéses rajzvászon és a feladványt elrejtő csapatnézet.
 - Megfejtésenként 1 pont, büntetés nélküli passz, utolsó lap visszavonása.
 - Automatikus helyi mentés, szünet és visszavágó. Minden csapat ugyanannyi kört kap.
+- Offline/PWA támogatás: az „Offline játékra kész” jelzés után a teljes játék internet nélkül újranyitható ezen az eszközön. A böngészőből kezdőképernyőre is telepíthető, ha azt a böngésző támogatja. A gyorsítótár kizárólag a játék saját alkönyvtárára vonatkozik. Új verzió a játék összes lapjának bezárása és újranyitása után lép életbe; futó játékot nem tölt újra.
 - Nincs regisztráció, külső betűtípus, követőkód vagy szerveroldali adatkezelés.
 
 Példák: „Eljegyzési hagymakarika”, „Csipkés alibi”, illetve a külön csomagban „Nemi vágy”, „Szexuális előjáték”, „Vízbázisú síkosító”. A mentett játékok megőrzik a korábbi paklijukat és váltási módjukat; az új paklit, témaszűrést és módhoz igazított lapválasztást új játék indításával kapjátok meg.
@@ -46,10 +52,10 @@ Node.js 22 vagy újabb verzióval:
 npm test
 ```
 
-A tesztek a pontozást, a határidőt, a szünetet, a visszavonást, a mentett állást, az azonos körszámot, a döntetlent, a nyíltköri pontelosztást és az előadóváltást ellenőrzik.
+A tesztek a pontozást, a határidőt, a szünetet, a visszavonást, a mentett állást, az azonos körszámot, a döntetlent, a nyíltköri pontelosztást, az előadóváltást, a fordított lapok szerepeit, a kétlapos visszavonást és újrakeverést, a külön nehézségszűrést, a saját pakli beolvasását, valamint az offline gyorsítótár és frissítés működését ellenőrzik.
 
 ## Adatok
 
-A böngésző `localStorage` tárában a csapat- és játékosnevek, a beállítások és a játékállás szerepel, beleértve a függőben lévő nyíltköri pontválasztást. Az „Új játék” véglegesítése törli a mentett állást. Ha a helyi tárolás tiltva van, a játék mentés nélkül használható. A böngésző bezárása nem garantálja a folyamatban lévő kör megállítását: visszatéréskor az eredeti határidő számít. A Szünet gombbal állítsátok meg az órát.
+A böngésző `localStorage` tárában a csapat- és játékosnevek, a beállítások és a játékállás szerepel, beleértve a függőben lévő nyíltköri pontválasztást. A saját pakli szerkesztőjének szövege, módbesorolása és nehézsége külön helyi mentést kap. A lap szövege egyszerű szövegként jelenik meg, nem végrehajtható HTML-ként. Az „Új játék” véglegesítése törli a mentett játékállást; a saját paklit megőrzi. A saját pakli csak a kifejezett fájlexporttal kerül ki az eszközről. A böngésző webhelyadatainak törlése a játékot, a saját paklit és az offline gyorsítótárat is törli. Ha a helyi tárolás tiltva van, a játék mentés nélkül használható. A böngésző bezárása nem garantálja a folyamatban lévő kör megállítását: visszatéréskor az eredeti határidő számít. A Szünet gombbal állítsátok meg az órát.
 
 A 18+ jelölés önbevallásos korhatárnyilatkozat, nem személyazonosításon alapuló ellenőrzés. A pikáns csomagok felnőttes humorúak és kétértelműek; a külön szex témájú pakli rövid kifejezéseket tartalmaz intimitásról, szexualitásról és védekezésről.

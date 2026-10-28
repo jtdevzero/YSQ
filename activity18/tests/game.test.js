@@ -189,7 +189,7 @@ test('saved card rotation resumes its current mode while legacy saves keep round
 
 test('every catalog card has valid themes and suitable modes, including semantic exceptions', () => {
   const themeIds = ['party', 'dating', 'bedroom', 'desire', 'accessories', 'health', 'absurd'];
-  assert.deepEqual(Object.keys(THEMES).sort(), [...themeIds].sort());
+  assert.deepEqual(Object.keys(THEMES).sort(), [...themeIds, 'custom'].sort());
   for (const prompt of PROMPTS) {
     assert.ok(Array.isArray(prompt.themes) && prompt.themes.length > 0, `Missing themes: ${prompt.id}`);
     assert.ok(prompt.themes.every(theme => themeIds.includes(theme)), `Unknown theme: ${prompt.id}`);
